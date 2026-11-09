@@ -12,9 +12,9 @@
   --bg:#ECEEF3; --surface:#FFFFFF; --sunken:#E2E6EE; --ink:#121722; --muted:#566074; --rule:#D2D8E2; --hover:#F4F6F9;
   --bar:#0E1624; --bar-2:#1B2538; --on-bar:#EEF1F6; --on-bar-muted:#9BA7BC;
   --hero:#101A2B; --hero-2:#18253B;
-  --acc:#9C6608; --acc-hi:#E8B03C; --on-acc:#1B1305; --acc-soft:#F6E9CC;
+  --acc:#875600; --acc-hi:#E8B03C; --on-acc:#1B1305; --acc-soft:#F6E9CC;
   --food:#C23B38; --wood:#875A30; --gold:#CF9A14; --stone:#7A8595;
-  --good:#1F7A49; --warn:#A86A06; --bad:#B3312C; --good-soft:#DCEFE3; --bad-soft:#F6DEDC;
+  --good:#1B7041; --warn:#8A5905; --bad:#B3312C; --good-soft:#DCEFE3; --bad-soft:#F6DEDC;
   --t-cav:#B3312C; --t-arch:#2B7A4B; --t-inf:#2B4FB5; --t-naval:#1F8AA6; --t-monk:#6F3D92; --t-gun:#3A3A48;
   --t-siege:#C0651A; --t-def:#6E7A8C; --t-camel:#B88A1C; --t-eleph:#8A3358; --t-ca:#9A5A28; --t-cont:#4F6A7D;
   --shield-edge:#0E1624;
@@ -79,8 +79,6 @@ button{cursor:pointer}
 .nav a:hover{color:var(--on-bar)}
 .nav a[aria-current="page"]{color:var(--on-bar)}
 .nav a[aria-current="page"]::after{content:"";position:absolute;left:10px;right:10px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--acc-hi)}
-.save{font-size:12px;color:var(--on-bar-muted);white-space:nowrap;flex:none}
-.save i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--good);margin-right:6px;vertical-align:1px}
 
 .main{padding-block:28px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .wrap{max-width:1240px;margin-inline:auto;display:flex;flex-direction:column;gap:30px}
@@ -190,14 +188,6 @@ a .ui[data-k]:hover,button .ui[data-k]:hover{box-shadow:0 0 0 1px var(--rule)}
 .hero .row{margin-top:20px}
 .hero .btn.ghost{color:var(--on-bar);border-color:var(--hero-2)}
 .hero .btn.ghost:hover{background:var(--hero-2)}
-.queue{background:var(--hero-2);border-radius:10px;padding:16px}
-.queue .eyebrow{color:var(--on-bar-muted)}
-.qbar{height:12px;background:var(--bar);margin-top:10px;overflow:hidden;border-radius:6px}
-.qbar i{display:block;height:100%;width:0;background:var(--acc-hi);border-radius:6px}
-.qread{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-top:10px;flex-wrap:wrap}
-.qread b{font-family:var(--mono);font-size:30px;font-weight:600;line-height:1}
-.qread span{color:var(--on-bar-muted);font-size:14px}
-.qnote{font-size:13.5px;color:var(--on-bar-muted);margin-top:9px}
 .shortcuts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 @media (max-width:1000px){.shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .sc{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:16px 18px}
@@ -441,17 +431,24 @@ td.mono,th.mono{text-align:right}
   .rrow2{grid-template-columns:80px minmax(0,1fr) 30px}
 }
 @media (prefers-reduced-motion:reduce){.alloc span,.ccard{transition:none}.ccard:hover{transform:none}}
+/*@BLDCSS@*/
+/*@UXCSS@*/
 </style>
 
+<a class="skip" href="#view">Saltar al contenido</a>
 <header class="top">
   <div class="topin">
     <a class="brand" href="#ruta" aria-label="Academia de Aldeanos, inicio"><svg viewBox="0 0 32 38" aria-hidden="true"><path d="M2 2h28v16c0 9-7 15-14 18C9 33 2 27 2 18z" fill="var(--acc-hi)"/><path d="M10 12h12M16 8v20M11 22l5 5 5-5" stroke="var(--bar)" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg><b>Academia de Aldeanos<small>AoE II · Definitive Edition</small></b></a>
     <nav class="nav" id="nav" aria-label="Secciones"></nav>
-    <div class="save" id="save"><i></i>Guardando en este navegador</div>
+    <div class="tools"><button class="tool search-open" data-act="search-open" aria-label="Buscar en toda la academia" title="Buscar (Ctrl+K)"><span aria-hidden="true">⌕</span><span class="search-label">Buscar <kbd>Ctrl K</kbd></span></button><button class="tool" id="themebtn" data-act="theme" aria-label="Cambiar tema" title="Cambiar tema">◐</button><button class="tool menubtn" data-act="menu" aria-expanded="false" aria-controls="nav" aria-label="Abrir menú">☰</button></div>
   </div>
 </header>
-<main class="main"><div class="wrap" id="view"></div></main>
-<dialog class="zoom" id="zoom" aria-label="Ficha de unidad"><div id="zoombody"></div><button class="btn ghost" data-act="zoom-close">Cerrar</button></dialog>
+<main class="main"><div class="wrap" id="view" tabindex="-1"></div></main>
+<footer class="footer"><div class="footer-in"><a class="footer-brand" href="#ruta">Academia de Aldeanos <span>Aprendé. Practicá. Volvé a jugar.</span></a><div class="footer-links"><a href="#aprender">Aprender a jugar</a><a href="#ayuda">Ayuda y fuentes</a></div><p>Guía de la comunidad · Age of Empires II © Microsoft. Las estrategias y valoraciones son orientativas.</p></div></footer>
+<nav class="mobile-nav" aria-label="Accesos rápidos"></nav>
+<div class="toast" id="toast" role="status" hidden></div>
+<dialog class="zoom" id="zoom" aria-label="Ficha de unidad"><div class="dialog-tools"><button class="btn ghost" data-act="copy-unit">Copiar enlace</button><button class="icon-close" data-act="zoom-close" aria-label="Cerrar ficha">✕</button></div><div id="zoombody"></div><button class="btn ghost" data-act="zoom-close">Cerrar ficha</button></dialog>
+<dialog class="finder" id="finder" aria-labelledby="finder-title"><div class="finder-head"><h2 id="finder-title">¿Qué estás buscando?</h2><button class="icon-close" data-act="search-close" aria-label="Cerrar búsqueda">✕</button></div><label class="sr-only" for="globalq">Buscar civilización, unidad, apertura o concepto</label><input class="input" id="globalq" type="search" placeholder="Civilización, unidad, apertura, concepto…" autocomplete="off" aria-controls="searchresults"><div class="finder-meta" id="searchmeta" role="status"></div><div class="searchresults" id="searchresults"></div><div class="finder-foot"><span>↑ ↓ para recorrer · Enter para abrir</span><kbd>Esc para cerrar</kbd></div></dialog>
 
 <script>
 /* ---------- Datos base ---------- */
@@ -468,7 +465,7 @@ const gimg=(id,cls='')=>uimg('@'+id,cls);
 const UMETA={scout:['Establo','Caballería'],knight:['Establo','Caballería'],archer:['Campo de arqueros','Arquero a pie'],skirm:['Campo de arqueros','Arquero a pie'],spear:['Cuartel','Infantería'],maa:['Cuartel','Infantería'],camel:['Establo','Caballería'],ca:['Campo de arqueros','Arquero a caballo'],monk:['Monasterio','Monje'],mangonel:['Taller de asedio','Asedio'],ram:['Taller de asedio','Asedio'],treb:['Castillo','Asedio'],eleph:['Establo','Caballería (elefante)'],eagle:['Cuartel','Infantería'],hc:['Campo de arqueros','Pólvora'],bombard:['Taller de asedio','Asedio (pólvora)']};
 U.forEach(u=>{[u.at,u.cls]=UMETA[u.id]||['','']});
 
-const NAV=[['ruta','Inicio'],['civs','Civilizaciones'],['unidades','Unidades'],['counters','Counters'],['aperturas','Aperturas'],['mapas','Mapas'],['quiz','Entrenar'],['ayuda','Ayuda y coach']];
+const NAV=[['ruta','Inicio'],['civs','Civilizaciones'],['unidades','Unidades'],['edificios','Edificios'],['counters','Counters'],['aperturas','Aperturas'],['mapas','Mapas'],['aprender','Aprender'],['quiz','Entrenar'],['ayuda','Guía y ayuda']];
 const SPEC={cav:'Caballería',arch:'Arqueros',inf:'Infantería',naval:'Naval',monk:'Monjes',gun:'Pólvora',siege:'Asedio',def:'Defensa',camel:'Camellos',eleph:'Elefantes',ca:'Arq. a caballo',cont:'Contraunidades'};
 const STATS=['Economía','Temprano','Castillos','Imperial','Agua','Facilidad'];
 const STATS_SHORT=['Eco','Temprano','Castillos','Imperial','Agua','Facilidad'];
@@ -480,6 +477,7 @@ const civByEs=Object.fromEntries(CIVS.map(c=>[c.es,c]));
 const UUINFO={};CIVS.forEach(c=>c.uu.forEach(u=>{const o=UUINFO[u[0]];if(o)o.civs.push(c.es);else UUINFO[u[0]]={es:u[1],en:u[0],d:u[2],civs:[c.es]}}));
 function zoomOpen(k){
   const dlg=$('#zoom');if(!dlg)return;
+  ST.unit=k;
   const src=ICONS[k]||ICONS[{Longboat:'Longship'}[k]]||'';
   const fact=(l,v)=>v?`<div><span>${l}</span><b>${v}</b></div>`:'';
   const techRows=cls=>(TECHS[cls]||[]).map(([b,t])=>`<div><b>${b}</b><span>${t}</span></div>`).join('');
@@ -510,34 +508,32 @@ const buildById=Object.fromEntries(BUILDS.map(b=>[b.id,b]));
 
 /* ---------- Estado y guardado ---------- */
 const KEY='academia-aldeanos-v1';
-const BLANK=()=>({done:{},best:0,feudal:{},main:null,updatedAt:0});
+const BLANK=()=>({done:{},best:0,feudal:{},main:null,updatedAt:0,rounds:0});
 let P=BLANK();
 try{const r=JSON.parse(localStorage.getItem(KEY)||'null');if(r)P=Object.assign(P,r)}catch(e){}
 let dbDoc=null,saveTimer=null,saving=false,dirty=false;
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function setSave(where){const n=$('#save');if(n)n.innerHTML='<i></i>'+(where==='cuenta'?'Progreso guardado en tu cuenta':'Progreso guardado en este navegador')}
 function save(){P.updatedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(P))}catch(e){}dirty=true;clearTimeout(saveTimer);saveTimer=setTimeout(flush,800)}
-async function flush(){if(!dbDoc||saving||!dirty)return;saving=true;dirty=false;try{await dbDoc.set(JSON.parse(JSON.stringify(P)));setSave('cuenta')}catch(e){setSave('local')}finally{saving=false;if(dirty)flush()}}
+async function flush(){if(!dbDoc||saving||!dirty)return;saving=true;dirty=false;try{await dbDoc.set(JSON.parse(JSON.stringify(P)))}catch(e){}finally{saving=false;if(dirty)flush()}}
 async function bootStore(){
-  if(!window.claude||!window.claude.use){setSave('local');return}
+  if(!window.claude||!window.claude.use){return}
   try{
     const [db,user]=await Promise.all([claude.use('db'),claude.use('user')]);
-    if(!db||!user){setSave('local');return}
-    const id=await user.id();if(!id){setSave('local');return}
+    if(!db||!user){return}
+    const id=await user.id();if(!id){return}
     dbDoc=db.doc('data/users/'+id+'/progreso');
     const snap=await dbDoc.get();
     if(snap.exists){const r=snap.data();if((r.updatedAt||0)>(P.updatedAt||0)){P=Object.assign(BLANK(),JSON.parse(JSON.stringify(r)));try{localStorage.setItem(KEY,JSON.stringify(P))}catch(e){}render()}}
     else if(P.updatedAt){dirty=true;flush()}
-    setSave('cuenta');
-  }catch(e){setSave('local')}
+  }catch(e){}
 }
 
 const ST={route:'ruta',build:'archers',step:0,clock:{on:false,t:0,last:0,speed:1.7,follow:false},civ:'franks',cmp:'',filt:new Set(),lvl:0,q:'',sort:'name',dir:1,us:'n',ud:1,uq:'',ugrp:'',uat:'',uage:'',uciv:'',ukind:'all',uview:'cards',view:'cards',enemy:new Set(['knight','archer']),quiz:null,chat:[],busy:false,ctl:null,pendingAsk:null};
 try{const v=localStorage.getItem(KEY+'-view');if(v==='table'||v==='cards')ST.view=v}catch(e){}
 let sampleFn=null,sampleChecked=false;
-const heroStart=Date.now();
+
 
 
 /* Dónde se entrena cada unidad única, en qué edad aparece y si tiene versión de élite (fuente: árboles de aoe2techtree.net) */
@@ -558,25 +554,25 @@ Object.entries({
  monk:['Warrior Priest','Missionary'],
  hero:['Cao Cao','Sun Jian','Liu Bei']
 }).forEach(([c,l])=>l.forEach(n=>UCLS[n]=c));
-const T_BS_INF=['Herrería','Ataque: Forja, Fundición de hierro y Alto horno (Forging, Iron Casting, Blast Furnace). Armadura: Cota de escamas, Cota de malla y Armadura de placas (Scale, Chain y Plate Mail Armor).'];
+const T_BS_INF=['Herrería','Ataque: Forja, Fundición de hierro y Alto horno (Forging, Iron Casting, Blast Furnace). Armadura: Armadura de láminas, de cota de malla y de placas de malla (Scale, Chain y Plate Mail Armor).'];
 const T_BS_CAV=['Herrería','Ataque: Forja, Fundición de hierro y Alto horno. Armadura: Barda de escamas, de malla y de placas (Scale, Chain y Plate Barding Armor).'];
-const T_BS_ARCH=['Herrería','Ataque y alcance: Emplumado, Flecha perforante y Brazal (Fletching, Bodkin Arrow, Bracer). Armadura: armadura acolchada, de cuero y de anillas de arquero (Padded, Leather y Ring Archer Armor).'];
+const T_BS_ARCH=['Herrería','Ataque y alcance: Emplumado de flechas, Flecha punzón y Brazal (Fletching, Bodkin Arrow, Bracer). Armadura: armadura acolchada, de cuero y de anillos de arqueros (Padded, Leather y Ring Archer Armor).'];
 const T_UNI_ARCH=['Universidad','Balística (Ballistics: puntería contra objetivos en movimiento) y Química (Chemistry: +1 de ataque).'];
-const T_CONS=['Castillo','Conscripción (Conscription): se entrena más rápido.'];
-const T_STABLE=['Establo','Linaje (Bloodlines: +20 de vida) y Ganadería (Husbandry: +10% de velocidad).'];
+const T_CONS=['Castillo','Leva (Conscription): se entrena más rápido.'];
+const T_STABLE=['Establo','Pureza de sangre (Bloodlines: +20 de vida) y Ganadería (Husbandry: +10% de velocidad).'];
 const TECHS={
- inf:[T_BS_INF,['Cuartel','Escuderos (Squires: +10% de velocidad) e Incendio (Arson: más daño a edificios).'],T_CONS],
- maa:[T_BS_INF,['Cuartel','Escuderos (Squires: +10% de velocidad), Incendio (Arson: más daño a edificios) y Gambesones (Gambesons: +armadura a distancia de la línea de milicia).'],T_CONS],
- arch:[T_BS_ARCH,['Campo de arqueros','Anillo de pulgar (Thumb Ring: disparo más rápido y preciso).'],T_UNI_ARCH,T_CONS],
+ inf:[T_BS_INF,['Cuartel','Escuderos (Squires: +10% de velocidad) e Incendiarismo (Arson: más daño a edificios).'],T_CONS],
+ maa:[T_BS_INF,['Cuartel','Escuderos (Squires: +10% de velocidad), Incendiarismo (Arson: más daño a edificios) y Gambesones (Gambesons: +armadura a distancia de la línea de milicia).'],T_CONS],
+ arch:[T_BS_ARCH,['Campo de arqueros','Dactilera (Thumb Ring: disparo más rápido y preciso).'],T_UNI_ARCH,T_CONS],
  skirm:[T_BS_ARCH,T_UNI_ARCH,T_CONS],
- ca:[T_BS_ARCH,['Campo de arqueros','Anillo de pulgar (Thumb Ring) y Tácticas partas (Parthian Tactics: +armadura y ataque contra lanceros).'],T_STABLE,T_UNI_ARCH,T_CONS],
+ ca:[T_BS_ARCH,['Campo de arqueros','Dactilera (Thumb Ring) y Tácticas partas (Parthian Tactics: +armadura y ataque contra lanceros).'],T_STABLE,T_UNI_ARCH,T_CONS],
  cav:[T_BS_CAV,T_STABLE,T_CONS],
  eleph:[T_BS_CAV,T_STABLE,T_CONS],
  gun:[['Universidad','Química (Chemistry): obligatoria para habilitar la pólvora.'],['Herrería','Solo armadura: de arquero si va a pie, barda si es montada. Las mejoras de ataque de la herrería no afectan a la pólvora.'],T_CONS],
  siege:[['Universidad','Química (Chemistry: +1 de ataque) e Ingenieros de asedio (Siege Engineers: +1 de alcance y +20% de daño a edificios).'],['Taller de asedio','Mejoras de línea (por ejemplo Onagro o Ariete reforzado), si la unidad las tiene.']],
  ram:[['Universidad','Ingenieros de asedio (Siege Engineers): +20% de daño a edificios.'],['Taller de asedio','Mejoras de línea.']],
- naval:[['Muelle','Carenado (Careening: +1 armadura a distancia), Dique seco (Dry Dock: +15% de velocidad) y Carpinteros navales (Shipwright: -20% de madera).'],['Herrería','Emplumado, Flecha perforante y Brazal para los barcos que disparan flechas.'],['Universidad','Química y Balística.']],
- monk:[['Monasterio','Redención, Expiación, Medicina herbal, Herejía, Santidad (+vida), Fervor (+velocidad), Imprenta (+alcance de conversión), Iluminación (recupera fe más rápido) y Teocracia.']],
+ naval:[['Universidad','Carenado (Careening), Dique seco (Dry Dock) y Carpintero naval (Shipwright), entre otras mejoras navales.'],['Muelle','Buques de guerra medianos y Barcos de guerra pesados (mejoras de la flota).'],['Herrería','Emplumado de flechas, Flecha punzón y Brazal para los barcos que disparan flechas.'],['Universidad','Química y Balística.']],
+ monk:[['Monasterio','Redención, Expiación, Hierbas medicinales, Herejía, Santidad (+vida), Fervor (+velocidad), Imprenta (+alcance de conversión), Iluminación (recupera fe más rápido) y Teocracia.']],
  hero:[['Castillo','Se entrena una sola vez por partida. Revisá en el árbol tecnológico qué mejoras de herrería recibe.']]
 };
 const GCLS={scout:'cav',knight:'cav',archer:'arch',skirm:'skirm',spear:'inf',maa:'maa',camel:'cav',ca:'ca',monk:'monk',mangonel:'siege',ram:'ram',treb:'siege',eleph:'eleph',eagle:'inf',hc:'gun',bombard:'siege'};
@@ -611,42 +607,30 @@ function navRender(){const cur=ST.route==='civ'?'civs':ST.route;$('#nav').innerH
 function render(){
   navRender();
   const v=$('#view');
-  v.innerHTML=({ruta:vRuta,aperturas:vAperturas,civs:vCivs,civ:vCiv,unidades:vUnidades,counters:vCounters,mapas:vMapas,quiz:vQuiz,ayuda:vAyuda}[ST.route]||vRuta)();
+  v.innerHTML=({ruta:vRuta,aprender:vAprender,aperturas:vAperturas,civs:vCivs,civ:vCiv,unidades:vUnidades,edificios:vEdificios,counters:vCounters,mapas:vMapas,quiz:vQuiz,ayuda:vAyuda}[ST.route]||vRuta)();
   if(ST.route==='aperturas')paintStep();
   if(ST.route==='civs')paintCivGrid();
   if(ST.route==='civ'){paintRate();watchToc()}
   if(ST.route==='counters')paintResp();
   if(ST.route==='unidades')paintUnits();
+  if(ST.route==='edificios')paintBld();
   if(ST.route==='ayuda')initCoach();
 }
 function route(){
-  const h=decodeURIComponent((location.hash||'').slice(1));
-  let open=null;
+  let h='';try{h=decodeURIComponent((location.hash||'').slice(1))}catch(e){}
+  let open=null,openB=null;
   if(h.startsWith('civ-')&&civById[h.slice(4)]){ST.route='civ';if(ST.civ!==h.slice(4))ST.cmp='';ST.civ=h.slice(4)}
   else if(h.startsWith('unidad-')&&UNIT_BY_SLUG[h.slice(7)]){ST.route='unidades';open=UNIT_BY_SLUG[h.slice(7)].k}
+  else if(h.startsWith('edificio-')&&BLD_BY_SLUG[h.slice(9)]){ST.route='edificios';openB=BLD_BY_SLUG[h.slice(9)].id}
+  else if(h.startsWith('apertura-')&&buildById[h.slice(9)]){ST.route='aperturas';if(ST.build!==h.slice(9)){ST.build=h.slice(9);ST.step=0;ST.clock.on=false;ST.clock.t=0}}
   else ST.route=NAV.some(n=>n[0]===h)?h:'ruta';
-  const d=$('#zoom');if(d&&d.open&&!open)d.close();
-  render();window.scrollTo(0,0);
+  const d=$('#zoom');if(d&&d.open&&!open&&!openB)d.close();
+  render();window.scrollTo(0,0);afterRoute();
   if(open)zoomOpen(open);
+  if(openB)bOpen(openB);
 }
 
 /* ---------- Inicio ---------- */
-function vRuta(){
-  const done=LESSONS.filter((_,i)=>P.done[i]).length,next=LESSONS.findIndex((_,i)=>!P.done[i]);
-  const mc=P.main&&civById[P.main];
-  const starters=CIVS.filter(c=>c.l===1);
-  return `<section class="hero"><div><div class="eyebrow">Guía de estudio · Age of Empires II: DE</div><h1>Academia de Aldeanos</h1><p>Ya sabés jugar. Esta es la parte que falta: qué hacer en cada minuto, qué civilización elegir y con qué ganarle a lo que tenés enfrente.</p>
-  <div class="row"><a class="btn acc" href="#civs">Explorar las 56 civs</a><a class="btn ghost" href="#aperturas">Aperturas con reloj</a></div></div>
-  <div class="queue"><div class="eyebrow">Cola del Centro Urbano</div><div class="qbar"><i id="qfill"></i></div><div class="qread"><b id="qpop">3</b><span id="qclock">reloj 0:00</span></div><div class="qnote">Un aldeano cada 25 segundos. Esta cuenta arrancó cuando abriste la página.</div></div></section>
-  ${mc?`<section class="panel mine">${shield(mc)}<div><div class="eyebrow">Tu civ principal</div><h3 style="font-size:24px">${mc.es}</h3><p class="count">${mc.win}</p></div><a class="btn" href="#civ-${mc.id}">Abrir ficha</a></section>`
-  :`<section class="stack"><div class="head"><div class="eyebrow">Para arrancar</div><h2>Elegí una civ fácil y jugala 20 partidas</h2></div><div class="cgrid">${starters.slice(0,8).map(cardHtml).join('')}</div></section>`}
-  <section class="shortcuts"><a class="sc" href="#unidades"><b>Unidades</b><span>Las 103 unidades: dónde se hacen y qué mejoras las afectan.</span></a><a class="sc" href="#counters"><b>Counters</b><span>Marcá lo que tiene el rival y te digo con qué responder.</span></a><a class="sc" href="#mapas"><b>Mapas</b><span>Qué apertura y qué civs rinden en cada tipo de mapa.</span></a><a class="sc" href="#quiz"><b>Entrenar</b><span>Preguntas rápidas de counters, civs y conceptos.</span></a></section>
-  <section class="stack"><div class="head"><div class="eyebrow">Ruta de aprendizaje</div><h2>De jugar a saber por qué ganás</h2></div>
-  <div class="progress"><span class="count">${done} de ${LESSONS.length} lecciones</span><div class="track"><i style="width:${done/LESSONS.length*100}%"></i></div></div>
-  <div class="lessons">${LESSONS.map((l,i)=>`<details class="lesson${P.done[i]?' done':''}"${i===(next<0?0:next)?' open':''}><summary><span class="num">${i+1}</span><h3>${l.t}</h3><span class="pill">${P.done[i]?'Hecha':'Pendiente'}</span></summary>
-  <div class="lbody"><p>${l.why}</p><ul>${l.keys.map(k=>`<li>${k}</li>`).join('')}</ul><div class="drill"><b>Ejercicio</b>${l.drill}</div><div class="drill"><b>Lista cuando</b>${l.done}</div><div class="row"><button class="btn" data-act="toggle-lesson" data-i="${i}">${P.done[i]?'Marcar pendiente':'Marcar como hecha'}</button><a class="btn ghost" href="#${l.link[0]}"${l.link[1].includes('Arqueros')?' data-build="archers"':l.link[1].includes('Fast Castle')?' data-build="fck"':''}>${l.link[1]}</a></div></div></details>`).join('')}</div></section>`;
-}
-
 /* ---------- Civilizaciones: índice ---------- */
 function cardHtml(c){
   return `<a class="ccard" href="#civ-${c.id}"><div class="cc-top">${shield(c)}<div><b>${c.es}</b><small>${c.en} · ${c.st}</small></div>${lvTag(c.l)}</div>
@@ -665,8 +649,8 @@ function vCivs(){
   <p class="fine">Las valoraciones de 1 a 5 son orientativas, pensadas para quien está aprendiendo, y no un ranking competitivo. Los bonos cambian con los parches: el árbol tecnológico del juego es la referencia final.</p>`;
 }
 function civList(){
-  const q=ST.q.trim().toLowerCase();
-  const list=CIVS.filter(c=>(!ST.lvl||c.l===ST.lvl)&&(!ST.filt.size||[...ST.filt].some(f=>c.s.includes(f)))&&(!q||[c.es,c.en,c.st,c.uu.map(u=>u[0]+' '+u[1]).join(' ')].join(' ').toLowerCase().includes(q)));
+  const q=fold(ST.q.trim());
+  const list=CIVS.filter(c=>(!ST.lvl||c.l===ST.lvl)&&(!ST.filt.size||[...ST.filt].some(f=>c.s.includes(f)))&&(!q||fold([c.es,c.en,c.st,c.s.map(k=>SPEC[k]).join(' '),c.uu.map(u=>u[0]+' '+u[1]).join(' ')].join(' ')).includes(q)));
   const by={name:c=>c.es,spec:c=>SPEC[c.s[0]],uu:c=>c.uu.length,lvl:c=>c.l},k=ST.sort;
   const val=c=>typeof k==='number'?c.rv[k-1]:(by[k]||by.name)(c);
   list.sort((a,b)=>{const va=val(a),vb=val(b);const r=typeof va==='string'?va.localeCompare(vb,'es'):va-vb;return r*ST.dir||a.es.localeCompare(b.es,'es')});
@@ -675,8 +659,9 @@ function civList(){
 function paintCivGrid(){
   const list=civList(),g=$('#cgrid');
   const sl={name:'nombre',spec:'especialidad',uu:'cantidad de únicas',lvl:'dificultad'}[ST.sort]||STATS[ST.sort-1].toLowerCase();
-  $('#civcount').textContent=`${list.length} de ${CIVS.length} · ordenadas por ${sl} (${ST.dir>0?'ascendente':'descendente'})`;
-  if(!list.length){g.className='';g.innerHTML='<div class="panel">Ninguna civilización coincide. Probá con menos filtros o otra búsqueda.</div>';return}
+  $('#civcount').textContent=`${list.length} de ${CIVS.length} civilizaciones · por ${sl} ${ST.dir>0?'↑':'↓'}`;
+  const reset=$('[data-act="creset"]');if(reset)reset.hidden=!(ST.q||ST.lvl||ST.filt.size||ST.mapFilter);
+  if(!list.length){g.className='';g.innerHTML='<div class="empty-state"><span aria-hidden="true">⌕</span><h3>No encontramos esa combinación</h3><p>Probá otro nombre o quitá los filtros para explorar todas las civilizaciones.</p><button class="btn" data-act="creset">Ver todas las civilizaciones</button></div>';return}
   if(ST.view==='table'){
     g.className='scroll panel';g.style.padding='4px 8px';
     g.innerHTML=`<table class="ctable rtable" id="ctable"><thead><tr>${sortTh('Civilización','name',ST.sort,ST.dir,'sortcol')}${sortTh('Especialidad','spec',ST.sort,ST.dir,'sortcol')}${sortTh('Únicas','uu',ST.sort,ST.dir,'sortcol')}${sortTh('Dificultad','lvl',ST.sort,ST.dir,'sortcol')}${STATS.map((s,i)=>sortTh(s,i+1,ST.sort,ST.dir,'sortcol')).join('')}</tr></thead><tbody>${list.map(c=>`<tr data-href="#civ-${c.id}"><td><a href="#civ-${c.id}">${shield(c)}${c.es}</a></td><td>${c.s.map(k=>SPEC[k]).join(' · ')}</td><td><span class="uirow" style="flex-wrap:nowrap">${c.uu.map(u=>uimg(u[0],'s')).join('')}</span></td><td>${lvTag(c.l)}</td>${c.rv.map(n=>`<td><span class="cell-bar"><b>${n}</b><i style="width:${n*9}px"></i></span></td>`).join('')}</tr>`).join('')}</tbody></table>`;
@@ -696,7 +681,7 @@ function vCiv(){
     <div class="ch-id">${shield(c)}<div><div class="eyebrow">${c.en} · ${c.st}</div><h1>${c.es}</h1><div class="chips">${c.s.map(specTag).join('')}${lvTag(c.l)}</div></div></div>
     <p class="csum">${c.sum}</p>
     <div class="win"><b>Cómo ganás</b><p>${c.win}</p></div>
-    <div class="row"><button class="btn ${isMain?'acc':'ghost'}" data-act="main">${isMain?'★ Es tu civ principal':'☆ Marcar como mi civ principal'}</button><button class="btn ghost" data-act="ask-civ">Preguntarle al coach</button></div>
+    <div class="row"><button class="btn ${isMain?'acc':'ghost'}" data-act="main">${isMain?'★ Es tu civ principal':'☆ Marcar como mi civ principal'}</button><button class="btn ghost" data-act="ask-civ">Armar un plan con esta civ</button></div>
   </div>
   <aside class="panel rate" aria-label="Valoración"><div class="eyebrow">Valoración orientativa</div><div id="rate"></div>
     <label class="field"><span class="count">Comparar con</span><select class="select" id="cmp" style="flex:1 1 140px;min-width:0"><option value="">Ninguna</option>${CIVS.filter(x=>x.id!==c.id).map(x=>`<option value="${x.id}"${ST.cmp===x.id?' selected':''}>${x.es}</option>`).join('')}</select></label>
@@ -800,21 +785,21 @@ function vUnidades(){
   <div class="stack"><div class="ctl"><input class="input search" id="uq" type="search" placeholder="Buscar por nombre en español o inglés" value="${esc(ST.uq)}" aria-label="Buscar unidad">
   <div class="seg" role="group" aria-label="Qué unidades">${[['all','Todas'],['gen','Genéricas'],['uu','Únicas']].map(([v,l])=>`<button data-act="ukind" data-v="${v}" aria-pressed="${ST.ukind===v}">${l}</button>`).join('')}</div>
   <div class="seg" role="group" aria-label="Vista">${[['cards','Tarjetas'],['table','Tabla']].map(([v,l])=>`<button data-act="uview" data-v="${v}" aria-pressed="${ST.uview===v}">${l}</button>`).join('')}</div></div>
-  <div class="ufilters">${sel('ugrp','Tipo',U_GRPS,ST.ugrp,'Todos')}${sel('uat','Se hace en',U_ATS,ST.uat,'Cualquier edificio')}${sel('uage','Edad',['Feudal','Castillos','Imperial'],ST.uage,'Cualquier edad')}${sel('uciv','Civilización',U_CIVS,ST.uciv,'Todas')}</div></div>
+  <div class="ufilters">${sel('ugrp','Tipo',U_GRPS,ST.ugrp,'Todos')}${sel('uat','Se hace en',U_ATS,ST.uat,'Cualquier edificio')}${sel('uage','Edad',['Feudal','Castillos','Imperial'],ST.uage,'Cualquier edad')}${sel('uciv','Civilización (únicas)',U_CIVS,ST.uciv,'Todas')}</div></div>
   <div class="stack"><div class="row" style="justify-content:space-between"><span class="count" id="ucount"></span><button class="btn ghost" data-act="ureset">Limpiar filtros</button></div><div id="ulist"></div></div>
   <p class="fine">Dónde se entrena cada unidad única sale de los árboles tecnológicos de aoe2techtree.net. Las tecnologías de cada ficha son las generales de su tipo: algunas civs no tienen todas.</p>`;
 }
 function unitsList(){
-  const q=ST.uq.trim().toLowerCase();
+  const q=fold(ST.uq.trim());
   const by={n:x=>x.n,cls:x=>x.cls,at:x=>x.at,age:x=>x.ageN,civ:x=>x.gen?'':x.civ,cost:x=>x.cost,beats:x=>x.gen?x.u.beats.length+(x.u.vs?1:0):-1,loses:x=>x.gen?x.u.loses.length:-1};
   const f=by[ST.us]||by.n;
-  return ALLU.filter(x=>(ST.ukind==='all'||(ST.ukind==='gen')===x.gen)&&(!ST.ugrp||x.grp===ST.ugrp)&&(!ST.uat||x.at.split(' o ').includes(ST.uat))&&(!ST.uage||x.age===ST.uage)&&(!ST.uciv||x.civ.split(', ').includes(ST.uciv))&&(!q||(x.n+' '+x.en+' '+x.civ).toLowerCase().includes(q)))
+  return ALLU.filter(x=>(ST.ukind==='all'||(ST.ukind==='gen')===x.gen)&&(!ST.ugrp||x.grp===ST.ugrp)&&(!ST.uat||x.at.split(' o ').includes(ST.uat))&&(!ST.uage||x.age===ST.uage)&&(!ST.uciv||x.civ.split(', ').includes(ST.uciv))&&(!q||fold(x.n+' '+x.en+' '+x.civ+' '+x.cls+' '+x.at).includes(q)))
     .sort((a,b)=>{const va=f(a),vb=f(b);const r=typeof va==='string'?va.localeCompare(vb,'es'):va-vb;return r*ST.ud||a.n.localeCompare(b.n,'es')});
 }
 function paintUnits(){
   const box=$('#ulist');if(!box)return;const list=unitsList();
   $('#ucount').textContent=`${list.length} de ${ALLU.length} unidades`;
-  if(!list.length){box.className='';box.style.padding='';box.innerHTML='<div class="panel">Ninguna unidad coincide. Probá con menos filtros.</div>';return}
+  if(!list.length){box.className='';box.style.padding='';box.innerHTML='<div class="empty-state"><span aria-hidden="true">⌕</span><h3>No hay unidades con estos filtros</h3><p>Buscá por nombre en español o inglés, o empezá de nuevo.</p><button class="btn" data-act="ureset">Ver todas las unidades</button></div>';return}
   if(ST.uview==='table'){
     const gen=ST.ukind==='gen',h=(l,k)=>sortTh(l,k,ST.us,ST.ud,'usort');
     box.className='scroll panel';box.style.padding='4px 8px';
@@ -885,6 +870,8 @@ async function ask(text){
   ST.busy=false;ST.ctl=null;const s2=$('#chatsend');if(s2)s2.textContent='Enviar';chatPaint();
 }
 
+/*@BUILDINGS@*/
+
 /* ---------- Eventos ---------- */
 document.addEventListener('click',e=>{
   const linkB=e.target.closest('a[data-build]');if(linkB){ST.build=linkB.dataset.build;ST.step=0}
@@ -898,9 +885,9 @@ document.addEventListener('click',e=>{
   else if(a==='step'){ST.clock.follow=false;setStep(+t.dataset.i)}
   else if(a==='prev'){ST.clock.follow=false;setStep(ST.step-1)}
   else if(a==='next'){ST.clock.follow=false;setStep(ST.step+1)}
-  else if(a==='clock'){const c=ST.clock;c.on=!c.on;c.last=Date.now();c.follow=true;if(c.on)wake();paintStep()}
-  else if(a==='clock-reset'){ST.clock.on=false;ST.clock.t=0;ST.step=0;paintStep()}
-  else if(a==='ftime'){const b=curBuild(),v=$('#ftime').value;$('#fout').textContent=tierText(b,v);if(parseT(v)!=null){P.feudal[b.id]=v;save()}}
+  else if(a==='clock'){const c=ST.clock;if(!c.on&&c.t===0&&ST.step>0)c.t=curBuild().steps[ST.step].t;c.on=!c.on;c.last=Date.now();c.follow=true;if(c.on)wake();else releaseWake();paintStep()}
+  else if(a==='clock-reset'){ST.clock.on=false;ST.clock.t=0;ST.step=0;releaseWake();paintStep()}
+  else if(a==='ftime'){const b=curBuild(),v=$('#ftime').value;const valid=parseT(v)!=null;$('#fout').textContent=tierText(b,v);$('#ftime').setAttribute('aria-invalid',!valid);if(valid){P.feudal[b.id]=fmtT(parseT(v));save()}}
   else if(a==='lvl'){ST.lvl=+t.dataset.v;$$('[data-act="lvl"]').forEach(x=>x.setAttribute('aria-pressed',+x.dataset.v===ST.lvl));paintCivGrid()}
   else if(a==='view'){ST.view=t.dataset.v;try{localStorage.setItem(KEY+'-view',ST.view)}catch(err){}$$('[data-act="view"]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===ST.view));paintCivGrid()}
   else if(a==='sortcol'){const raw=t.dataset.v,v=/^\d$/.test(raw)?+raw:raw;if(ST.sort===v)ST.dir*=-1;else{ST.sort=v;ST.dir=typeof v==='number'?-1:1}const s=$('#civsort');if(s)s.value=String(ST.sort);paintCivGrid()}
@@ -936,20 +923,14 @@ document.addEventListener('keydown',e=>{
   else if(ST.route==='civ'&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){const i=CIVS.indexOf(civById[ST.civ]);const n=CIVS[(i+(e.key==='ArrowRight'?1:-1)+CIVS.length)%CIVS.length];location.hash='civ-'+n.id}
 });
 addEventListener('hashchange',route);
-function zoomClose(){const d=$('#zoom');if(!d)return;if(d.close)d.close();else d.removeAttribute('open');if((location.hash||'').startsWith('#unidad-')){try{history.replaceState(null,'','#unidades')}catch(e){}}}
+function zoomClose(){const d=$('#zoom');if(!d)return;if(d.close)d.close();else d.removeAttribute('open');const hh=location.hash||'';if(hh.startsWith('#unidad-')){try{history.replaceState(null,'','#unidades')}catch(e){}}else if(hh.startsWith('#edificio-')){try{history.replaceState(null,'','#edificios')}catch(e){}}}
 document.addEventListener('keydown',e=>{const d=$('#zoom');if(e.key==='Escape'&&d&&d.open){e.preventDefault();zoomClose()}},true);
-{const d=document.getElementById('zoom');if(d)d.addEventListener('close',()=>{if((location.hash||'').startsWith('#unidad-')){try{history.replaceState(null,'','#unidades')}catch(e){}}})}
+{const d=document.getElementById('zoom');if(d)d.addEventListener('close',()=>{const hh=location.hash||'';if(hh.startsWith('#unidad-')){try{history.replaceState(null,'','#unidades')}catch(e){}}else if(hh.startsWith('#edificio-')){try{history.replaceState(null,'','#edificios')}catch(e){}}})}
 let wakeLock=null;async function wake(){try{if(navigator.wakeLock&&!wakeLock){wakeLock=await navigator.wakeLock.request('screen');wakeLock.addEventListener('release',()=>{wakeLock=null})}}catch(e){}}
 
 /* ---------- Relojes ---------- */
 const reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
 setInterval(()=>{
-  const fill=$('#qfill');
-  if(fill){
-    const gt=reduced?480:((Date.now()-heroStart)/1000*1.7)%(197*25);
-    const pop=3+Math.floor(gt/25),frac=(gt%25)/25;
-    fill.style.width=(reduced?0:frac*100)+'%';$('#qpop').textContent=pop+' aldeanos';$('#qclock').textContent='reloj '+fmtT(gt);
-  }
   const c=ST.clock;
   if(c.on){
     const now=Date.now();c.t+=(now-c.last)/1000*c.speed;c.last=now;
@@ -963,6 +944,7 @@ setInterval(()=>{
   }
 },200);
 
+/*@UXJS@*/
 route();
 bootStore();
 </script>

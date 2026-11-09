@@ -3,5 +3,7 @@
 dist/.vercel/
 # Node
 node_modules/
+tests/screenshots/
+__pycache__/
 # Claude Code local
 .claude/settings.local.json

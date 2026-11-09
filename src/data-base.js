@@ -110,7 +110,7 @@ steps:[
 ]}
 ];
 BUILDS.forEach(b=>{b.steps=b.steps.map(s=>({t:parseT(s[0]),pop:s[1],age:s[2],do:s[3],note:s[4],a:s[5]}))});
-function parseT(s){const m=String(s).trim().match(/^(\d{1,3})[:.,](\d{2})$/);if(!m)return null;return +m[1]*60+ +m[2]}
+function parseT(s){const m=String(s).trim().match(/^(\d{1,3})[:.,](\d{2})$/);if(!m||+m[2]>59)return null;return +m[1]*60+ +m[2]}
 function fmtT(n){n=Math.max(0,Math.floor(n));return Math.floor(n/60)+':'+String(n%60).padStart(2,'0')}
 const U=[
 {id:'scout',n:'Explorador',en:'Scout',age:'Feudal',cost:'Solo comida',beats:['archer','skirm','monk'],loses:['spear','camel','knight'],why:'Barato y veloz. Sirve para matar aldeanos y arqueros sueltos.'},
