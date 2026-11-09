@@ -136,6 +136,36 @@ a .ui[data-k]:hover,button .ui[data-k]:hover{box-shadow:0 0 0 1px var(--rule)}
 .zoom figcaption small{color:var(--muted);font-size:13.5px}
 .zoom figcaption p{font-size:15px;color:var(--ink);margin-top:4px}
 .zoom .btn{margin:16px auto 0;display:flex}
+.zoom{width:min(660px,calc(100vw - 32px));max-height:calc(100vh - 40px);overflow:auto}
+.us-head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center}
+.us-head img{width:112px;height:112px;image-rendering:pixelated;border-radius:12px;background:var(--sunken);box-shadow:0 0 0 1px var(--rule)}
+.us-head b{display:block;font-family:var(--display);font-size:26px;font-weight:800;font-stretch:108%;line-height:1.1}
+.us-head small{color:var(--muted);font-size:13.5px}
+.us-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:16px}
+.us-facts div{background:var(--sunken);border-radius:8px;padding:8px 10px;display:grid;gap:2px}
+.us-facts span{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.us-facts b{font-size:14.5px}
+.us-sec{margin-top:16px;display:grid;gap:8px}
+.us-sec h3{font-size:15px}
+.us-sec p{font-size:15px}
+.us-tech{display:grid;gap:0;border:1px solid var(--rule);border-radius:9px;overflow:hidden}
+.us-tech div{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;padding:9px 12px;font-size:14.5px}
+.us-tech div+div{border-top:1px solid var(--rule)}
+.us-tech b{font-weight:750}
+.us-two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.linkbtn{border:0;background:none;padding:0;font:inherit;font-weight:700;color:inherit;text-align:left;cursor:pointer}
+.linkbtn:hover{color:var(--acc);text-decoration:underline}
+.ucard .more{border:0;background:none;padding:0;font:inherit;font-size:13.5px;font-weight:700;color:var(--acc);text-align:left;cursor:pointer;margin-top:2px}
+.ucard .where{font-size:13px;color:var(--muted)}
+/* Columnas redimensionables */
+.rtable th{position:relative}
+.rz{position:absolute;top:0;bottom:0;right:-4px;width:10px;cursor:col-resize;touch-action:none;z-index:2}
+.rz::after{content:"";position:absolute;left:4px;top:28%;bottom:28%;width:2px;border-radius:1px;background:var(--rule)}
+.rz:hover::after,.rz.on::after{background:var(--acc-hi)}
+.rtable.fixed{table-layout:fixed}
+.rtable.fixed td,.rtable.fixed th{overflow:hidden;text-overflow:ellipsis}
+@media (max-width:560px){.us-tech div{grid-template-columns:minmax(0,1fr);gap:2px}.us-two{grid-template-columns:minmax(0,1fr)}.us-head img{width:80px;height:80px}}
+
 .chip .ui.s{width:22px;height:22px;margin-left:-6px;border-radius:50%}
 /* Escudo */
 .sh{width:34px;height:40px;flex:none;display:block}
@@ -413,7 +443,7 @@ td.mono,th.mono{text-align:right}
   </div>
 </header>
 <main class="main"><div class="wrap" id="view"></div></main>
-<dialog class="zoom" id="zoom" aria-label="Unidad ampliada"><figure><img id="zoomimg" src="data:," alt=""><figcaption><b id="zoomt"></b><small id="zooms"></small><p id="zoomd"></p></figcaption></figure><button class="btn ghost" data-act="zoom-close">Cerrar</button></dialog>
+<dialog class="zoom" id="zoom" aria-label="Ficha de unidad"><div id="zoombody"></div><button class="btn ghost" data-act="zoom-close">Cerrar</button></dialog>
 
 <script>
 /* ---------- Datos base ---------- */
@@ -1660,11 +1690,31 @@ const civById=Object.fromEntries(CIVS.map(c=>[c.id,c]));
 const civByEs=Object.fromEntries(CIVS.map(c=>[c.es,c]));
 const UUINFO={};CIVS.forEach(c=>c.uu.forEach(u=>{const o=UUINFO[u[0]];if(o)o.civs.push(c.es);else UUINFO[u[0]]={es:u[1],en:u[0],d:u[2],civs:[c.es]}}));
 function zoomOpen(k){
-  const dlg=$('#zoom');if(!dlg)return;let t,s,d;
-  if(k.startsWith('@')){const u=ub[k.slice(1)];t=u.n;s=`${u.en} · ${u.cls} · Se hace en: ${u.at} · ${u.age} · ${u.cost}`;d=u.why}
-  else{const u=UUINFO[k]||{es:k,en:k,d:'',civs:[]};t=u.es;s=`${u.en} · Unidad única de ${u.civs.join(', ')}`;d=u.d}
-  const src=ICONS[k]||ICONS[{Longboat:'Longship'}[k]];$('#zoomimg').src=src;$('#zoomimg').alt=t;$('#zoomt').textContent=t;$('#zooms').textContent=s;$('#zoomd').textContent=d;
+  const dlg=$('#zoom');if(!dlg)return;
+  const src=ICONS[k]||ICONS[{Longboat:'Longship'}[k]]||'';
+  const fact=(l,v)=>v?`<div><span>${l}</span><b>${v}</b></div>`:'';
+  const techRows=cls=>(TECHS[cls]||[]).map(([b,t])=>`<div><b>${b}</b><span>${t}</span></div>`).join('');
+  let h;
+  if(k.startsWith('@')){
+    const id=k.slice(1),u=ub[id];
+    h=`<div class="us-head"><img src="${src}" alt="${esc(u.n)}"><div><b>${u.n}</b><small>${u.en} · Unidad genérica</small><p style="margin-top:8px">${u.why}</p></div></div>
+    <div class="us-facts">${fact('Tipo',u.cls)}${fact('Se hace en',u.at)}${fact('Edad',u.age)}${fact('Costo',u.cost)}</div>
+    <div class="us-sec"><h3>Mejoras de línea</h3><p>${LINE[id]||'Sin mejoras de línea.'}</p></div>
+    <div class="us-sec"><h3>Tecnologías que la mejoran</h3><div class="us-tech">${techRows(GCLS[id])}</div></div>
+    <div class="us-sec us-two"><div><h3>Le gana a</h3><p>${beatsText(u)}</p></div><div><h3>Pierde contra</h3><p>${u.loses.map(i=>ub[i].n).join(', ')}</p></div></div>`;
+  }else{
+    const u=UUINFO[k]||{es:k,en:k,d:'',civs:[]},m=UUMETA[k]||{},cls=UCLS[k];
+    const owners=u.civs.map(n=>civByEs[n]).filter(Boolean);
+    const low=x=>x.toLowerCase();
+    const uts=owners.flatMap(c=>c.ut.filter(t=>low(t[2]).includes(low(k))||low(t[2]).includes(low(u.es))).map(t=>[c,t]));
+    h=`<div class="us-head"><img src="${src}" alt="${esc(u.es)}"><div><b>${u.es}</b><small>${u.en} · Unidad única de ${owners.map(c=>`<a href="#civ-${c.id}" data-act="zoom-close">${c.es}</a>`).join(', ')}</small><p style="margin-top:8px">${u.d}</p></div></div>
+    <div class="us-facts">${fact('Tipo',CLSNAME[cls])}${fact('Se hace en',m.at)}${fact('Disponible desde',AGE_NAME[m.age])}${fact('Versión de élite',m.elite?'Sí, en Imperial':'No')}</div>
+    ${uts.length?`<div class="us-sec"><h3>Tecnologías únicas que la afectan</h3><div class="us-tech">${uts.map(([c,t])=>`<div><b>${t[0]}</b><span>${t[1]} · ${t[2]}</span></div>`).join('')}</div></div>`:''}
+    <div class="us-sec"><h3>Tecnologías generales que la mejoran</h3><div class="us-tech">${techRows(cls)}</div><p class="fine">Son las mejoras de su tipo de unidad. Algunas civs no tienen todas: confirmalo en el árbol tecnológico del juego.</p></div>`;
+  }
+  $('#zoombody').innerHTML=h;
   if(dlg.showModal){if(!dlg.open)dlg.showModal()}else dlg.setAttribute('open','');
+  dlg.scrollTop=0;
 }
 const buildById=Object.fromEntries(BUILDS.map(b=>[b.id,b]));
 
@@ -1699,6 +1749,500 @@ try{const v=localStorage.getItem(KEY+'-view');if(v==='table'||v==='cards')ST.vie
 let sampleFn=null,sampleChecked=false;
 const heroStart=Date.now();
 
+
+/* Dónde se entrena cada unidad única, en qué edad aparece y si tiene versión de élite (fuente: árboles de aoe2techtree.net) */
+const UUMETA={
+ "Composite Bowman": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Warrior Priest": {
+  "at": "Iglesia fortificada",
+  "age": 3,
+  "elite": false
+ },
+ "Jaguar Warrior": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Eagle Warrior": {
+  "at": "Cuartel",
+  "age": 3,
+  "elite": true
+ },
+ "Ratha": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Camel Archer": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Genitour": {
+  "at": "Campo de arqueros",
+  "age": 3,
+  "elite": true
+ },
+ "Hussite Wagon": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Houfnice": {
+  "at": "Taller de asedio",
+  "age": 4,
+  "elite": false
+ },
+ "Longbowman": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Konnik": {
+  "at": "Castillo o Krepost",
+  "age": 3,
+  "elite": true
+ },
+ "Coustillier": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Flemish Militia": {
+  "at": "Cuartel",
+  "age": 2,
+  "elite": false
+ },
+ "Arambai": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Cataphract": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Woad Raider": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Chu Ko Nu": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Dragon Ship": {
+  "at": "Muelle",
+  "age": 4,
+  "elite": false
+ },
+ "Kipchak": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Jomsviking": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Boyar": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Conquistador": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Missionary": {
+  "at": "Monasterio",
+  "age": 3,
+  "elite": false
+ },
+ "Keshik": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Flaming Camel": {
+  "at": "Taller de asedio",
+  "age": 4,
+  "elite": false
+ },
+ "Teutonic Knight": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Blackwood Archer": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Ibirapema Warrior": {
+  "at": "Cuartel",
+  "age": 3,
+  "elite": true
+ },
+ "Janissary": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Jarl": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Rattan Archer": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Imperial Skirmisher": {
+  "at": "Campo de arqueros",
+  "age": 4,
+  "elite": false
+ },
+ "Berserk": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Longboat": {
+  "at": "Muelle",
+  "age": 3,
+  "elite": true
+ },
+ "Tiger Cavalry": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Xianbei Raider": {
+  "at": "Campo de arqueros",
+  "age": 3,
+  "elite": false
+ },
+ "Cao Cao": {
+  "at": "Castillo",
+  "age": 4,
+  "elite": false
+ },
+ "Fire Archer": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Jian Swordsman": {
+  "at": "Cuartel",
+  "age": 3,
+  "elite": false
+ },
+ "Sun Jian": {
+  "at": "Castillo",
+  "age": 4,
+  "elite": false
+ },
+ "Urumi Swordsman": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Thirisadai": {
+  "at": "Muelle",
+  "age": 4,
+  "elite": false
+ },
+ "Shotel Warrior": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Throwing Axeman": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Monaspa": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Huskarl": {
+  "at": "Cuartel o Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Chakram Thrower": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Shrivamsha Rider": {
+  "at": "Establo",
+  "age": 3,
+  "elite": true
+ },
+ "Camel Scout": {
+  "at": "Establo",
+  "age": 2,
+  "elite": false
+ },
+ "Ghulam": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Imperial Camel Rider": {
+  "at": "Establo",
+  "age": 4,
+  "elite": false
+ },
+ "Tarkan": {
+  "at": "Establo o Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Kamayuk": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Slinger": {
+  "at": "Campo de arqueros",
+  "age": 3,
+  "elite": false
+ },
+ "Genoese Crossbowman": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Condottiero": {
+  "at": "Cuartel",
+  "age": 4,
+  "elite": false
+ },
+ "Samurai": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Iron Pagoda": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Grenadier": {
+  "at": "Campo de arqueros",
+  "age": 3,
+  "elite": false
+ },
+ "Liao Dao": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Mounted Trebuchet": {
+  "at": "Taller de asedio",
+  "age": 4,
+  "elite": false
+ },
+ "Ballista Elephant": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "War Wagon": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Turtle Ship": {
+  "at": "Muelle",
+  "age": 3,
+  "elite": true
+ },
+ "Leitis": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Winged Hussar": {
+  "at": "Establo",
+  "age": 4,
+  "elite": false
+ },
+ "Magyar Huszar": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Karambit Warrior": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Gbeto": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Kona": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Bolas Rider": {
+  "at": "Campo de arqueros",
+  "age": 3,
+  "elite": true
+ },
+ "Plumed Archer": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Mangudai": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Guecha Warrior": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Temple Guard": {
+  "at": "Cuartel o Monasterio",
+  "age": 3,
+  "elite": true
+ },
+ "War Elephant": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Obuch": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Organ Gun": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Caravel": {
+  "at": "Muelle",
+  "age": 3,
+  "elite": true
+ },
+ "Centurion": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Legionary": {
+  "at": "Cuartel",
+  "age": 4,
+  "elite": false
+ },
+ "Mameluke": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Hearth Troop": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "White Feather Guard": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "War Chariot": {
+  "at": "Taller de asedio",
+  "age": 3,
+  "elite": false
+ },
+ "Liu Bei": {
+  "at": "Castillo",
+  "age": 4,
+  "elite": false
+ },
+ "Serjeant": {
+  "at": "Castillo o Donjon",
+  "age": 2,
+  "elite": true
+ }
+};
+const AGE_NAME={1:'Edad Oscura',2:'Feudal',3:'Castillos',4:'Imperial'};
+const CLSNAME={inf:'Infantería',maa:'Infantería',arch:'Arquero a pie',skirm:'Arquero a pie',ca:'Arquero a caballo',cav:'Caballería',eleph:'Elefante',gun:'Pólvora',siege:'Asedio',ram:'Asedio',naval:'Barco',monk:'Monje',hero:'Héroe'};
+const UCLS={};
+Object.entries({
+ inf:['Jaguar Warrior','Eagle Warrior','Flemish Militia','Woad Raider','Jomsviking','Teutonic Knight','Ibirapema Warrior','Berserk','Jian Swordsman','Urumi Swordsman','Shotel Warrior','Huskarl','Ghulam','Kamayuk','Condottiero','Samurai','Liao Dao','Karambit Warrior','Gbeto','Throwing Axeman','Guecha Warrior','Temple Guard','Obuch','Legionary','Hearth Troop','White Feather Guard','Serjeant','Chakram Thrower'],
+ arch:['Composite Bowman','Longbowman','Chu Ko Nu','Blackwood Archer','Rattan Archer','Genoese Crossbowman','Plumed Archer','Slinger','Fire Archer'],
+ skirm:['Imperial Skirmisher'],
+ ca:['Camel Archer','Genitour','Kipchak','Xianbei Raider','Mangudai','War Wagon','Bolas Rider','Arambai','Ratha'],
+ cav:['Coustillier','Cataphract','Boyar','Keshik','Jarl','Tiger Cavalry','Monaspa','Shrivamsha Rider','Camel Scout','Imperial Camel Rider','Tarkan','Iron Pagoda','Leitis','Winged Hussar','Magyar Huszar','Kona','Centurion','Mameluke','Konnik'],
+ eleph:['War Elephant','Ballista Elephant'],
+ gun:['Hussite Wagon','Janissary','Organ Gun','Grenadier','Conquistador'],
+ siege:['Houfnice','Mounted Trebuchet','War Chariot','Flaming Camel'],
+ naval:['Dragon Ship','Longboat','Thirisadai','Turtle Ship','Caravel'],
+ monk:['Warrior Priest','Missionary'],
+ hero:['Cao Cao','Sun Jian','Liu Bei']
+}).forEach(([c,l])=>l.forEach(n=>UCLS[n]=c));
+const T_BS_INF=['Herrería','Ataque: Forja, Fundición de hierro y Alto horno (Forging, Iron Casting, Blast Furnace). Armadura: Cota de escamas, Cota de malla y Armadura de placas (Scale, Chain y Plate Mail Armor).'];
+const T_BS_CAV=['Herrería','Ataque: Forja, Fundición de hierro y Alto horno. Armadura: Barda de escamas, de malla y de placas (Scale, Chain y Plate Barding Armor).'];
+const T_BS_ARCH=['Herrería','Ataque y alcance: Emplumado, Flecha perforante y Brazal (Fletching, Bodkin Arrow, Bracer). Armadura: armadura acolchada, de cuero y de anillas de arquero (Padded, Leather y Ring Archer Armor).'];
+const T_UNI_ARCH=['Universidad','Balística (Ballistics: puntería contra objetivos en movimiento) y Química (Chemistry: +1 de ataque).'];
+const T_CONS=['Castillo','Conscripción (Conscription): se entrena más rápido.'];
+const T_STABLE=['Establo','Linaje (Bloodlines: +20 de vida) y Ganadería (Husbandry: +10% de velocidad).'];
+const TECHS={
+ inf:[T_BS_INF,['Cuartel','Escuderos (Squires: +10% de velocidad) e Incendio (Arson: más daño a edificios).'],T_CONS],
+ maa:[T_BS_INF,['Cuartel','Escuderos (Squires: +10% de velocidad), Incendio (Arson: más daño a edificios) y Gambesones (Gambesons: +armadura a distancia de la línea de milicia).'],T_CONS],
+ arch:[T_BS_ARCH,['Campo de arqueros','Anillo de pulgar (Thumb Ring: disparo más rápido y preciso).'],T_UNI_ARCH,T_CONS],
+ skirm:[T_BS_ARCH,T_UNI_ARCH,T_CONS],
+ ca:[T_BS_ARCH,['Campo de arqueros','Anillo de pulgar (Thumb Ring) y Tácticas partas (Parthian Tactics: +armadura y ataque contra lanceros).'],T_STABLE,T_UNI_ARCH,T_CONS],
+ cav:[T_BS_CAV,T_STABLE,T_CONS],
+ eleph:[T_BS_CAV,T_STABLE,T_CONS],
+ gun:[['Universidad','Química (Chemistry): obligatoria para habilitar la pólvora.'],['Herrería','Solo armadura: de arquero si va a pie, barda si es montada. Las mejoras de ataque de la herrería no afectan a la pólvora.'],T_CONS],
+ siege:[['Universidad','Química (Chemistry: +1 de ataque) e Ingenieros de asedio (Siege Engineers: +1 de alcance y +20% de daño a edificios).'],['Taller de asedio','Mejoras de línea (por ejemplo Onagro o Ariete reforzado), si la unidad las tiene.']],
+ ram:[['Universidad','Ingenieros de asedio (Siege Engineers): +20% de daño a edificios.'],['Taller de asedio','Mejoras de línea.']],
+ naval:[['Muelle','Carenado (Careening: +1 armadura a distancia), Dique seco (Dry Dock: +15% de velocidad) y Carpinteros navales (Shipwright: -20% de madera).'],['Herrería','Emplumado, Flecha perforante y Brazal para los barcos que disparan flechas.'],['Universidad','Química y Balística.']],
+ monk:[['Monasterio','Redención, Expiación, Medicina herbal, Herejía, Santidad (+vida), Fervor (+velocidad), Imprenta (+alcance de conversión), Iluminación (recupera fe más rápido) y Teocracia.']],
+ hero:[['Castillo','Se entrena una sola vez por partida. Revisá en el árbol tecnológico qué mejoras de herrería recibe.']]
+};
+const GCLS={scout:'cav',knight:'cav',archer:'arch',skirm:'skirm',spear:'inf',maa:'maa',camel:'cav',ca:'ca',monk:'monk',mangonel:'siege',ram:'ram',treb:'siege',eleph:'eleph',eagle:'inf',hc:'gun',bombard:'siege'};
+const LINE={scout:'Explorador → Caballería ligera (Castillos, en el establo) → Húsar (Imperial)',knight:'Caballero → Cavalier (Imperial) → Paladín (Imperial). Mejoras en el establo.',archer:'Arquero → Ballestero (Castillos) → Arbalestero (Imperial). Mejoras en el campo de arqueros.',skirm:'Hostigador → Hostigador de élite (Castillos). Algunas civs tienen además el Hostigador Imperial.',spear:'Lancero → Piquero (Castillos) → Alabardero (Imperial). Mejoras en el cuartel.',maa:'Milicia → Hombre de armas (Feudal) → Espadachín (Castillos) → Espadachín con mandoble (Imperial) → Campeón (Imperial). Mejoras en el cuartel.',camel:'Camello → Camello pesado (Imperial). Algunas civs tienen además el Camello imperial.',ca:'Arquero a caballo → Arquero a caballo pesado (Imperial).',monk:'Sin mejoras de línea: se mejora con las tecnologías del monasterio.',mangonel:'Mangana → Onagro (Imperial) → Onagro de asedio (Imperial).',ram:'Ariete → Ariete reforzado (Imperial) → Ariete de asedio (Imperial).',treb:'Sin mejoras de línea. Se arma y desarma para moverse.',eleph:'Elefante de batalla → Elefante de batalla de élite (Imperial).',eagle:'Explorador águila (Edad Oscura) → Guerrero Águila (Castillos) → Guerrero Águila de élite (Imperial).',hc:'Sin mejoras de línea. Necesita Química.',bombard:'Sin mejoras de línea. Necesita Química. Los Bohemios lo mejoran a Houfnice.'};
+
+/* Columnas redimensionables: arrastrá el borde derecho del encabezado; doble clic lo restablece */
+let COLW={};try{COLW=JSON.parse(localStorage.getItem(KEY+'-colw')||'{}')}catch(e){}
+function rz(table){
+  if(!table)return;const ths=[...table.querySelectorAll('thead th')],saved=COLW[table.id];
+  const apply=ws=>{ths.forEach((th,i)=>th.style.width=ws[i]+'px');table.style.width=ws.reduce((a,b)=>a+b,0)+'px';table.classList.add('fixed')};
+  if(saved&&saved.length===ths.length)apply(saved);else{table.classList.remove('fixed');table.style.width='';ths.forEach(th=>th.style.width='')}
+  ths.forEach((th,i)=>{if(th.querySelector('.rz'))return;const h=document.createElement('span');h.className='rz';h.title='Arrastrá para cambiar el ancho. Doble clic para restablecer.';th.appendChild(h);
+    h.addEventListener('click',e=>{e.stopPropagation();e.preventDefault()});
+    h.addEventListener('dblclick',e=>{e.stopPropagation();delete COLW[table.id];try{localStorage.setItem(KEY+'-colw',JSON.stringify(COLW))}catch(err){}rz(table)});
+    h.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();const ws=ths.map(t=>t.getBoundingClientRect().width);apply(ws);const x0=e.clientX,w0=ws[i];h.classList.add('on');h.setPointerCapture(e.pointerId);
+      const mv=ev=>{ws[i]=Math.max(56,w0+ev.clientX-x0);apply(ws)};
+      const up=()=>{h.classList.remove('on');h.removeEventListener('pointermove',mv);h.removeEventListener('pointerup',up);h.removeEventListener('pointercancel',up);COLW[table.id]=ws.map(Math.round);try{localStorage.setItem(KEY+'-colw',JSON.stringify(COLW))}catch(err){}};
+      h.addEventListener('pointermove',mv);h.addEventListener('pointerup',up);h.addEventListener('pointercancel',up)})})
+}
+
 /* ---------- Piezas ---------- */
 function shield(c,cls='sh'){
   const a=c.s[0],b=c.s[1],d='M2 2h28v16c0 9-7 15-14 18C9 33 2 27 2 18z';
@@ -1717,7 +2261,7 @@ function render(){
   if(ST.route==='aperturas')paintStep();
   if(ST.route==='civs')paintCivGrid();
   if(ST.route==='civ'){paintRate();watchToc()}
-  if(ST.route==='counters')paintResp();
+  if(ST.route==='counters'){paintResp();rz($('#utable'))}
   if(ST.route==='ayuda')initCoach();
 }
 function route(){
@@ -1776,8 +2320,8 @@ function paintCivGrid(){
   if(!list.length){g.className='';g.innerHTML='<div class="panel">Ninguna civilización coincide. Probá con menos filtros o otra búsqueda.</div>';return}
   if(ST.view==='table'){
     g.className='scroll panel';g.style.padding='4px 8px';
-    g.innerHTML=`<table class="ctable"><thead><tr>${sortTh('Civilización','name',ST.sort,ST.dir,'sortcol')}${sortTh('Especialidad','spec',ST.sort,ST.dir,'sortcol')}${sortTh('Únicas','uu',ST.sort,ST.dir,'sortcol')}${sortTh('Dificultad','lvl',ST.sort,ST.dir,'sortcol')}${STATS.map((s,i)=>sortTh(s,i+1,ST.sort,ST.dir,'sortcol')).join('')}</tr></thead><tbody>${list.map(c=>`<tr data-href="#civ-${c.id}"><td><a href="#civ-${c.id}">${shield(c)}${c.es}</a></td><td>${c.s.map(k=>SPEC[k]).join(' · ')}</td><td><span class="uirow" style="flex-wrap:nowrap">${c.uu.map(u=>uimg(u[0],'s')).join('')}</span></td><td>${lvTag(c.l)}</td>${c.rv.map(n=>`<td><span class="cell-bar"><b>${n}</b><i style="width:${n*9}px"></i></span></td>`).join('')}</tr>`).join('')}</tbody></table>`;
-  }else{g.className='cgrid';g.style.padding='';g.innerHTML=list.map(cardHtml).join('')}
+    g.innerHTML=`<table class="ctable rtable" id="ctable"><thead><tr>${sortTh('Civilización','name',ST.sort,ST.dir,'sortcol')}${sortTh('Especialidad','spec',ST.sort,ST.dir,'sortcol')}${sortTh('Únicas','uu',ST.sort,ST.dir,'sortcol')}${sortTh('Dificultad','lvl',ST.sort,ST.dir,'sortcol')}${STATS.map((s,i)=>sortTh(s,i+1,ST.sort,ST.dir,'sortcol')).join('')}</tr></thead><tbody>${list.map(c=>`<tr data-href="#civ-${c.id}"><td><a href="#civ-${c.id}">${shield(c)}${c.es}</a></td><td>${c.s.map(k=>SPEC[k]).join(' · ')}</td><td><span class="uirow" style="flex-wrap:nowrap">${c.uu.map(u=>uimg(u[0],'s')).join('')}</span></td><td>${lvTag(c.l)}</td>${c.rv.map(n=>`<td><span class="cell-bar"><b>${n}</b><i style="width:${n*9}px"></i></span></td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  rz($('#ctable'));}else{g.className='cgrid';g.style.padding='';g.innerHTML=list.map(cardHtml).join('')}
 }
 
 /* ---------- Civilizaciones: ficha ---------- */
@@ -1805,7 +2349,7 @@ function vCiv(){
     <div class="panel pc con"><h3>Debilidades</h3><ul class="list minus">${c.con.map(x=>`<li>${x}</li>`).join('')}</ul></div></div></section>
   <section class="sec" id="sec-bonos"><header><h2>Bonos</h2><p>Todo lo que la civ tiene distinto al resto.</p></header><div class="stack"><div class="panel"><ul class="list">${c.b.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="callout"><b>Bono de equipo</b><span>${c.t}</span></div></div></section>
   <section class="sec" id="sec-unicas"><header><h2>Únicas</h2><p>Unidades y tecnologías que solo tiene esta civ.</p></header><div class="stack">
-    <div class="ucards">${c.uu.map(u=>{const im=uimg(u[0],'l',u[1]);return `<div class="ucard${im?' withimg':''}">${im}<div class="eyebrow">Unidad única</div><b>${u[1]}</b><small>${u[0]}</small><p>${u[2]}</p></div>`}).join('')}</div>
+    <div class="ucards">${c.uu.map(u=>{const im=uimg(u[0],'l',u[1]);const m=UUMETA[u[0]]||{};return `<div class="ucard${im?' withimg':''}">${im}<div class="eyebrow">Unidad única</div><b>${u[1]}</b><small>${u[0]}</small>${m.at?`<span class="where">Se hace en: ${m.at} · desde ${AGE_NAME[m.age]}</span>`:''}<p>${u[2]}</p><button class="more" data-act="unit" data-k="${esc(u[0])}">Ver mejoras que la afectan →</button></div>`}).join('')}</div>
     <div class="ucards">${c.ut.map(u=>`<div class="ucard"><span class="age${u[1]==='Imperial'?' imp':''}">${u[1]}</span><b>${u[0]}</b><p>${u[2]}</p></div>`).join('')}</div></div></section>
   <section class="sec" id="sec-ejercito"><header><h2>Ejército</h2><p>Con qué peleás y qué hacés cuando se acaba el oro.</p></header><div class="two">
     <div class="panel"><div class="eyebrow">Composición principal</div><p style="margin-top:8px">${c.army}</p></div>
@@ -1874,7 +2418,7 @@ function vCounters(){
   <g font-size="27" font-weight="800" text-anchor="middle"><text x="260" y="44">Caballería</text><text x="100" y="314">Arqueros</text><text x="420" y="314">Lanceros</text></g>
   <g font-size="20" text-anchor="middle"><text x="118" y="165" style="fill:var(--muted)">gana a</text><text x="258" y="292" style="fill:var(--muted)">ganan a</text><text x="402" y="165" style="fill:var(--muted)">ganan a</text>
   <text x="100" y="352" style="fill:var(--muted)">y los hostigadores</text><text x="420" y="352" style="fill:var(--muted)">y los camellos</text></g></svg></div></div>
-  <section class="stack"><h3>Referencia completa</h3><div class="scroll panel" style="padding:4px 8px"><table class="utable" id="utable">${utableHtml()}</table></div><p class="fine">Las civilizaciones cambian estas relaciones: revisá en la ficha de cada civ qué hace bien y en el juego si tiene la mejora completa de cada línea.</p></section>`;
+  <section class="stack"><h3>Referencia completa</h3><div class="scroll panel" style="padding:4px 8px"><table class="utable rtable" id="utable">${utableHtml()}</table></div><p class="fine">Las civilizaciones cambian estas relaciones: revisá en la ficha de cada civ qué hace bien y en el juego si tiene la mejora completa de cada línea.</p></section>`;
 }
 const AGE_ORDER={'Feudal':1,'Castillos':2,'Imperial':3};
 const beatsText=u=>[...u.beats.map(i=>ub[i].n),u.vs].filter(Boolean).join(', ')||'Edificios';
@@ -1883,7 +2427,7 @@ function utableHtml(){
   const f=by[ST.us]||by.n;
   const rows=[...U].sort((a,b)=>{const va=f(a),vb=f(b);const r=typeof va==='string'?va.localeCompare(vb,'es'):va-vb;return r*ST.ud||a.n.localeCompare(b.n,'es')});
   const h=(l,k)=>sortTh(l,k,ST.us,ST.ud,'usort');
-  return `<thead><tr>${h('Unidad','n')}${h('Tipo','cls')}${h('Se hace en','at')}${h('Edad','age')}${h('Costo','cost')}${h('Le gana a','beats')}${h('Pierde contra','loses')}</tr></thead><tbody>${rows.map(u=>`<tr><td><span>${gimg(u.id,'s')}${u.n}</span></td><td>${u.cls}</td><td>${u.at}</td><td>${u.age}</td><td>${u.cost}</td><td>${beatsText(u)}</td><td>${u.loses.map(i=>ub[i].n).join(', ')}</td></tr>`).join('')}</tbody>`;
+  return `<thead><tr>${h('Unidad','n')}${h('Tipo','cls')}${h('Se hace en','at')}${h('Edad','age')}${h('Costo','cost')}${h('Le gana a','beats')}${h('Pierde contra','loses')}</tr></thead><tbody>${rows.map(u=>`<tr><td><span>${gimg(u.id,'s')}<button class="linkbtn" data-act="unit" data-k="@${u.id}">${u.n}</button></span></td><td>${u.cls}</td><td>${u.at}</td><td>${u.age}</td><td>${u.cost}</td><td>${beatsText(u)}</td><td>${u.loses.map(i=>ub[i].n).join(', ')}</td></tr>`).join('')}</tbody>`;
 }
 function respond(){const s={};[...ST.enemy].forEach(id=>{const e=ub[id];e.loses.forEach((c,i)=>{s[c]=s[c]||{p:0,vs:[]};s[c].p+=3-i>0?3-i:1;s[c].vs.push(e.n)})});[...ST.enemy].forEach(id=>{const e=ub[id];(e.beats||[]).forEach(c=>{if(s[c])s[c].p-=2})});return Object.entries(s).sort((a,b)=>b[1].p-a[1].p).slice(0,3)}
 function paintResp(){const r=$('#resp');if(!r)return;if(!ST.enemy.size){r.innerHTML='<p class="count">Elegí al menos una unidad rival.</p>';return}r.innerHTML=respond().map(([id,v],i)=>{const u=ub[id];return `<div class="rrow"><span class="rank">${i+1}</span>${gimg(u.id)}<div><b>${u.n}</b> <span class="count">${u.en} · ${u.cls} · ${u.at} · ${u.age} · ${u.cost}</span><div>Sirve contra: ${v.vs.join(', ')}.</div><div class="count">${u.why}</div></div></div>`}).join('')}
@@ -1964,7 +2508,7 @@ document.addEventListener('click',e=>{
   else if(a==='lvl'){ST.lvl=+t.dataset.v;$$('[data-act="lvl"]').forEach(x=>x.setAttribute('aria-pressed',+x.dataset.v===ST.lvl));paintCivGrid()}
   else if(a==='view'){ST.view=t.dataset.v;try{localStorage.setItem(KEY+'-view',ST.view)}catch(err){}$$('[data-act="view"]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===ST.view));paintCivGrid()}
   else if(a==='sortcol'){const raw=t.dataset.v,v=/^\d$/.test(raw)?+raw:raw;if(ST.sort===v)ST.dir*=-1;else{ST.sort=v;ST.dir=typeof v==='number'?-1:1}const s=$('#civsort');if(s)s.value=String(ST.sort);paintCivGrid()}
-  else if(a==='usort'){const v=t.dataset.v;if(ST.us===v)ST.ud*=-1;else{ST.us=v;ST.ud=(v==='beats'?-1:1)}$('#utable').innerHTML=utableHtml()}
+  else if(a==='usort'){const v=t.dataset.v;if(ST.us===v)ST.ud*=-1;else{ST.us=v;ST.ud=(v==='beats'?-1:1)}$('#utable').innerHTML=utableHtml();rz($('#utable'))}
   else if(a==='spec'){const k=t.dataset.k;ST.filt.has(k)?ST.filt.delete(k):ST.filt.add(k);t.setAttribute('aria-pressed',ST.filt.has(k));paintCivGrid()}
   else if(a==='main'){P.main=P.main===ST.civ?null:ST.civ;save();const y=scrollY;render();scrollTo(0,y)}
   else if(a==='ask-civ'){const c=civById[ST.civ];ST.pendingAsk=`Juego ${c.es}. Dame un plan concreto para una partida en Arabia: apertura, qué hacer en Feudal y Castillos, y cómo enfrentar a las civs que me cuestan.`;location.hash='ayuda'}
@@ -1975,6 +2519,7 @@ document.addEventListener('click',e=>{
   else if(a==='quiz-next'){ST.quiz.i++;ST.quiz.ans=null;render()}
   else if(a==='quiz-new'){newQuiz();render()}
   else if(a==='coach-ex'){ask(t.dataset.t)}
+  else if(a==='unit'){zoomOpen(t.dataset.k)}
   else if(a==='zoom-close'){const d=$('#zoom');if(d.close)d.close();else d.removeAttribute('open')}
 });
 document.addEventListener('change',e=>{

@@ -13,7 +13,7 @@ console.log('civs',CIVDATA.length);
 if(process.argv[2]==='check')process.exit(0);
 const icons=JSON.parse(src('icons.json'));
 const iconJs='const ICONS='+JSON.stringify(Object.fromEntries(Object.entries(icons).map(([k,p])=>[k,'data:image/png;base64,'+fs.readFileSync(path.join(__dirname,'src','icons',p+'.png')).toString('base64')])))+';';
-const page=src('page.html').replace('/*@BASE@*/',()=>src('data-base.js').trim()).replace('/*@CIVDATA@*/',()=>civJs).replace('/*@ICONS@*/',()=>iconJs).replace('@TOUCHICON@',()=>'data:image/png;base64,'+fs.readFileSync(path.join(__dirname,'src','apple-touch-icon.png')).toString('base64'));
+const page=src('page.html').replace('/*@BASE@*/',()=>src('data-base.js').trim()).replace('/*@CIVDATA@*/',()=>civJs).replace('/*@ICONS@*/',()=>iconJs).replace('/*@UNITMETA@*/',()=>src('units-meta.json').trim()).replace('@TOUCHICON@',()=>'data:image/png;base64,'+fs.readFileSync(path.join(__dirname,'src','apple-touch-icon.png')).toString('base64'));
 fs.writeFileSync(path.join(__dirname,'academia-de-aldeanos.html'),page);
 const dist='<!doctype html>\n<html lang="es">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n<meta name="description" content="Guía de estudio de Age of Empires II: Definitive Edition con aperturas paso a paso, fichas completas de las 56 civilizaciones, counters y mapas.">\n<style>:root{color-scheme:light;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>\n'+page.replace(/<\/style>/,'</style>\n</head>\n<body>')+'\n</body>\n</html>\n';
 fs.writeFileSync(path.join(__dirname,'dist','index.html'),dist);

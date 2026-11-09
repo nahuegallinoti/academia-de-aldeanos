@@ -1,0 +1,437 @@
+{
+ "Composite Bowman": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Warrior Priest": {
+  "at": "Iglesia fortificada",
+  "age": 3,
+  "elite": false
+ },
+ "Jaguar Warrior": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Eagle Warrior": {
+  "at": "Cuartel",
+  "age": 3,
+  "elite": true
+ },
+ "Ratha": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Camel Archer": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Genitour": {
+  "at": "Campo de arqueros",
+  "age": 3,
+  "elite": true
+ },
+ "Hussite Wagon": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Houfnice": {
+  "at": "Taller de asedio",
+  "age": 4,
+  "elite": false
+ },
+ "Longbowman": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Konnik": {
+  "at": "Castillo o Krepost",
+  "age": 3,
+  "elite": true
+ },
+ "Coustillier": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Flemish Militia": {
+  "at": "Cuartel",
+  "age": 2,
+  "elite": false
+ },
+ "Arambai": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Cataphract": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Woad Raider": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Chu Ko Nu": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Dragon Ship": {
+  "at": "Muelle",
+  "age": 4,
+  "elite": false
+ },
+ "Kipchak": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Jomsviking": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Boyar": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Conquistador": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Missionary": {
+  "at": "Monasterio",
+  "age": 3,
+  "elite": false
+ },
+ "Keshik": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Flaming Camel": {
+  "at": "Taller de asedio",
+  "age": 4,
+  "elite": false
+ },
+ "Teutonic Knight": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Blackwood Archer": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Ibirapema Warrior": {
+  "at": "Cuartel",
+  "age": 3,
+  "elite": true
+ },
+ "Janissary": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Jarl": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Rattan Archer": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Imperial Skirmisher": {
+  "at": "Campo de arqueros",
+  "age": 4,
+  "elite": false
+ },
+ "Berserk": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Longboat": {
+  "at": "Muelle",
+  "age": 3,
+  "elite": true
+ },
+ "Tiger Cavalry": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Xianbei Raider": {
+  "at": "Campo de arqueros",
+  "age": 3,
+  "elite": false
+ },
+ "Cao Cao": {
+  "at": "Castillo",
+  "age": 4,
+  "elite": false
+ },
+ "Fire Archer": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Jian Swordsman": {
+  "at": "Cuartel",
+  "age": 3,
+  "elite": false
+ },
+ "Sun Jian": {
+  "at": "Castillo",
+  "age": 4,
+  "elite": false
+ },
+ "Urumi Swordsman": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Thirisadai": {
+  "at": "Muelle",
+  "age": 4,
+  "elite": false
+ },
+ "Shotel Warrior": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Throwing Axeman": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Monaspa": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Huskarl": {
+  "at": "Cuartel o Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Chakram Thrower": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Shrivamsha Rider": {
+  "at": "Establo",
+  "age": 3,
+  "elite": true
+ },
+ "Camel Scout": {
+  "at": "Establo",
+  "age": 2,
+  "elite": false
+ },
+ "Ghulam": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Imperial Camel Rider": {
+  "at": "Establo",
+  "age": 4,
+  "elite": false
+ },
+ "Tarkan": {
+  "at": "Establo o Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Kamayuk": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Slinger": {
+  "at": "Campo de arqueros",
+  "age": 3,
+  "elite": false
+ },
+ "Genoese Crossbowman": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Condottiero": {
+  "at": "Cuartel",
+  "age": 4,
+  "elite": false
+ },
+ "Samurai": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Iron Pagoda": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Grenadier": {
+  "at": "Campo de arqueros",
+  "age": 3,
+  "elite": false
+ },
+ "Liao Dao": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Mounted Trebuchet": {
+  "at": "Taller de asedio",
+  "age": 4,
+  "elite": false
+ },
+ "Ballista Elephant": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "War Wagon": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Turtle Ship": {
+  "at": "Muelle",
+  "age": 3,
+  "elite": true
+ },
+ "Leitis": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Winged Hussar": {
+  "at": "Establo",
+  "age": 4,
+  "elite": false
+ },
+ "Magyar Huszar": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Karambit Warrior": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Gbeto": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Kona": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Bolas Rider": {
+  "at": "Campo de arqueros",
+  "age": 3,
+  "elite": true
+ },
+ "Plumed Archer": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Mangudai": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Guecha Warrior": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Temple Guard": {
+  "at": "Cuartel o Monasterio",
+  "age": 3,
+  "elite": true
+ },
+ "War Elephant": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Obuch": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Organ Gun": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Caravel": {
+  "at": "Muelle",
+  "age": 3,
+  "elite": true
+ },
+ "Centurion": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Legionary": {
+  "at": "Cuartel",
+  "age": 4,
+  "elite": false
+ },
+ "Mameluke": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "Hearth Troop": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "White Feather Guard": {
+  "at": "Castillo",
+  "age": 3,
+  "elite": true
+ },
+ "War Chariot": {
+  "at": "Taller de asedio",
+  "age": 3,
+  "elite": false
+ },
+ "Liu Bei": {
+  "at": "Castillo",
+  "age": 4,
+  "elite": false
+ },
+ "Serjeant": {
+  "at": "Castillo o Donjon",
+  "age": 2,
+  "elite": true
+ }
+}
