@@ -432,6 +432,7 @@ td.mono,th.mono{text-align:right}
 }
 @media (prefers-reduced-motion:reduce){.alloc span,.ccard{transition:none}.ccard:hover{transform:none}}
 /*@BLDCSS@*/
+/*@NAVCSS@*/
 /*@UXCSS@*/
 </style>
 
@@ -443,7 +444,7 @@ td.mono,th.mono{text-align:right}
     <div class="tools"><button class="tool search-open" data-act="search-open" aria-label="Buscar en toda la academia" title="Buscar (Ctrl+K)"><span aria-hidden="true">⌕</span><span class="search-label">Buscar <kbd>Ctrl K</kbd></span></button><button class="tool" id="themebtn" data-act="theme" aria-label="Cambiar tema" title="Cambiar tema">◐</button><button class="tool menubtn" data-act="menu" aria-expanded="false" aria-controls="nav" aria-label="Abrir menú">☰</button></div>
   </div>
 </header>
-<main class="main"><div class="wrap" id="view" tabindex="-1"></div></main>
+<main class="main"><nav class="subnav" id="subnav" aria-label="Secciones del grupo" hidden></nav><div class="wrap" id="view" tabindex="-1"></div></main>
 <footer class="footer"><div class="footer-in"><a class="footer-brand" href="#ruta">Academia de Aldeanos <span>Aprendé. Practicá. Volvé a jugar.</span></a><div class="footer-links"><a href="#aprender">Aprender a jugar</a><a href="#ayuda">Ayuda y fuentes</a></div><p>Guía de la comunidad · Age of Empires II © Microsoft. Las estrategias y valoraciones son orientativas.</p></div></footer>
 <nav class="mobile-nav" aria-label="Accesos rápidos"></nav>
 <div class="toast" id="toast" role="status" hidden></div>
@@ -603,7 +604,22 @@ const lvTag=l=>`<span class="lv lv${l}">${LVL[l]}</span>`;
 const sortTh=(label,key,cur,dir,act)=>{const on=String(cur)===String(key);return `<th aria-sort="${on?(dir>0?'ascending':'descending'):'none'}"><button class="sortb" data-act="${act}" data-v="${key}" title="Ordenar por ${esc(label.toLowerCase())}">${label}<span aria-hidden="true">${on?(dir>0?'▲':'▼'):'↕'}</span></button></th>`};
 const pips=n=>`<div class="pips" aria-hidden="true">${[1,2,3,4,5].map(i=>`<i${i<=n?' class="on"':''}></i>`).join('')}</div>`;
 const civLink=(c,extra='')=>`<a class="tag" href="#civ-${c.id}"${extra}><i class="dot" style="background:var(--t-${c.s[0]})"></i>${c.es}</a>`;
-function navRender(){const cur=ST.route==='civ'?'civs':ST.route;$('#nav').innerHTML=NAV.map(([id,l])=>`<a href="#${id}"${cur===id?' aria-current="page"':''}>${l}</a>`).join('')}
+/* Menú agrupado: la barra muestra grupos con submenú; NAV sigue siendo la lista plana de secciones. */
+const NAVG=[
+  {id:'ruta',l:'Inicio'},
+  {g:'Enciclopedia',items:[['civs','Civilizaciones','Bonos, únicas y plan de las 56 civs'],['unidades','Unidades','Las 103 unidades y sus mejoras'],['edificios','Edificios','Costos, producción y tecnologías'],['mapas','Mapas','Qué jugar en cada tipo de mapa']]},
+  {g:'Para la partida',items:[['aperturas','Aperturas','Paso a paso, con reloj'],['counters','Counters','Con qué responder al ejército rival']]},
+  {g:'Aprender',items:[['aprender','Aprender a jugar','Lecciones en orden'],['quiz','Entrenar','Preguntas rápidas'],['ayuda','Guía y ayuda','Problemas comunes, glosario y coach']]}
+];
+function navClose(){$$('.navg.open').forEach(x=>{x.classList.remove('open');const b=x.querySelector('.navbtn');if(b)b.setAttribute('aria-expanded','false')})}
+function navRender(){
+  const cur=ST.route==='civ'?'civs':ST.route,inG=g=>!!(g.items&&g.items.some(i=>i[0]===cur));
+  $('#nav').innerHTML=NAVG.map((g,gi)=>g.id?`<a href="#${g.id}"${cur===g.id?' aria-current="page"':''}>${g.l}</a>`:`<div class="navg${inG(g)?' cur':''}"><button class="navbtn" data-act="navg" aria-expanded="false" aria-haspopup="true" aria-controls="navp${gi}">${g.g}<span aria-hidden="true">▾</span></button><div class="navpanel" id="navp${gi}">${g.items.map(([id,l,d])=>`<a href="#${id}"${cur===id?' aria-current="page"':''}><b>${l}</b><small>${d}</small></a>`).join('')}</div></div>`).join('');
+  const sg=NAVG.find(inG),sn=$('#subnav');
+  if(sn){if(sg){sn.hidden=false;sn.innerHTML=`<span class="subg">${sg.g}</span>${sg.items.map(([id,l])=>`<a href="#${id}"${cur===id?' aria-current="page"':''}>${l}</a>`).join('')}`}else{sn.hidden=true;sn.innerHTML=''}}
+}
+document.addEventListener('click',e=>{if(e.target.closest('#nav a')){navClose();const tp=$('.top'),mb=$('.menubtn');if(tp)tp.classList.remove('menu-open');if(mb)mb.setAttribute('aria-expanded','false');return}if(!e.target.closest('.navg'))navClose()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('.navg.open')){navClose();const b=document.activeElement;if(b&&b.blur)b.blur()}});
 function render(){
   navRender();
   const v=$('#view');
@@ -908,6 +924,7 @@ document.addEventListener('click',e=>{
   else if(a==='coach-ex'){ask(t.dataset.t)}
   else if(a==='unit'){zoomOpen(t.dataset.k)}
   else if(a==='zoom-close'){zoomClose()}
+  else if(a==='navg'){const w=t.closest('.navg'),open=!w.classList.contains('open');navClose();if(open){w.classList.add('open');t.setAttribute('aria-expanded','true')}}
 });
 document.addEventListener('change',e=>{
   if(e.target.id==='speed'){ST.clock.speed=+e.target.value}

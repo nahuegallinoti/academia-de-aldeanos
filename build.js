@@ -13,7 +13,7 @@ console.log('civs',CIVDATA.length);
 if(process.argv[2]==='check')process.exit(0);
 const icons=JSON.parse(src('icons.json'));
 const iconJs='const ICONS='+JSON.stringify(Object.fromEntries(Object.entries(icons).map(([k,p])=>[k,'data:image/png;base64,'+fs.readFileSync(path.join(__dirname,'src','icons',p+'.png')).toString('base64')])))+';';
-const page=src('page.html').replace('/*@BASE@*/',()=>src('data-base.js').trim()).replace('/*@CIVDATA@*/',()=>civJs).replace('/*@ICONS@*/',()=>iconJs).replace('/*@UNITMETA@*/',()=>src('units-meta.json').trim()).replace('/*@BLDCSS@*/',()=>src('buildings.css')).replace('/*@BUILDINGS@*/',()=>require('./tools/build-buildings.js')(__dirname)).replace('/*@UXCSS@*/',()=>src('experience.css')).replace('/*@UXJS@*/',()=>src('experience.js')).replace('@TOUCHICON@',()=>'data:image/png;base64,'+fs.readFileSync(path.join(__dirname,'src','apple-touch-icon.png')).toString('base64'));
+const page=src('page.html').replace('/*@BASE@*/',()=>src('data-base.js').trim()).replace('/*@CIVDATA@*/',()=>civJs).replace('/*@ICONS@*/',()=>iconJs).replace('/*@UNITMETA@*/',()=>src('units-meta.json').trim()).replace('/*@BLDCSS@*/',()=>src('buildings.css')).replace('/*@NAVCSS@*/',()=>src('nav.css')).replace('/*@BUILDINGS@*/',()=>require('./tools/build-buildings.js')(__dirname)).replace('/*@UXCSS@*/',()=>src('experience.css')).replace('/*@UXJS@*/',()=>src('experience.js')).replace('@TOUCHICON@',()=>'data:image/png;base64,'+fs.readFileSync(path.join(__dirname,'src','apple-touch-icon.png')).toString('base64'));
 // Valida el JavaScript ensamblado antes de modificar los archivos de salida.
 new (require('vm').Script)(page.match(/<script>([\s\S]*)<\/script>/)[1]);
 fs.writeFileSync(path.join(__dirname,'academia-de-aldeanos.html'),page);

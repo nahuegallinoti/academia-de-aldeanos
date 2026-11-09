@@ -87,6 +87,7 @@ function unitChip(u){
 }
 function bOpen(id){
   const b=BLD_BY_ID[id],dlg=$('#zoom');if(!b||!dlg)return;ST.bLast=id;
+  const cb=$('#zoom [data-act="copy-unit"],#zoom [data-act="copy-bld"]');if(cb){cb.dataset.act='copy-bld';cb.textContent='Copiar enlace'}
   const fact=(l,v)=>v?`<div><span>${l}</span><b>${v}</b></div>`:'';
   const gu=b.units.filter(u=>u.all),ou=b.units.filter(u=>!u.all);
   const gt=b.techs.filter(t=>t.all),ot=b.techs.filter(t=>!t.all);
@@ -111,7 +112,10 @@ function bUnitOpen(pic,name,en){
   $('#zoombody').innerHTML=`<div class="us-head"><img src="${BICON['u'+pic]||''}" alt="${esc(name)}"><div><b>${name}</b><small>${en}${b?` · Se hace en: ${b.n}`:''}</small></div></div>${b?`<p style="margin-top:14px"><button class="btn ghost" data-bld="${b.id}">← Volver a ${b.n}</button></p>`:''}`;
   $('#zoom').scrollTop=0;
 }
+/* La ficha de unidad y la de edificio comparten el diálogo: el botón de copiar enlace sigue a la ficha abierta. */
+{const zo=zoomOpen;zoomOpen=function(k){const cb=$('#zoom [data-act="copy-bld"]');if(cb)cb.dataset.act='copy-unit';return zo(k)}}
 document.addEventListener('click',e=>{
+  const cpy=e.target.closest('[data-act="copy-bld"]');if(cpy){const b=BLD_BY_ID[ST.bLast];if(b){const url=new URL(location.href);url.hash='edificio-'+b.slug;if(navigator.clipboard)navigator.clipboard.writeText(url.href).then(()=>toast('Enlace del edificio copiado')).catch(()=>toast('No se pudo copiar el enlace'));else toast('Tu navegador no permite copiar el enlace')}return}
   const bu=e.target.closest('[data-bunit]');if(bu){bUnitOpen(bu.dataset.bunit,bu.dataset.name,bu.dataset.en);return}
   const bl=e.target.closest('[data-bld]');if(bl){e.preventDefault();bOpen(+bl.dataset.bld);return}
   const t=e.target.closest('[data-bact]');if(!t)return;

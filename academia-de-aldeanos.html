@@ -454,6 +454,42 @@ details.us-sec summary{cursor:pointer;padding:4px 0}
 details.us-sec[open] summary{margin-bottom:8px}
 @media (prefers-reduced-motion:reduce){.bcard{transition:none}.bcard:hover{transform:none}}
 
+/* Menú agrupado con submenús */
+.navg{position:relative;display:flex}
+.navbtn{background:none;border:0;color:var(--on-bar-muted);font-weight:650;font-size:13px;padding:25px 10px;display:inline-flex;gap:6px;align-items:center;cursor:pointer;position:relative;white-space:nowrap}
+.navbtn span{font-size:10px;opacity:.8;transition:transform .15s}
+.navbtn:hover,.navg.cur .navbtn,.navg.open .navbtn{color:var(--on-bar)}
+.navg.open .navbtn span{transform:rotate(180deg)}
+.navg.cur .navbtn::after{content:"";position:absolute;left:10px;right:10px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--acc-hi)}
+.nav .navpanel{display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);min-width:280px;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:12px;box-shadow:0 18px 44px rgba(0,0,0,.28);padding:8px;z-index:40;gap:2px}
+.navg.open .navpanel{display:grid}
+@media (hover:hover) and (min-width:821px){.navg:hover .navpanel{display:grid}}
+.nav .navpanel a{display:grid;gap:2px;padding:9px 12px;border-radius:8px;text-decoration:none;color:var(--ink);font-size:14px;white-space:normal}
+.nav .navpanel a::after{display:none}
+.nav .navpanel a:hover{background:var(--hover)}
+.nav .navpanel a[aria-current="page"]{background:var(--acc-soft);color:var(--acc)}
+.nav .navpanel b{font-weight:750}
+.nav .navpanel small{color:var(--muted);font-size:12px;font-weight:500}
+/* Pestañas del grupo actual */
+.subnav{max-width:1280px;margin:0 auto 18px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.subnav[hidden]{display:none}
+.subg{font-family:var(--display);font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-right:6px;font-stretch:118%}
+.subnav a{text-decoration:none;color:var(--muted);font-weight:650;font-size:14px;padding:6px 12px;border-radius:999px;border:1px solid var(--rule);background:var(--surface)}
+.subnav a:hover{color:var(--ink);border-color:var(--muted)}
+.subnav a[aria-current="page"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+@media (max-width:820px){
+  .top .nav .navg{display:block;grid-column:1/-1}
+  .top .nav>a{grid-column:1/-1}
+  .top .nav .navbtn{padding:10px 4px 4px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;pointer-events:none;color:var(--on-bar-muted)}
+  .top .nav .navbtn span,.top .nav .navg.cur .navbtn::after{display:none}
+  .top .nav .navpanel{display:grid;position:static;transform:none;background:none;border:0;box-shadow:none;padding:0;grid-template-columns:1fr 1fr;gap:5px;min-width:0}
+  .top .nav .navpanel a{color:var(--on-bar);background:var(--bar-2);padding:10px 12px}
+  .top .nav .navpanel a[aria-current="page"]{color:var(--acc-hi);background:var(--bar-2)}
+  .top .nav .navpanel small{display:none}
+  .subnav{margin-bottom:14px}
+}
+@media (prefers-reduced-motion:reduce){.navbtn span{transition:none}}
+
 /* Una interfaz de consulta: navegación visible, tareas primero y lectura tranquila. */
 :root{--bg:#F2F3F5;--r:14px;--shadow:0 8px 28px #0e162408}
 body{font-size:16px}
@@ -678,7 +714,7 @@ dialog::backdrop{background:#060a11aa;backdrop-filter:blur(4px)}
     <div class="tools"><button class="tool search-open" data-act="search-open" aria-label="Buscar en toda la academia" title="Buscar (Ctrl+K)"><span aria-hidden="true">⌕</span><span class="search-label">Buscar <kbd>Ctrl K</kbd></span></button><button class="tool" id="themebtn" data-act="theme" aria-label="Cambiar tema" title="Cambiar tema">◐</button><button class="tool menubtn" data-act="menu" aria-expanded="false" aria-controls="nav" aria-label="Abrir menú">☰</button></div>
   </div>
 </header>
-<main class="main"><div class="wrap" id="view" tabindex="-1"></div></main>
+<main class="main"><nav class="subnav" id="subnav" aria-label="Secciones del grupo" hidden></nav><div class="wrap" id="view" tabindex="-1"></div></main>
 <footer class="footer"><div class="footer-in"><a class="footer-brand" href="#ruta">Academia de Aldeanos <span>Aprendé. Practicá. Volvé a jugar.</span></a><div class="footer-links"><a href="#aprender">Aprender a jugar</a><a href="#ayuda">Ayuda y fuentes</a></div><p>Guía de la comunidad · Age of Empires II © Microsoft. Las estrategias y valoraciones son orientativas.</p></div></footer>
 <nav class="mobile-nav" aria-label="Accesos rápidos"></nav>
 <div class="toast" id="toast" role="status" hidden></div>
@@ -2493,7 +2529,22 @@ const lvTag=l=>`<span class="lv lv${l}">${LVL[l]}</span>`;
 const sortTh=(label,key,cur,dir,act)=>{const on=String(cur)===String(key);return `<th aria-sort="${on?(dir>0?'ascending':'descending'):'none'}"><button class="sortb" data-act="${act}" data-v="${key}" title="Ordenar por ${esc(label.toLowerCase())}">${label}<span aria-hidden="true">${on?(dir>0?'▲':'▼'):'↕'}</span></button></th>`};
 const pips=n=>`<div class="pips" aria-hidden="true">${[1,2,3,4,5].map(i=>`<i${i<=n?' class="on"':''}></i>`).join('')}</div>`;
 const civLink=(c,extra='')=>`<a class="tag" href="#civ-${c.id}"${extra}><i class="dot" style="background:var(--t-${c.s[0]})"></i>${c.es}</a>`;
-function navRender(){const cur=ST.route==='civ'?'civs':ST.route;$('#nav').innerHTML=NAV.map(([id,l])=>`<a href="#${id}"${cur===id?' aria-current="page"':''}>${l}</a>`).join('')}
+/* Menú agrupado: la barra muestra grupos con submenú; NAV sigue siendo la lista plana de secciones. */
+const NAVG=[
+  {id:'ruta',l:'Inicio'},
+  {g:'Enciclopedia',items:[['civs','Civilizaciones','Bonos, únicas y plan de las 56 civs'],['unidades','Unidades','Las 103 unidades y sus mejoras'],['edificios','Edificios','Costos, producción y tecnologías'],['mapas','Mapas','Qué jugar en cada tipo de mapa']]},
+  {g:'Para la partida',items:[['aperturas','Aperturas','Paso a paso, con reloj'],['counters','Counters','Con qué responder al ejército rival']]},
+  {g:'Aprender',items:[['aprender','Aprender a jugar','Lecciones en orden'],['quiz','Entrenar','Preguntas rápidas'],['ayuda','Guía y ayuda','Problemas comunes, glosario y coach']]}
+];
+function navClose(){$$('.navg.open').forEach(x=>{x.classList.remove('open');const b=x.querySelector('.navbtn');if(b)b.setAttribute('aria-expanded','false')})}
+function navRender(){
+  const cur=ST.route==='civ'?'civs':ST.route,inG=g=>!!(g.items&&g.items.some(i=>i[0]===cur));
+  $('#nav').innerHTML=NAVG.map((g,gi)=>g.id?`<a href="#${g.id}"${cur===g.id?' aria-current="page"':''}>${g.l}</a>`:`<div class="navg${inG(g)?' cur':''}"><button class="navbtn" data-act="navg" aria-expanded="false" aria-haspopup="true" aria-controls="navp${gi}">${g.g}<span aria-hidden="true">▾</span></button><div class="navpanel" id="navp${gi}">${g.items.map(([id,l,d])=>`<a href="#${id}"${cur===id?' aria-current="page"':''}><b>${l}</b><small>${d}</small></a>`).join('')}</div></div>`).join('');
+  const sg=NAVG.find(inG),sn=$('#subnav');
+  if(sn){if(sg){sn.hidden=false;sn.innerHTML=`<span class="subg">${sg.g}</span>${sg.items.map(([id,l])=>`<a href="#${id}"${cur===id?' aria-current="page"':''}>${l}</a>`).join('')}`}else{sn.hidden=true;sn.innerHTML=''}}
+}
+document.addEventListener('click',e=>{if(e.target.closest('#nav a')){navClose();const tp=$('.top'),mb=$('.menubtn');if(tp)tp.classList.remove('menu-open');if(mb)mb.setAttribute('aria-expanded','false');return}if(!e.target.closest('.navg'))navClose()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('.navg.open')){navClose();const b=document.activeElement;if(b&&b.blur)b.blur()}});
 function render(){
   navRender();
   const v=$('#view');
@@ -2849,6 +2900,7 @@ function unitChip(u){
 }
 function bOpen(id){
   const b=BLD_BY_ID[id],dlg=$('#zoom');if(!b||!dlg)return;ST.bLast=id;
+  const cb=$('#zoom [data-act="copy-unit"],#zoom [data-act="copy-bld"]');if(cb){cb.dataset.act='copy-bld';cb.textContent='Copiar enlace'}
   const fact=(l,v)=>v?`<div><span>${l}</span><b>${v}</b></div>`:'';
   const gu=b.units.filter(u=>u.all),ou=b.units.filter(u=>!u.all);
   const gt=b.techs.filter(t=>t.all),ot=b.techs.filter(t=>!t.all);
@@ -2873,7 +2925,10 @@ function bUnitOpen(pic,name,en){
   $('#zoombody').innerHTML=`<div class="us-head"><img src="${BICON['u'+pic]||''}" alt="${esc(name)}"><div><b>${name}</b><small>${en}${b?` · Se hace en: ${b.n}`:''}</small></div></div>${b?`<p style="margin-top:14px"><button class="btn ghost" data-bld="${b.id}">← Volver a ${b.n}</button></p>`:''}`;
   $('#zoom').scrollTop=0;
 }
+/* La ficha de unidad y la de edificio comparten el diálogo: el botón de copiar enlace sigue a la ficha abierta. */
+{const zo=zoomOpen;zoomOpen=function(k){const cb=$('#zoom [data-act="copy-bld"]');if(cb)cb.dataset.act='copy-unit';return zo(k)}}
 document.addEventListener('click',e=>{
+  const cpy=e.target.closest('[data-act="copy-bld"]');if(cpy){const b=BLD_BY_ID[ST.bLast];if(b){const url=new URL(location.href);url.hash='edificio-'+b.slug;if(navigator.clipboard)navigator.clipboard.writeText(url.href).then(()=>toast('Enlace del edificio copiado')).catch(()=>toast('No se pudo copiar el enlace'));else toast('Tu navegador no permite copiar el enlace')}return}
   const bu=e.target.closest('[data-bunit]');if(bu){bUnitOpen(bu.dataset.bunit,bu.dataset.name,bu.dataset.en);return}
   const bl=e.target.closest('[data-bld]');if(bl){e.preventDefault();bOpen(+bl.dataset.bld);return}
   const t=e.target.closest('[data-bact]');if(!t)return;
@@ -2920,6 +2975,7 @@ document.addEventListener('click',e=>{
   else if(a==='coach-ex'){ask(t.dataset.t)}
   else if(a==='unit'){zoomOpen(t.dataset.k)}
   else if(a==='zoom-close'){zoomClose()}
+  else if(a==='navg'){const w=t.closest('.navg'),open=!w.classList.contains('open');navClose();if(open){w.classList.add('open');t.setAttribute('aria-expanded','true')}}
 });
 document.addEventListener('change',e=>{
   if(e.target.id==='speed'){ST.clock.speed=+e.target.value}
