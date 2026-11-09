@@ -417,6 +417,9 @@ td.mono,th.mono{text-align:right}
 /*@ICONS@*/
 const uimg=(name,cls='',alt='')=>{const src=ICONS[name]||ICONS[{Longboat:'Longship'}[name]];return src?`<img class="ui${cls?' '+cls:''}" src="${src}" alt="${esc(alt)}" data-k="${esc(name)}" width="48" height="48" loading="lazy">`:''};
 const gimg=(id,cls='')=>uimg('@'+id,cls);
+/* Dónde se entrena y de qué tipo es cada unidad de la tabla de counters */
+const UMETA={scout:['Establo','Caballería'],knight:['Establo','Caballería'],archer:['Campo de arqueros','Arquero a pie'],skirm:['Campo de arqueros','Arquero a pie'],spear:['Cuartel','Infantería'],maa:['Cuartel','Infantería'],camel:['Establo','Caballería'],ca:['Campo de arqueros','Arquero a caballo'],monk:['Monasterio','Monje'],mangonel:['Taller de asedio','Asedio'],ram:['Taller de asedio','Asedio'],treb:['Castillo','Asedio'],eleph:['Establo','Caballería (elefante)'],eagle:['Cuartel','Infantería'],hc:['Campo de arqueros','Pólvora'],bombard:['Taller de asedio','Asedio (pólvora)']};
+U.forEach(u=>{[u.at,u.cls]=UMETA[u.id]||['','']});
 
 const NAV=[['ruta','Inicio'],['civs','Civilizaciones'],['aperturas','Aperturas'],['counters','Counters'],['mapas','Mapas'],['quiz','Entrenar'],['ayuda','Ayuda y coach']];
 const SPEC={cav:'Caballería',arch:'Arqueros',inf:'Infantería',naval:'Naval',monk:'Monjes',gun:'Pólvora',siege:'Asedio',def:'Defensa',camel:'Camellos',eleph:'Elefantes',ca:'Arq. a caballo',cont:'Contraunidades'};
@@ -430,7 +433,7 @@ const civByEs=Object.fromEntries(CIVS.map(c=>[c.es,c]));
 const UUINFO={};CIVS.forEach(c=>c.uu.forEach(u=>{const o=UUINFO[u[0]];if(o)o.civs.push(c.es);else UUINFO[u[0]]={es:u[1],en:u[0],d:u[2],civs:[c.es]}}));
 function zoomOpen(k){
   const dlg=$('#zoom');if(!dlg)return;let t,s,d;
-  if(k.startsWith('@')){const u=ub[k.slice(1)];t=u.n;s=`${u.en} · ${u.age} · ${u.cost}`;d=u.why}
+  if(k.startsWith('@')){const u=ub[k.slice(1)];t=u.n;s=`${u.en} · ${u.cls} · Se hace en: ${u.at} · ${u.age} · ${u.cost}`;d=u.why}
   else{const u=UUINFO[k]||{es:k,en:k,d:'',civs:[]};t=u.es;s=`${u.en} · Unidad única de ${u.civs.join(', ')}`;d=u.d}
   const src=ICONS[k]||ICONS[{Longboat:'Longship'}[k]];$('#zoomimg').src=src;$('#zoomimg').alt=t;$('#zoomt').textContent=t;$('#zooms').textContent=s;$('#zoomd').textContent=d;
   if(dlg.showModal){if(!dlg.open)dlg.showModal()}else dlg.setAttribute('open','');
@@ -648,14 +651,14 @@ function vCounters(){
 const AGE_ORDER={'Feudal':1,'Castillos':2,'Imperial':3};
 const beatsText=u=>[...u.beats.map(i=>ub[i].n),u.vs].filter(Boolean).join(', ')||'Edificios';
 function utableHtml(){
-  const by={n:u=>u.n,age:u=>AGE_ORDER[u.age]||9,cost:u=>u.cost,beats:u=>u.beats.length+(u.vs?1:0),loses:u=>u.loses.length};
+  const by={n:u=>u.n,cls:u=>u.cls,at:u=>u.at,age:u=>AGE_ORDER[u.age]||9,cost:u=>u.cost,beats:u=>u.beats.length+(u.vs?1:0),loses:u=>u.loses.length};
   const f=by[ST.us]||by.n;
   const rows=[...U].sort((a,b)=>{const va=f(a),vb=f(b);const r=typeof va==='string'?va.localeCompare(vb,'es'):va-vb;return r*ST.ud||a.n.localeCompare(b.n,'es')});
   const h=(l,k)=>sortTh(l,k,ST.us,ST.ud,'usort');
-  return `<thead><tr>${h('Unidad','n')}${h('Edad','age')}${h('Costo','cost')}${h('Le gana a','beats')}${h('Pierde contra','loses')}</tr></thead><tbody>${rows.map(u=>`<tr><td><span>${gimg(u.id,'s')}${u.n}</span></td><td>${u.age}</td><td>${u.cost}</td><td>${beatsText(u)}</td><td>${u.loses.map(i=>ub[i].n).join(', ')}</td></tr>`).join('')}</tbody>`;
+  return `<thead><tr>${h('Unidad','n')}${h('Tipo','cls')}${h('Se hace en','at')}${h('Edad','age')}${h('Costo','cost')}${h('Le gana a','beats')}${h('Pierde contra','loses')}</tr></thead><tbody>${rows.map(u=>`<tr><td><span>${gimg(u.id,'s')}${u.n}</span></td><td>${u.cls}</td><td>${u.at}</td><td>${u.age}</td><td>${u.cost}</td><td>${beatsText(u)}</td><td>${u.loses.map(i=>ub[i].n).join(', ')}</td></tr>`).join('')}</tbody>`;
 }
 function respond(){const s={};[...ST.enemy].forEach(id=>{const e=ub[id];e.loses.forEach((c,i)=>{s[c]=s[c]||{p:0,vs:[]};s[c].p+=3-i>0?3-i:1;s[c].vs.push(e.n)})});[...ST.enemy].forEach(id=>{const e=ub[id];(e.beats||[]).forEach(c=>{if(s[c])s[c].p-=2})});return Object.entries(s).sort((a,b)=>b[1].p-a[1].p).slice(0,3)}
-function paintResp(){const r=$('#resp');if(!r)return;if(!ST.enemy.size){r.innerHTML='<p class="count">Elegí al menos una unidad rival.</p>';return}r.innerHTML=respond().map(([id,v],i)=>{const u=ub[id];return `<div class="rrow"><span class="rank">${i+1}</span>${gimg(u.id)}<div><b>${u.n}</b> <span class="count">${u.en} · ${u.age} · ${u.cost}</span><div>Sirve contra: ${v.vs.join(', ')}.</div><div class="count">${u.why}</div></div></div>`}).join('')}
+function paintResp(){const r=$('#resp');if(!r)return;if(!ST.enemy.size){r.innerHTML='<p class="count">Elegí al menos una unidad rival.</p>';return}r.innerHTML=respond().map(([id,v],i)=>{const u=ub[id];return `<div class="rrow"><span class="rank">${i+1}</span>${gimg(u.id)}<div><b>${u.n}</b> <span class="count">${u.en} · ${u.cls} · ${u.at} · ${u.age} · ${u.cost}</span><div>Sirve contra: ${v.vs.join(', ')}.</div><div class="count">${u.why}</div></div></div>`}).join('')}
 
 /* ---------- Mapas ---------- */
 function vMapas(){return `<section class="head"><div class="eyebrow">Mapas</div><h2>El mapa decide la apertura</h2><p class="lede">El pool ranked rota: revisalo en el juego. Estos tipos cubren casi todo lo que vas a encontrar.</p></section>
