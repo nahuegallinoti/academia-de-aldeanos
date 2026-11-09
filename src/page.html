@@ -1,0 +1,727 @@
+<title>Academia de Aldeanos</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Hanken+Grotesk:ital,wght@0,400..800;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: barra de mando oscura fija arriba; debajo, un códice de campaña en columnas. Oro como único acento; los colores de especialidad y de recursos son datos. */
+:root{
+  --bg:#ECEEF3; --surface:#FFFFFF; --sunken:#E2E6EE; --ink:#121722; --muted:#566074; --rule:#D2D8E2; --hover:#F4F6F9;
+  --bar:#0E1624; --bar-2:#1B2538; --on-bar:#EEF1F6; --on-bar-muted:#9BA7BC;
+  --hero:#101A2B; --hero-2:#18253B;
+  --acc:#9C6608; --acc-hi:#E8B03C; --on-acc:#1B1305; --acc-soft:#F6E9CC;
+  --food:#C23B38; --wood:#875A30; --gold:#CF9A14; --stone:#7A8595;
+  --good:#1F7A49; --warn:#A86A06; --bad:#B3312C; --good-soft:#DCEFE3; --bad-soft:#F6DEDC;
+  --t-cav:#B3312C; --t-arch:#2B7A4B; --t-inf:#2B4FB5; --t-naval:#1F8AA6; --t-monk:#6F3D92; --t-gun:#3A3A48;
+  --t-siege:#C0651A; --t-def:#6E7A8C; --t-camel:#B88A1C; --t-eleph:#8A3358; --t-ca:#9A5A28; --t-cont:#4F6A7D;
+  --shield-edge:#0E1624;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"Hanken Grotesk","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#090D15; --surface:#111826; --sunken:#0D131E; --ink:#E6EAF1; --muted:#97A2B6; --rule:#222D41; --hover:#162033;
+  --bar:#060A11; --bar-2:#141C2B; --on-bar:#EEF1F6; --on-bar-muted:#8F9BB0;
+  --hero:#0F1827; --hero-2:#16233A;
+  --acc:#E8B03C; --acc-hi:#E8B03C; --on-acc:#1B1305; --acc-soft:#2A2312;
+  --food:#E25F59; --wood:#B98857; --gold:#E9BC50; --stone:#A5AFBD;
+  --good:#57BF86; --warn:#E3A33A; --bad:#EF7A72; --good-soft:#12261C; --bad-soft:#2C1615;
+  --t-cav:#D3504A; --t-arch:#44A56C; --t-inf:#5B7DDD; --t-naval:#3FAFCB; --t-monk:#9A66BE; --t-gun:#7A7A8E;
+  --t-siege:#DE8438; --t-def:#8D99AB; --t-camel:#D8AE43; --t-eleph:#B85080; --t-ca:#BC7A45; --t-cont:#7796AC;
+  --shield-edge:#E6EAF1; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#090D15; --surface:#111826; --sunken:#0D131E; --ink:#E6EAF1; --muted:#97A2B6; --rule:#222D41; --hover:#162033;
+  --bar:#060A11; --bar-2:#141C2B; --on-bar:#EEF1F6; --on-bar-muted:#8F9BB0;
+  --hero:#0F1827; --hero-2:#16233A;
+  --acc:#E8B03C; --acc-hi:#E8B03C; --on-acc:#1B1305; --acc-soft:#2A2312;
+  --food:#E25F59; --wood:#B98857; --gold:#E9BC50; --stone:#A5AFBD;
+  --good:#57BF86; --warn:#E3A33A; --bad:#EF7A72; --good-soft:#12261C; --bad-soft:#2C1615;
+  --t-cav:#D3504A; --t-arch:#44A56C; --t-inf:#5B7DDD; --t-naval:#3FAFCB; --t-monk:#9A66BE; --t-gun:#7A7A8E;
+  --t-siege:#DE8438; --t-def:#8D99AB; --t-camel:#D8AE43; --t-eleph:#B85080; --t-ca:#BC7A45; --t-cont:#7796AC;
+  --shield-edge:#E6EAF1; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bar)}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-weight:850;font-stretch:115%;line-height:.95}
+h2{font-size:clamp(28px,3.6vw,40px);font-weight:800;font-stretch:112%;line-height:1}
+h3{font-size:19px;font-weight:750;font-stretch:104%;line-height:1.2}
+p{margin:0}
+a{color:var(--acc)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--acc-hi);outline-offset:2px;border-radius:4px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--display);font-size:12px;font-weight:700;font-stretch:118%;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:64ch;font-size:17.5px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.scroll{overflow-x:auto}
+.count{color:var(--muted);font-size:14.5px}
+.fine{color:var(--muted);font-size:13px;line-height:1.45}
+
+/* Barra superior */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bar);color:var(--on-bar);border-bottom:1px solid var(--bar-2)}
+.topin{max-width:1240px;margin-inline:auto;display:flex;align-items:center;gap:22px;padding-block:0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));min-height:60px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--on-bar);flex:none}
+.brand svg{width:26px;height:30px}
+.brand b{font-family:var(--display);font-weight:850;font-stretch:120%;font-size:15px;letter-spacing:.06em;text-transform:uppercase;line-height:1.05}
+.brand b small{display:block;font-weight:600;font-size:10.5px;letter-spacing:.14em;color:var(--on-bar-muted)}
+.nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;flex:1 1 auto;min-width:0}
+.nav::-webkit-scrollbar{display:none}
+.nav a{position:relative;text-decoration:none;color:var(--on-bar-muted);font-weight:650;font-size:15px;padding:19px 12px;white-space:nowrap}
+.nav a:hover{color:var(--on-bar)}
+.nav a[aria-current="page"]{color:var(--on-bar)}
+.nav a[aria-current="page"]::after{content:"";position:absolute;left:10px;right:10px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--acc-hi)}
+.save{font-size:12px;color:var(--on-bar-muted);white-space:nowrap;flex:none}
+.save i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--good);margin-right:6px;vertical-align:1px}
+
+.main{padding-block:28px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1240px;margin-inline:auto;display:flex;flex-direction:column;gap:30px}
+.head{display:flex;flex-direction:column;gap:10px}
+
+/* Controles */
+.btn{background:var(--ink);color:var(--bg);border:1px solid var(--ink);padding:9px 16px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;border-radius:8px;font-size:15px;line-height:1.2}
+.btn:hover{opacity:.88}
+.btn.acc{background:var(--acc-hi);border-color:var(--acc-hi);color:var(--on-acc)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+.btn.ghost:hover{background:var(--hover);opacity:1}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid var(--rule);background:var(--surface);padding:6px 12px;font-weight:600;display:inline-flex;align-items:center;gap:7px;font-size:14px;border-radius:999px;text-decoration:none;color:var(--ink)}
+.chip:hover{border-color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.dot{width:9px;height:9px;display:inline-block;flex:none;border-radius:2px}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:9px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:8px 13px;font-weight:650;font-size:14px;color:var(--muted);white-space:nowrap}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.field{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.input,.select{background:var(--surface);border:1px solid var(--rule);padding:9px 12px;border-radius:8px}
+.panel{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:18px}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--sunken);color:var(--ink);white-space:nowrap}
+.lv{font-size:12px;font-weight:750;padding:3px 9px;border-radius:999px;white-space:nowrap;border:1px solid currentColor}
+.lv1{color:var(--good)} .lv2{color:var(--warn)} .lv3{color:var(--bad)}
+
+/* Escudo */
+.sh{width:34px;height:40px;flex:none;display:block}
+.sh text{font-family:var(--display);font-weight:850;font-stretch:110%;fill:#fff;paint-order:stroke;stroke:rgba(0,0,0,.35);stroke-width:2px}
+
+/* Inicio */
+.hero{background:var(--hero);color:var(--on-bar);border-radius:14px;padding:30px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:30px;align-items:end;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent 0 22px,rgba(255,255,255,.025) 22px 23px);pointer-events:none}
+.hero>*{position:relative}
+.hero .eyebrow{color:var(--acc-hi)}
+.hero h1{font-size:clamp(44px,7vw,84px);margin-top:10px}
+.hero p{color:var(--on-bar-muted);margin-top:14px;max-width:48ch;font-size:17.5px}
+.hero .row{margin-top:20px}
+.hero .btn.ghost{color:var(--on-bar);border-color:var(--hero-2)}
+.hero .btn.ghost:hover{background:var(--hero-2)}
+.queue{background:var(--hero-2);border-radius:10px;padding:16px}
+.queue .eyebrow{color:var(--on-bar-muted)}
+.qbar{height:12px;background:var(--bar);margin-top:10px;overflow:hidden;border-radius:6px}
+.qbar i{display:block;height:100%;width:0;background:var(--acc-hi);border-radius:6px}
+.qread{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-top:10px;flex-wrap:wrap}
+.qread b{font-family:var(--mono);font-size:30px;font-weight:600;line-height:1}
+.qread span{color:var(--on-bar-muted);font-size:14px}
+.qnote{font-size:13.5px;color:var(--on-bar-muted);margin-top:9px}
+.shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.sc{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:16px 18px}
+.sc:hover{border-color:var(--muted)}
+.sc b{font-family:var(--display);font-size:20px;font-weight:800;font-stretch:110%}
+.sc span{color:var(--muted);font-size:14.5px}
+.mine{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:center}
+.mine .sh{width:52px;height:62px}
+
+.progress{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.track{flex:1 1 180px;height:8px;background:var(--sunken);min-width:0;border-radius:4px;overflow:hidden}
+.track i{display:block;height:100%;background:var(--acc-hi)}
+.lessons{border:1px solid var(--rule);border-radius:var(--r);background:var(--surface);overflow:hidden}
+.lesson+.lesson{border-top:1px solid var(--rule)}
+.lesson summary{list-style:none;display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px 16px;cursor:pointer}
+.lesson summary:hover{background:var(--hover)}
+.lesson summary::-webkit-details-marker{display:none}
+.num{font-family:var(--mono);font-size:15px;font-weight:600;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;border:2px solid var(--rule);color:var(--muted)}
+.lesson.done .num{background:var(--good);border-color:var(--good);color:var(--surface)}
+.pill{font-size:12.5px;font-weight:700;padding:3px 10px;background:var(--sunken);color:var(--muted);white-space:nowrap;border-radius:999px}
+.lesson.done .pill{background:var(--good-soft);color:var(--good)}
+.lbody{padding:4px 16px 20px 70px;display:grid;gap:14px;max-width:820px}
+.lbody ul{margin:0;padding-left:20px;display:grid;gap:6px}
+.drill{background:var(--sunken);padding:12px 14px;border-radius:8px}
+.drill b{display:block;font-family:var(--display);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;font-stretch:115%}
+
+/* Civilizaciones: índice */
+.ctl{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center}
+.search{width:100%}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.ccard{display:flex;flex-direction:column;gap:12px;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:16px;min-width:0;transition:border-color .15s,transform .15s}
+.ccard:hover{border-color:var(--acc);transform:translateY(-2px)}
+.cc-top{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center}
+.cc-top b{display:block;font-family:var(--display);font-size:20px;font-weight:800;font-stretch:108%;line-height:1.1}
+.cc-top small{display:block;color:var(--muted);font-size:13px;line-height:1.3}
+.cc-sum{color:var(--muted);font-size:14.5px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.cc-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 12px;padding-top:12px;border-top:1px solid var(--rule)}
+.ms{display:flex;flex-direction:column;gap:4px;min-width:0}
+.ms span{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.pips{display:flex;gap:3px}
+.pips i{flex:1 1 0;height:6px;border-radius:2px;background:var(--sunken)}
+.pips i.on{background:var(--acc-hi)}
+.cc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.ctable td,.ctable th{white-space:nowrap}
+.ctable tbody tr{cursor:pointer}
+.ctable tbody tr:hover{background:var(--hover)}
+.ctable a{color:var(--ink);text-decoration:none;font-weight:750;display:inline-flex;align-items:center;gap:10px}
+.ctable .sh{width:24px;height:28px}
+.cell-bar{display:inline-flex;align-items:center;gap:7px}
+.cell-bar i{display:inline-block;height:6px;border-radius:3px;background:var(--acc-hi)}
+.cell-bar b{font-family:var(--mono);font-weight:600;font-size:13px;width:10px;text-align:right}
+.ctable th button{border:0;background:none;padding:0;font-weight:700;color:var(--muted);font-size:12.5px;letter-spacing:.04em}
+.ctable th button[aria-pressed="true"]{color:var(--acc)}
+
+/* Civilizaciones: ficha */
+.crumbs{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.crumbs a{text-decoration:none;font-weight:650;color:var(--muted);font-size:14.5px}
+.crumbs a:hover{color:var(--ink)}
+.pn{display:flex;gap:6px}
+.pn a{border:1px solid var(--rule);background:var(--surface);border-radius:8px;padding:6px 11px}
+.chero{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr);gap:18px;align-items:stretch}
+.chero-main{background:var(--hero);color:var(--on-bar);border-radius:14px;padding:28px;display:flex;flex-direction:column;gap:18px;position:relative;overflow:hidden}
+.chero-main::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent 0 22px,rgba(255,255,255,.025) 22px 23px);pointer-events:none}
+.chero-main>*{position:relative}
+.ch-id{display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:center}
+.ch-id .sh{width:84px;height:100px}
+.ch-id .eyebrow{color:var(--acc-hi)}
+.ch-id h1{font-size:clamp(40px,6vw,68px);margin:6px 0 10px}
+.ch-id .tag{background:var(--hero-2);color:var(--on-bar)}
+.csum{font-size:18px;line-height:1.55;color:var(--on-bar);max-width:62ch}
+.win{border-left:3px solid var(--acc-hi);padding:4px 0 4px 16px}
+.win b{display:block;font-family:var(--display);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--acc-hi);font-stretch:118%;margin-bottom:4px}
+.win p{color:var(--on-bar);font-size:16.5px}
+.chero-main .btn.ghost{color:var(--on-bar);border-color:var(--hero-2)}
+.chero-main .btn.ghost:hover{background:var(--hero-2)}
+.rate{display:flex;flex-direction:column;gap:14px}
+.rrow2{display:grid;grid-template-columns:92px minmax(0,1fr) 34px;gap:10px;align-items:center;font-size:14.5px}
+.rrow2 span{font-weight:650}
+.rbar{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.rbar i{height:12px;border-radius:3px;background:var(--sunken);position:relative}
+.rbar i.on{background:var(--acc-hi)}
+.rbar i.cmp::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:3px;border-radius:2px;background:var(--t-naval)}
+.rrow2 b{font-family:var(--mono);font-weight:600;text-align:right;font-size:13.5px}
+.cmpkey{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
+.cmpkey i{display:inline-block;width:14px;height:4px;border-radius:2px;margin-right:6px;vertical-align:3px}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.fact{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:5px;min-width:0}
+.fact b{font-weight:750;line-height:1.3}
+.fact p{color:var(--muted);font-size:14px;line-height:1.45}
+.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 60px);z-index:5;background:var(--bg);display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-block:8px;border-bottom:1px solid var(--rule)}
+.toc::-webkit-scrollbar{display:none}
+.toc button{border:0;background:none;padding:7px 11px;border-radius:7px;font-weight:650;font-size:14px;color:var(--muted);white-space:nowrap}
+.toc button:hover,.toc button[aria-current="true"]{background:var(--surface);color:var(--ink)}
+.sec{display:grid;grid-template-columns:200px minmax(0,1fr);gap:24px;padding-top:6px;scroll-margin-top:130px}
+.sec>header{display:flex;flex-direction:column;gap:6px}
+.sec>header h2{font-size:24px}
+.sec>header p{color:var(--muted);font-size:14px}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.list{margin:0;padding:0;list-style:none;display:grid;gap:9px}
+.list li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;align-items:start}
+.list li::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--acc-hi);margin:8px 0 0 6px}
+.list.plus li::before{content:"+";width:auto;height:auto;background:none;margin:0;font-family:var(--mono);font-weight:700;color:var(--good);text-align:center}
+.list.minus li::before{content:"−";width:auto;height:auto;background:none;margin:0;font-family:var(--mono);font-weight:700;color:var(--bad);text-align:center}
+.pc h3{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.pc.pro{border-top:3px solid var(--good)} .pc.con{border-top:3px solid var(--bad)}
+.callout{background:var(--acc-soft);border-radius:var(--r);padding:14px 16px;display:grid;gap:4px}
+.callout b{font-family:var(--display);font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-stretch:118%;color:var(--acc)}
+.ucards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.ucard{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.ucard .eyebrow{font-size:11px}
+.ucard b{font-family:var(--display);font-size:18px;font-weight:800;font-stretch:106%}
+.ucard small{color:var(--muted);font-size:13px}
+.ucard p{font-size:14.5px;color:var(--ink)}
+.age{font-size:11.5px;font-weight:750;padding:2px 8px;border-radius:999px;background:var(--sunken);color:var(--muted);align-self:flex-start}
+.age.imp{background:var(--acc-soft);color:var(--acc)}
+.timeline{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.timeline li{display:grid;grid-template-columns:120px minmax(0,1fr);gap:18px;padding:14px 0;border-top:1px solid var(--rule);position:relative}
+.timeline li:first-child{border-top:0;padding-top:4px}
+.timeline .when{display:flex;flex-direction:column;gap:2px}
+.timeline .when b{font-family:var(--display);font-weight:800;font-stretch:110%;font-size:16px}
+.timeline .when span{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.ops{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.op{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:8px}
+.op b{font-family:var(--display);font-size:18px;font-weight:800;font-stretch:106%}
+.op p{font-size:14.5px;color:var(--muted)}
+.op .btn{align-self:flex-start;margin-top:auto}
+.mapbox{display:flex;flex-direction:column;gap:8px}
+.mapbox h3{font-size:15px}
+.chiplist{display:flex;flex-wrap:wrap;gap:6px}
+.chiplist .tag.good{background:var(--good-soft);color:var(--good)}
+.chiplist .tag.bad{background:var(--bad-soft);color:var(--bad)}
+.enemy{border:1px solid var(--rule);border-left:4px solid var(--bad);border-radius:var(--r);padding:14px 16px;background:var(--surface);display:grid;gap:4px}
+.enemy b{font-family:var(--display);font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-stretch:118%;color:var(--bad)}
+.foot-nav{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.foot-nav a{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px}
+.foot-nav a:hover{border-color:var(--acc)}
+.foot-nav a:last-child{justify-content:flex-end;text-align:right}
+.foot-nav small{display:block;color:var(--muted);font-size:12.5px}
+.foot-nav b{font-family:var(--display);font-weight:800;font-size:18px}
+
+/* Aperturas */
+.bgrid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:22px;align-items:start}
+.now{display:flex;flex-direction:column;gap:12px}
+.nowtop{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap}
+.nowt{font-family:var(--mono);font-size:36px;font-weight:600;line-height:1}
+.nowdo{font-size:22px;line-height:1.3;font-weight:750;min-height:3.9em}
+.nownote{color:var(--muted);font-size:15px}
+.next{font-size:14.5px;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+.alloc{display:flex;height:20px;background:var(--sunken);overflow:hidden;border-radius:5px}
+.alloc span{display:block;min-width:0;transition:flex-grow .3s}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14.5px}
+.legend b{font-family:var(--mono);font-weight:600}
+.legend i{width:10px;height:10px;display:inline-block;margin-right:5px;border-radius:2px}
+.steps{display:grid;max-height:560px;overflow-y:auto;border:1px solid var(--rule);border-radius:var(--r);background:var(--surface)}
+.step{display:grid;grid-template-columns:54px 40px minmax(0,1fr);gap:8px;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule);padding:9px 12px;align-items:baseline;font-size:14.5px;line-height:1.4}
+.step:hover{background:var(--hover)}
+.step[aria-current="step"]{background:var(--acc-soft);box-shadow:inset 3px 0 0 var(--acc-hi)}
+.agebreak{font-family:var(--display);font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:12px 12px 5px;color:var(--acc);font-stretch:118%}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--rule);white-space:nowrap}
+th{font-size:12.5px;color:var(--muted);letter-spacing:.04em;font-weight:700}
+td.mono,th.mono{text-align:right}
+.field input{width:90px;font-family:var(--mono)}
+
+/* Counters */
+.tri{display:block;width:100%;max-width:520px;height:auto;margin-inline:auto}
+.tri text{font-family:var(--display);fill:var(--ink)}
+.resp{display:grid;gap:4px}
+.rrow{display:grid;grid-template-columns:32px minmax(0,1fr);gap:10px;align-items:start;padding:10px 0;border-bottom:1px solid var(--rule)}
+.rrow:last-child{border-bottom:0}
+.rank{font-family:var(--mono);font-size:15px;font-weight:600;width:28px;height:28px;display:grid;place-items:center;border-radius:50%;background:var(--acc-hi);color:var(--on-acc)}
+.utable td{white-space:normal;vertical-align:top}
+.utable td:first-child{font-weight:700;white-space:nowrap}
+
+/* Mapas */
+.maps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.map{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:10px}
+.map h3{font-size:24px;font-weight:800}
+
+/* Entrenar y ayuda */
+.quiz{max-width:720px}
+.qtext{font-size:23px;line-height:1.3;font-weight:750}
+.opts{display:grid;gap:8px}
+.opt{border:1px solid var(--rule);background:var(--surface);padding:12px 15px;text-align:left;border-radius:9px;font-weight:550}
+.opt:hover:not(:disabled){border-color:var(--muted)}
+.opt:disabled{cursor:default}
+.opt.right{background:var(--good);color:var(--surface);border-color:var(--good)}
+.opt.wrong{background:var(--bad);color:var(--surface);border-color:var(--bad)}
+.ex{color:var(--muted)}
+.acc details{border:1px solid var(--rule);border-radius:9px;background:var(--surface);padding:12px 14px}
+.acc{display:grid;gap:8px}
+.acc summary{font-weight:700;cursor:pointer}
+.acc ul{margin:8px 0 0;padding-left:20px;display:grid;gap:5px}
+.chat{display:flex;flex-direction:column;gap:12px}
+.chatlog{display:flex;flex-direction:column;gap:9px;max-height:460px;overflow-y:auto}
+.msg{padding:10px 13px;white-space:pre-wrap;overflow-wrap:anywhere;border-radius:10px}
+.msg.me{background:var(--ink);color:var(--bg);align-self:flex-end;max-width:88%}
+.msg.ai{background:var(--sunken);align-self:flex-start;max-width:96%}
+.chatform{display:flex;gap:8px}
+.chatform input{flex:1 1 auto;min-width:0}
+.gloss{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px 22px;margin:0}
+.gloss dt{font-weight:800}
+.gloss dd{margin:0;color:var(--muted);font-size:14.5px}
+.src{font-size:14.5px;color:var(--muted)}
+.src ul{padding-left:20px;margin:6px 0 0;display:grid;gap:3px}
+.dl{display:grid;gap:12px;margin:0}
+.dl dt{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.dl dd{margin:2px 0 0}
+
+@media (max-width:1000px){
+  .chero{grid-template-columns:minmax(0,1fr)}
+  .facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sec{grid-template-columns:minmax(0,1fr);gap:12px}
+}
+@media (max-width:820px){
+  .save{display:none}
+  .brand b{display:none}
+  .hero,.bgrid{grid-template-columns:minmax(0,1fr)}
+  .hero{padding:22px}
+  .shortcuts,.maps{grid-template-columns:minmax(0,1fr)}
+  .ctl{grid-template-columns:minmax(0,1fr) auto}
+  .ctl .search{grid-column:1/-1}
+  .lbody{padding-left:16px}
+  .steps{max-height:none}
+  .nowdo{min-height:0}
+  .chero-main{padding:20px}
+  .ch-id .sh{width:60px;height:72px}
+}
+@media (max-width:560px){
+  .two,.facts,.foot-nav{grid-template-columns:minmax(0,1fr)}
+  .timeline li{grid-template-columns:minmax(0,1fr);gap:4px}
+  .mine{grid-template-columns:auto minmax(0,1fr)}
+  .mine .btn{grid-column:1/-1}
+  .rrow2{grid-template-columns:80px minmax(0,1fr) 30px}
+}
+@media (prefers-reduced-motion:reduce){.alloc span,.ccard{transition:none}.ccard:hover{transform:none}}
+</style>
+
+<header class="top">
+  <div class="topin">
+    <a class="brand" href="#ruta" aria-label="Academia de Aldeanos, inicio"><svg viewBox="0 0 32 38" aria-hidden="true"><path d="M2 2h28v16c0 9-7 15-14 18C9 33 2 27 2 18z" fill="var(--acc-hi)"/><path d="M10 12h12M16 8v20M11 22l5 5 5-5" stroke="var(--bar)" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg><b>Academia de Aldeanos<small>AoE II · Definitive Edition</small></b></a>
+    <nav class="nav" id="nav" aria-label="Secciones"></nav>
+    <div class="save" id="save"><i></i>Guardando en este navegador</div>
+  </div>
+</header>
+<main class="main"><div class="wrap" id="view"></div></main>
+
+<script>
+/* ---------- Datos base ---------- */
+/*@BASE@*/
+
+/* ---------- Civilizaciones ---------- */
+/*@CIVDATA@*/
+
+const NAV=[['ruta','Inicio'],['civs','Civilizaciones'],['aperturas','Aperturas'],['counters','Counters'],['mapas','Mapas'],['quiz','Entrenar'],['ayuda','Ayuda y coach']];
+const SPEC={cav:'Caballería',arch:'Arqueros',inf:'Infantería',naval:'Naval',monk:'Monjes',gun:'Pólvora',siege:'Asedio',def:'Defensa',camel:'Camellos',eleph:'Elefantes',ca:'Arq. a caballo',cont:'Contraunidades'};
+const STATS=['Economía','Temprano','Castillos','Imperial','Agua','Facilidad'];
+const STATS_SHORT=['Eco','Temprano','Castillos','Imperial','Agua','Facilidad'];
+const LVL={1:'Para empezar',2:'Intermedia',3:'Técnica'};
+const AGES=[['Edad Oscura','0:00 a ~10:00'],['Feudal','~10:00 a ~20:00'],['Castillos','~17:00 a ~30:00'],['Imperial','desde ~28:00']];
+const CIVS=CIVDATA.map(c=>({...c,rv:c.r.split('').map(Number)})).sort((a,b)=>a.es.localeCompare(b.es,'es'));
+const civById=Object.fromEntries(CIVS.map(c=>[c.id,c]));
+const civByEs=Object.fromEntries(CIVS.map(c=>[c.es,c]));
+const buildById=Object.fromEntries(BUILDS.map(b=>[b.id,b]));
+
+/* ---------- Estado y guardado ---------- */
+const KEY='academia-aldeanos-v1';
+const BLANK=()=>({done:{},best:0,feudal:{},main:null,updatedAt:0});
+let P=BLANK();
+try{const r=JSON.parse(localStorage.getItem(KEY)||'null');if(r)P=Object.assign(P,r)}catch(e){}
+let dbDoc=null,saveTimer=null,saving=false,dirty=false;
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function setSave(where){const n=$('#save');if(n)n.innerHTML='<i></i>'+(where==='cuenta'?'Progreso guardado en tu cuenta':'Progreso guardado en este navegador')}
+function save(){P.updatedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(P))}catch(e){}dirty=true;clearTimeout(saveTimer);saveTimer=setTimeout(flush,800)}
+async function flush(){if(!dbDoc||saving||!dirty)return;saving=true;dirty=false;try{await dbDoc.set(JSON.parse(JSON.stringify(P)));setSave('cuenta')}catch(e){setSave('local')}finally{saving=false;if(dirty)flush()}}
+async function bootStore(){
+  if(!window.claude||!window.claude.use){setSave('local');return}
+  try{
+    const [db,user]=await Promise.all([claude.use('db'),claude.use('user')]);
+    if(!db||!user){setSave('local');return}
+    const id=await user.id();if(!id){setSave('local');return}
+    dbDoc=db.doc('data/users/'+id+'/progreso');
+    const snap=await dbDoc.get();
+    if(snap.exists){const r=snap.data();if((r.updatedAt||0)>(P.updatedAt||0)){P=Object.assign(BLANK(),JSON.parse(JSON.stringify(r)));try{localStorage.setItem(KEY,JSON.stringify(P))}catch(e){}render()}}
+    else if(P.updatedAt){dirty=true;flush()}
+    setSave('cuenta');
+  }catch(e){setSave('local')}
+}
+
+const ST={route:'ruta',build:'archers',step:0,clock:{on:false,t:0,last:0,speed:1.7,follow:false},civ:'franks',cmp:'',filt:new Set(),lvl:0,q:'',sort:0,view:'cards',enemy:new Set(['knight','archer']),quiz:null,chat:[],busy:false,ctl:null,pendingAsk:null};
+try{const v=localStorage.getItem(KEY+'-view');if(v==='table'||v==='cards')ST.view=v}catch(e){}
+let sampleFn=null,sampleChecked=false;
+const heroStart=Date.now();
+
+/* ---------- Piezas ---------- */
+function shield(c,cls='sh'){
+  const a=c.s[0],b=c.s[1],d='M2 2h28v16c0 9-7 15-14 18C9 33 2 27 2 18z';
+  return `<svg class="${cls}" viewBox="0 0 32 38" aria-hidden="true"><path d="${d}" fill="var(--t-${a})"/>${b?`<path d="M16 2h14v16c0 9-7 15-14 18z" fill="var(--t-${b})"/>`:''}<path d="${d}" fill="none" stroke="var(--shield-edge)" stroke-width="1.4"/><text x="16" y="23.5" font-size="15" text-anchor="middle">${esc(c.es[0])}</text></svg>`;
+}
+const specTag=k=>`<span class="tag"><i class="dot" style="background:var(--t-${k})"></i>${SPEC[k]}</span>`;
+const lvTag=l=>`<span class="lv lv${l}">${LVL[l]}</span>`;
+const pips=n=>`<div class="pips" aria-hidden="true">${[1,2,3,4,5].map(i=>`<i${i<=n?' class="on"':''}></i>`).join('')}</div>`;
+const civLink=(c,extra='')=>`<a class="tag" href="#civ-${c.id}"${extra}><i class="dot" style="background:var(--t-${c.s[0]})"></i>${c.es}</a>`;
+function navRender(){const cur=ST.route==='civ'?'civs':ST.route;$('#nav').innerHTML=NAV.map(([id,l])=>`<a href="#${id}"${cur===id?' aria-current="page"':''}>${l}</a>`).join('')}
+function render(){
+  navRender();
+  const v=$('#view');
+  v.innerHTML=({ruta:vRuta,aperturas:vAperturas,civs:vCivs,civ:vCiv,counters:vCounters,mapas:vMapas,quiz:vQuiz,ayuda:vAyuda}[ST.route]||vRuta)();
+  if(ST.route==='aperturas')paintStep();
+  if(ST.route==='civs')paintCivGrid();
+  if(ST.route==='civ'){paintRate();watchToc()}
+  if(ST.route==='counters')paintResp();
+  if(ST.route==='ayuda')initCoach();
+}
+function route(){
+  const h=decodeURIComponent((location.hash||'').slice(1));
+  if(h.startsWith('civ-')&&civById[h.slice(4)]){ST.route='civ';if(ST.civ!==h.slice(4))ST.cmp='';ST.civ=h.slice(4)}
+  else ST.route=NAV.some(n=>n[0]===h)?h:'ruta';
+  render();window.scrollTo(0,0);
+}
+
+/* ---------- Inicio ---------- */
+function vRuta(){
+  const done=LESSONS.filter((_,i)=>P.done[i]).length,next=LESSONS.findIndex((_,i)=>!P.done[i]);
+  const mc=P.main&&civById[P.main];
+  const starters=CIVS.filter(c=>c.l===1);
+  return `<section class="hero"><div><div class="eyebrow">Guía de estudio · Age of Empires II: DE</div><h1>Academia de Aldeanos</h1><p>Ya sabés jugar. Esta es la parte que falta: qué hacer en cada minuto, qué civilización elegir y con qué ganarle a lo que tenés enfrente.</p>
+  <div class="row"><a class="btn acc" href="#civs">Explorar las 56 civs</a><a class="btn ghost" href="#aperturas">Aperturas con reloj</a></div></div>
+  <div class="queue"><div class="eyebrow">Cola del Centro Urbano</div><div class="qbar"><i id="qfill"></i></div><div class="qread"><b id="qpop">3</b><span id="qclock">reloj 0:00</span></div><div class="qnote">Un aldeano cada 25 segundos. Esta cuenta arrancó cuando abriste la página.</div></div></section>
+  ${mc?`<section class="panel mine">${shield(mc)}<div><div class="eyebrow">Tu civ principal</div><h3 style="font-size:24px">${mc.es}</h3><p class="count">${mc.win}</p></div><a class="btn" href="#civ-${mc.id}">Abrir ficha</a></section>`
+  :`<section class="stack"><div class="head"><div class="eyebrow">Para arrancar</div><h2>Elegí una civ fácil y jugala 20 partidas</h2></div><div class="cgrid">${starters.slice(0,8).map(cardHtml).join('')}</div></section>`}
+  <section class="shortcuts"><a class="sc" href="#counters"><b>Counters</b><span>Marcá lo que tiene el rival y te digo con qué responder.</span></a><a class="sc" href="#mapas"><b>Mapas</b><span>Qué apertura y qué civs rinden en cada tipo de mapa.</span></a><a class="sc" href="#quiz"><b>Entrenar</b><span>Preguntas rápidas de counters, civs y conceptos.</span></a></section>
+  <section class="stack"><div class="head"><div class="eyebrow">Ruta de aprendizaje</div><h2>De jugar a saber por qué ganás</h2></div>
+  <div class="progress"><span class="count">${done} de ${LESSONS.length} lecciones</span><div class="track"><i style="width:${done/LESSONS.length*100}%"></i></div></div>
+  <div class="lessons">${LESSONS.map((l,i)=>`<details class="lesson${P.done[i]?' done':''}"${i===(next<0?0:next)?' open':''}><summary><span class="num">${i+1}</span><h3>${l.t}</h3><span class="pill">${P.done[i]?'Hecha':'Pendiente'}</span></summary>
+  <div class="lbody"><p>${l.why}</p><ul>${l.keys.map(k=>`<li>${k}</li>`).join('')}</ul><div class="drill"><b>Ejercicio</b>${l.drill}</div><div class="drill"><b>Lista cuando</b>${l.done}</div><div class="row"><button class="btn" data-act="toggle-lesson" data-i="${i}">${P.done[i]?'Marcar pendiente':'Marcar como hecha'}</button><a class="btn ghost" href="#${l.link[0]}"${l.link[1].includes('Arqueros')?' data-build="archers"':l.link[1].includes('Fast Castle')?' data-build="fck"':''}>${l.link[1]}</a></div></div></details>`).join('')}</div></section>`;
+}
+
+/* ---------- Civilizaciones: índice ---------- */
+function cardHtml(c){
+  return `<a class="ccard" href="#civ-${c.id}"><div class="cc-top">${shield(c)}<div><b>${c.es}</b><small>${c.en} · ${c.st}</small></div>${lvTag(c.l)}</div>
+  <p class="cc-sum">${c.sum}</p>
+  <div class="cc-stats" aria-label="${STATS.map((s,i)=>s+' '+c.rv[i]+' de 5').join(', ')}">${STATS_SHORT.map((s,i)=>`<div class="ms"><span>${s}</span>${pips(c.rv[i])}</div>`).join('')}</div>
+  <div class="cc-tags">${c.s.map(specTag).join('')}</div></a>`;
+}
+function vCivs(){
+  return `<section class="head"><div class="eyebrow">${CIVS.length} civilizaciones</div><h2>Elegí tu civilización</h2><p class="lede">Cada ficha tiene un resumen arriba y debajo todo el detalle: bonos, únicas, plan por edad, aperturas, mapas, rivales y consejos. El escudo muestra la especialidad principal a la izquierda.</p></section>
+  <div class="stack"><div class="ctl"><input class="input search" id="civq" type="search" placeholder="Buscar por nombre, unidad única o estilo" value="${esc(ST.q)}" aria-label="Buscar civilización">
+  <label class="field"><span class="count">Ordenar</span><select class="select" id="civsort" aria-label="Ordenar civilizaciones"><option value="0">Nombre</option>${STATS.map((s,i)=>`<option value="${i+1}"${ST.sort===i+1?' selected':''}>${s}</option>`).join('')}</select></label>
+  <div class="seg" role="group" aria-label="Vista"><button data-act="view" data-v="cards" aria-pressed="${ST.view==='cards'}">Fichas</button><button data-act="view" data-v="table" aria-pressed="${ST.view==='table'}">Tabla</button></div></div>
+  <div class="row"><div class="seg" role="group" aria-label="Dificultad">${[[0,'Todas'],[1,'Para empezar'],[2,'Intermedia'],[3,'Técnica']].map(([v,l])=>`<button data-act="lvl" data-v="${v}" aria-pressed="${ST.lvl===v}">${l}</button>`).join('')}</div></div>
+  <div class="chips" role="group" aria-label="Filtrar por especialidad">${Object.entries(SPEC).map(([k,v])=>`<button class="chip" data-act="spec" data-k="${k}" aria-pressed="${ST.filt.has(k)}"><i class="dot" style="background:var(--t-${k})"></i>${v}</button>`).join('')}</div></div>
+  <div class="stack"><div class="count" id="civcount"></div><div id="cgrid"></div></div>
+  <p class="fine">Las valoraciones de 1 a 5 son orientativas, pensadas para quien está aprendiendo, y no un ranking competitivo. Los bonos cambian con los parches: el árbol tecnológico del juego es la referencia final.</p>`;
+}
+function civList(){
+  const q=ST.q.trim().toLowerCase();
+  const list=CIVS.filter(c=>(!ST.lvl||c.l===ST.lvl)&&(!ST.filt.size||[...ST.filt].some(f=>c.s.includes(f)))&&(!q||[c.es,c.en,c.st,c.uu.map(u=>u[0]+' '+u[1]).join(' ')].join(' ').toLowerCase().includes(q)));
+  if(ST.sort)list.sort((a,b)=>b.rv[ST.sort-1]-a.rv[ST.sort-1]||a.es.localeCompare(b.es,'es'));
+  return list;
+}
+function paintCivGrid(){
+  const list=civList(),g=$('#cgrid');
+  $('#civcount').textContent=`${list.length} de ${CIVS.length}`+(ST.sort?` · ordenadas por ${STATS[ST.sort-1].toLowerCase()}`:'');
+  if(!list.length){g.className='';g.innerHTML='<div class="panel">Ninguna civilización coincide. Probá con menos filtros o otra búsqueda.</div>';return}
+  if(ST.view==='table'){
+    g.className='scroll panel';g.style.padding='4px 8px';
+    g.innerHTML=`<table class="ctable"><thead><tr><th>Civilización</th><th>Especialidad</th><th>Dificultad</th>${STATS.map((s,i)=>`<th><button data-act="sortcol" data-v="${i+1}" aria-pressed="${ST.sort===i+1}">${s}</button></th>`).join('')}</tr></thead><tbody>${list.map(c=>`<tr data-href="#civ-${c.id}"><td><a href="#civ-${c.id}">${shield(c)}${c.es}</a></td><td>${c.s.map(k=>SPEC[k]).join(' · ')}</td><td>${lvTag(c.l)}</td>${c.rv.map(n=>`<td><span class="cell-bar"><b>${n}</b><i style="width:${n*9}px"></i></span></td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  }else{g.className='cgrid';g.style.padding='';g.innerHTML=list.map(cardHtml).join('')}
+}
+
+/* ---------- Civilizaciones: ficha ---------- */
+const SECS=[['resumen','Resumen'],['bonos','Bonos'],['unicas','Únicas'],['ejercito','Ejército'],['edades','Plan por edad'],['aperturas','Aperturas'],['rivales','Mapas y rivales'],['consejos','Consejos']];
+function vCiv(){
+  const c=civById[ST.civ],i=CIVS.indexOf(c),prev=CIVS[(i-1+CIVS.length)%CIVS.length],next=CIVS[(i+1)%CIVS.length];
+  const isMain=P.main===c.id;
+  const uuNames=c.uu.map(u=>u[0]).join(', ');
+  const opHtml=c.op.map(([id,a,b])=>{const bd=id&&buildById[id];const name=bd?bd.name:a,why=bd?a:b;
+    return `<div class="op"><div class="eyebrow">${bd?bd.tag:'Variante'}</div><b>${name}</b><p>${why}</p>${bd?`<button class="btn ghost" data-act="openbuild" data-id="${id}">Abrir paso a paso</button>`:'<p class="fine">No está en la app como paso a paso. Usá la apertura más parecida como base.</p>'}</div>`}).join('');
+  return `<nav class="crumbs" aria-label="Navegación de civilizaciones"><a href="#civs">← Todas las civilizaciones</a><span class="pn"><a href="#civ-${prev.id}" aria-label="Anterior: ${prev.es}">‹ ${prev.es}</a><a href="#civ-${next.id}" aria-label="Siguiente: ${next.es}">${next.es} ›</a></span></nav>
+  <section class="chero"><div class="chero-main">
+    <div class="ch-id">${shield(c)}<div><div class="eyebrow">${c.en} · ${c.st}</div><h1>${c.es}</h1><div class="chips">${c.s.map(specTag).join('')}${lvTag(c.l)}</div></div></div>
+    <p class="csum">${c.sum}</p>
+    <div class="win"><b>Cómo ganás</b><p>${c.win}</p></div>
+    <div class="row"><button class="btn ${isMain?'acc':'ghost'}" data-act="main">${isMain?'★ Es tu civ principal':'☆ Marcar como mi civ principal'}</button><button class="btn ghost" data-act="ask-civ">Preguntarle al coach</button></div>
+  </div>
+  <aside class="panel rate" aria-label="Valoración"><div class="eyebrow">Valoración orientativa</div><div id="rate"></div>
+    <label class="field"><span class="count">Comparar con</span><select class="select" id="cmp" style="flex:1 1 140px;min-width:0"><option value="">Ninguna</option>${CIVS.filter(x=>x.id!==c.id).map(x=>`<option value="${x.id}"${ST.cmp===x.id?' selected':''}>${x.es}</option>`).join('')}</select></label>
+    <p class="fine">1 a 5, pensado para quien aprende. Facilidad alta significa que perdona más errores.</p></aside></section>
+  <section class="facts"><div class="fact"><div class="eyebrow">Unidades únicas</div><b>${uuNames}</b><p>${c.uu[0][2]}</p></div><div class="fact"><div class="eyebrow">Tecnología de Castillos</div><b>${c.ut[0][0]}</b><p>${c.ut[0][2]}</p></div><div class="fact"><div class="eyebrow">Tecnología Imperial</div><b>${c.ut[1][0]}</b><p>${c.ut[1][2]}</p></div><div class="fact"><div class="eyebrow">Bono de equipo</div><b>${c.t}</b><p>Lo reciben vos y tus aliados en partidas por equipos.</p></div></section>
+  <nav class="toc" id="toc" aria-label="Secciones de la ficha">${SECS.map(([id,l])=>`<button data-act="toc" data-id="${id}">${l}</button>`).join('')}</nav>
+  <section class="sec" id="sec-resumen"><header><h2>Resumen</h2><p>Lo que hace bien y dónde sufre.</p></header><div class="two">
+    <div class="panel pc pro"><h3>Fortalezas</h3><ul class="list plus">${c.pro.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+    <div class="panel pc con"><h3>Debilidades</h3><ul class="list minus">${c.con.map(x=>`<li>${x}</li>`).join('')}</ul></div></div></section>
+  <section class="sec" id="sec-bonos"><header><h2>Bonos</h2><p>Todo lo que la civ tiene distinto al resto.</p></header><div class="stack"><div class="panel"><ul class="list">${c.b.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="callout"><b>Bono de equipo</b><span>${c.t}</span></div></div></section>
+  <section class="sec" id="sec-unicas"><header><h2>Únicas</h2><p>Unidades y tecnologías que solo tiene esta civ.</p></header><div class="stack">
+    <div class="ucards">${c.uu.map(u=>`<div class="ucard"><div class="eyebrow">Unidad única</div><b>${u[1]}</b><small>${u[0]}</small><p>${u[2]}</p></div>`).join('')}</div>
+    <div class="ucards">${c.ut.map(u=>`<div class="ucard"><span class="age${u[1]==='Imperial'?' imp':''}">${u[1]}</span><b>${u[0]}</b><p>${u[2]}</p></div>`).join('')}</div></div></section>
+  <section class="sec" id="sec-ejercito"><header><h2>Ejército</h2><p>Con qué peleás y qué hacés cuando se acaba el oro.</p></header><div class="two">
+    <div class="panel"><div class="eyebrow">Composición principal</div><p style="margin-top:8px">${c.army}</p></div>
+    <div class="panel"><div class="eyebrow">Sin oro</div><p style="margin-top:8px">${c.trash}</p></div></div></section>
+  <section class="sec" id="sec-edades"><header><h2>Plan por edad</h2><p>Qué priorizar en cada etapa. Los tiempos son de referencia para una partida 1v1 en Arabia.</p></header><div class="panel"><ol class="timeline">${c.ages.map((a,j)=>`<li><div class="when"><b>${AGES[j][0]}</b><span>${AGES[j][1]}</span></div><p>${a}</p></li>`).join('')}</ol></div></section>
+  <section class="sec" id="sec-aperturas"><header><h2>Aperturas</h2><p>Las que mejor aprovechan sus bonos.</p></header><div class="ops">${opHtml}</div></section>
+  <section class="sec" id="sec-rivales"><header><h2>Mapas y rivales</h2><p>Dónde brilla, contra quién sufre y cómo se le gana.</p></header><div class="stack">
+    <div class="two"><div class="panel mapbox"><h3>Mapas donde rinde</h3><div class="chiplist">${c.mg.map(m=>`<span class="tag good">${m}</span>`).join('')}</div></div><div class="panel mapbox"><h3>Mapas donde sufre</h3><div class="chiplist">${c.mb.map(m=>`<span class="tag bad">${m}</span>`).join('')}</div></div></div>
+    <div class="two"><div class="panel"><div class="eyebrow">Le va bien contra</div><p style="margin-top:6px">${c.vg}</p></div><div class="panel"><div class="eyebrow">Le cuesta contra</div><p style="margin-top:6px">${c.vb}</p></div></div>
+    <div class="enemy"><b>Si la tenés enfrente</b><p>${c.vs}</p></div></div></section>
+  <section class="sec" id="sec-consejos"><header><h2>Consejos</h2><p>Detalles que suben tu nivel con esta civ.</p></header><div class="panel"><ul class="list">${c.tips.map(x=>`<li>${x}</li>`).join('')}</ul></div></section>
+  <nav class="foot-nav" aria-label="Otras civilizaciones"><a href="#civ-${prev.id}">${shield(prev)}<span><small>Anterior</small><b>${prev.es}</b></span></a><a href="#civ-${next.id}"><span><small>Siguiente</small><b>${next.es}</b></span>${shield(next)}</a></nav>`;
+}
+function paintRate(){
+  const c=civById[ST.civ],o=ST.cmp&&civById[ST.cmp],r=$('#rate');if(!r)return;
+  r.innerHTML=(o?`<div class="cmpkey"><span><i style="background:var(--acc-hi)"></i>${c.es}</span><span><i style="background:var(--t-naval)"></i>${o.es}</span></div>`:'')+
+  `<div class="stack" style="gap:${o?16:11}px">${STATS.map((s,i)=>`<div class="rrow2"><span>${s}</span><div class="rbar" role="img" aria-label="${s}: ${c.rv[i]} de 5${o?`; ${o.es}: ${o.rv[i]} de 5`:''}">${[1,2,3,4,5].map(n=>`<i class="${n<=c.rv[i]?'on':''}${o&&n<=o.rv[i]?' cmp':''}"></i>`).join('')}</div><b>${c.rv[i]}${o?`<span style="color:var(--t-naval)">/${o.rv[i]}</span>`:''}</b></div>`).join('')}</div>`;
+}
+let tocObs=null;
+function watchToc(){
+  if(tocObs)tocObs.disconnect();
+  if(!('IntersectionObserver' in window))return;
+  tocObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const id=e.target.id.slice(4);$$('#toc button').forEach(b=>b.setAttribute('aria-current',b.dataset.id===id))}})},{rootMargin:'-140px 0px -60% 0px'});
+  SECS.forEach(([id])=>{const el=$('#sec-'+id);if(el)tocObs.observe(el)});
+}
+
+/* ---------- Aperturas ---------- */
+function curBuild(){return BUILDS.find(b=>b.id===ST.build)}
+function vAperturas(){
+  const b=curBuild(),fans=CIVS.filter(c=>c.op.some(o=>o[0]===b.id));
+  return `<section class="head"><div class="eyebrow">Aperturas</div><h2>Paso a paso, con reloj</h2><p class="lede">Abrila al lado del juego y arrancá el reloj junto con la partida. Sigue el reloj del juego, no el real. Con las flechas del teclado avanzás y retrocedés.</p></section>
+  <div class="chips" role="group" aria-label="Elegir apertura">${BUILDS.map(x=>`<button class="chip" data-act="build" data-id="${x.id}" aria-pressed="${x.id===b.id}">${x.name}</button>`).join('')}</div>
+  <div class="bgrid"><div class="stack"><div class="panel now" aria-live="polite"><div class="nowtop"><div class="nowt" id="clock">0:00</div><div class="eyebrow" id="nowmeta"></div></div><div class="nowdo" id="nowdo"></div><div class="nownote" id="nownote"></div><div class="alloc" id="alloc" role="img"></div><div class="legend" id="legend"></div><div class="next" id="next"></div>
+  <div class="row"><button class="btn acc" data-act="clock" id="clockbtn">Iniciar reloj</button><button class="btn ghost" data-act="clock-reset">Reiniciar</button><label for="speed" class="count">Velocidad</label><select class="select" id="speed" data-act="speed"><option value="1.7"${ST.clock.speed===1.7?' selected':''}>1.7x (normal online)</option><option value="1.5"${ST.clock.speed===1.5?' selected':''}>1.5x</option><option value="1"${ST.clock.speed===1?' selected':''}>1x</option><option value="2"${ST.clock.speed===2?' selected':''}>2x</option></select></div>
+  <div class="row"><button class="btn ghost" data-act="prev">Anterior</button><button class="btn ghost" data-act="next">Siguiente</button></div></div>
+  ${b.bench?benchHtml(b):''}</div>
+  <div class="stack"><div><h3 style="font-size:24px">${b.name}</h3><p class="count">${b.en} · ${b.tag}</p></div><dl class="dl"><div><dt>Cuándo</dt><dd>${b.when}</dd></div><div><dt>Riesgo</dt><dd>${b.risk}</dd></div><div><dt>Civs que la recomiendan</dt><dd class="chiplist" style="margin-top:6px">${fans.map(c=>civLink(c)).join('')||b.civs}</dd></div></dl>
+  <div class="steps" id="steps">${stepsHtml(b)}</div><p class="fine">Los repartos por paso son aproximados y dependen del mapa. ${b.source}</p></div></div>`;
+}
+function stepsHtml(b){let age='';return b.steps.map((s,i)=>{const h=s.age!==age?`<div class="agebreak">${s.age}</div>`:'';age=s.age;return h+`<button class="step" data-act="step" data-i="${i}"${i===ST.step?' aria-current="step"':''}><span class="mono">${fmtT(s.t)}</span><span class="mono">${s.pop}</span><span>${s.do}</span></button>`}).join('')}
+function benchHtml(b){const saved=P.feudal[b.id];return `<div class="panel stack"><h3>¿Qué tan rápido venís?</h3><div class="scroll"><table><thead><tr>${b.bench.h.map((h,i)=>`<th${i?' class="mono"':''}>${h}</th>`).join('')}</tr></thead><tbody>${b.bench.r.map(r=>`<tr>${r.map((c,i)=>`<td${i?' class="mono"':''}>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+  <div class="field"><label for="ftime">Tu clic Feudal</label><input class="input" id="ftime" inputmode="numeric" placeholder="9:10" value="${saved?esc(saved):''}"><button class="btn ghost" data-act="ftime">Comparar</button></div><p id="fout" class="count">${saved?tierText(b,saved):'Escribí el tiempo de tu última partida.'}</p></div>`}
+function tierText(b,val){const t=parseT(val);if(t==null)return'Escribilo como minutos y segundos, por ejemplo 9:10.';const row=b.bench.r[0],tiers=b.bench.h.slice(1);for(let i=0;i<tiers.length;i++){if(t<=parseT(row[i+1]))return`Nivel ${tiers[i]}.`+(i>0?` Tu próximo objetivo es ${row[i]} (nivel ${tiers[i-1]}).`:' No hay un nivel superior: seguí así.')}return`Todavía por debajo del nivel E (${row[6]}). Empezá por reducir el tiempo con el CU quieto.`}
+function paintStep(){
+  const b=curBuild(),s=b.steps[ST.step]||b.steps[0],nx=b.steps[ST.step+1];
+  const clockText=ST.clock.on||ST.clock.t>0?fmtT(ST.clock.t):fmtT(s.t);
+  const c=$('#clock');if(!c)return;c.textContent=clockText;
+  $('#nowmeta').textContent=`${s.age} · Población ${s.pop}`;$('#nowdo').textContent=s.do;$('#nownote').textContent=s.note||'';
+  const total=s.a.reduce((x,y)=>x+y,0)||1;
+  $('#alloc').innerHTML=RES.map(([r],i)=>s.a[i]?`<span style="flex-grow:${s.a[i]};background:var(--${r})"></span>`:'').join('');
+  $('#alloc').setAttribute('aria-label',`Reparto de ${total} aldeanos`);
+  $('#legend').innerHTML=RES.map(([r,l],i)=>`<span><i style="background:var(--${r})"></i>${l} <b>${s.a[i]}</b></span>`).join('');
+  $('#next').textContent=nx?`Después, a las ${fmtT(nx.t)}: ${nx.do}`:'Fin de la apertura. A partir de acá decidís según lo que haga el rival.';
+  $$('#steps .step').forEach(el=>{if(+el.dataset.i===ST.step)el.setAttribute('aria-current','step');else el.removeAttribute('aria-current')});
+  const btn=$('#clockbtn');if(btn)btn.textContent=ST.clock.on?'Pausar reloj':(ST.clock.t>0?'Continuar reloj':'Iniciar reloj');
+}
+function setStep(i){const b=curBuild();ST.step=Math.max(0,Math.min(b.steps.length-1,i));paintStep();const el=$(`#steps .step[data-i="${ST.step}"]`),box=$('#steps');if(el&&box&&box.scrollHeight>box.clientHeight)box.scrollTop=el.offsetTop-box.offsetTop-60}
+
+/* ---------- Counters ---------- */
+function vCounters(){
+  return `<section class="head"><div class="eyebrow">Counters</div><h2>Mirá qué hace el rival y respondé</h2><p class="lede">Elegí lo que ves en su ejército. La respuesta suma qué conviene contra todo el grupo.</p></section>
+  <div class="bgrid"><div class="panel stack"><div class="eyebrow">El rival tiene</div><div class="chips" role="group" aria-label="Unidades rivales">${U.map(u=>`<button class="chip" data-act="enemy" data-id="${u.id}" aria-pressed="${ST.enemy.has(u.id)}">${u.n}</button>`).join('')}</div><div class="eyebrow">Tu mejor respuesta</div><div class="resp" id="resp"></div></div>
+  <div class="panel"><svg class="tri" viewBox="0 0 520 380" role="img" aria-label="Triángulo de counters: caballería gana a arqueros, arqueros ganan a infantería y lanceros ganan a caballería.">
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--acc-hi)"/></marker></defs>
+  <g fill="none" stroke="var(--acc-hi)" stroke-width="3.5"><path d="M232 66L116 270" marker-end="url(#ah)"/><path d="M176 304H340" marker-end="url(#ah)"/><path d="M404 270L288 66" marker-end="url(#ah)"/></g>
+  <g font-size="27" font-weight="800" text-anchor="middle"><text x="260" y="44">Caballería</text><text x="100" y="314">Arqueros</text><text x="420" y="314">Lanceros</text></g>
+  <g font-size="20" text-anchor="middle"><text x="118" y="165" style="fill:var(--muted)">gana a</text><text x="258" y="292" style="fill:var(--muted)">ganan a</text><text x="402" y="165" style="fill:var(--muted)">ganan a</text>
+  <text x="100" y="352" style="fill:var(--muted)">y los hostigadores</text><text x="420" y="352" style="fill:var(--muted)">y los camellos</text></g></svg></div></div>
+  <section class="stack"><h3>Referencia completa</h3><div class="scroll panel" style="padding:4px 8px"><table class="utable"><thead><tr><th>Unidad</th><th>Edad</th><th>Costo</th><th>Le gana a</th><th>Pierde contra</th></tr></thead><tbody>${U.map(u=>`<tr><td>${u.n}</td><td>${u.age}</td><td>${u.cost}</td><td>${[...u.beats.map(i=>ub[i].n),u.vs].filter(Boolean).join(', ')||'Edificios'}</td><td>${u.loses.map(i=>ub[i].n).join(', ')}</td></tr>`).join('')}</tbody></table></div><p class="fine">Las civilizaciones cambian estas relaciones: revisá en la ficha de cada civ qué hace bien y en el juego si tiene la mejora completa de cada línea.</p></section>`;
+}
+function respond(){const s={};[...ST.enemy].forEach(id=>{const e=ub[id];e.loses.forEach((c,i)=>{s[c]=s[c]||{p:0,vs:[]};s[c].p+=3-i>0?3-i:1;s[c].vs.push(e.n)})});[...ST.enemy].forEach(id=>{const e=ub[id];(e.beats||[]).forEach(c=>{if(s[c])s[c].p-=2})});return Object.entries(s).sort((a,b)=>b[1].p-a[1].p).slice(0,3)}
+function paintResp(){const r=$('#resp');if(!r)return;if(!ST.enemy.size){r.innerHTML='<p class="count">Elegí al menos una unidad rival.</p>';return}r.innerHTML=respond().map(([id,v],i)=>{const u=ub[id];return `<div class="rrow"><span class="rank">${i+1}</span><div><b>${u.n}</b> <span class="count">${u.en} · ${u.age} · ${u.cost}</span><div>Sirve contra: ${v.vs.join(', ')}.</div><div class="count">${u.why}</div></div></div>`}).join('')}
+
+/* ---------- Mapas ---------- */
+function vMapas(){return `<section class="head"><div class="eyebrow">Mapas</div><h2>El mapa decide la apertura</h2><p class="lede">El pool ranked rota: revisalo en el juego. Estos tipos cubren casi todo lo que vas a encontrar.</p></section>
+  <div class="maps">${MAPS.map(m=>{const cs=CIVS.filter(c=>c.mg.some(g=>m.k.includes(g)));return `<article class="map"><div><h3>${m.n}</h3><p class="count">${m.t}</p></div><p>${m.plan}</p><div class="stack" style="gap:8px"><div class="eyebrow">Civs que rinden acá · ${cs.length}</div><div class="chiplist">${cs.slice(0,14).map(c=>civLink(c)).join('')}${cs.length>14?`<span class="tag">+${cs.length-14} más</span>`:''}</div></div><div><button class="btn ghost" data-act="mapciv" data-f="${m.f}">Filtrar civs: ${m.c}</button></div></article>`}).join('')}</div>`}
+
+/* ---------- Entrenar ---------- */
+function newQuiz(){
+  const qs=[];const shuffle=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+  shuffle(U.filter(u=>u.loses.length)).slice(0,4).forEach(u=>{const a=ub[u.loses[0]].n;const pool=U.filter(x=>x.id!==u.loses[0]&&!u.loses.includes(x.id)).map(x=>x.n);qs.push({q:`El rival masea ${u.n}. ¿Cuál es tu mejor respuesta?`,a,o:shuffle(pool).slice(0,3),x:u.why})});
+  shuffle(CIVS).slice(0,2).forEach(c=>{const a=SPEC[c.s[0]];const pool=Object.keys(SPEC).filter(k=>!c.s.includes(k)).map(k=>SPEC[k]);qs.push({q:`¿En qué se especializan los ${c.es}?`,a,o:shuffle(pool).slice(0,3),x:`${c.es}: ${c.win}`})});
+  shuffle(CIVS).slice(0,2).forEach(c=>{const u=c.uu[0];const pool=CIVS.filter(x=>x.id!==c.id&&!x.uu.some(y=>y[0]===u[0])).map(x=>x.es);qs.push({q:`¿De qué civilización es la unidad única ${u[0]} (${u[1]})?`,a:c.es,o:shuffle(pool).slice(0,3),x:u[2]})});
+  shuffle(QBANK).slice(0,2).forEach(q=>qs.push(q));
+  ST.quiz={qs:shuffle(qs).map(q=>({...q,opts:shuffle([q.a,...q.o])})),i:0,score:0,ans:null};
+}
+function vQuiz(){if(!ST.quiz)newQuiz();const z=ST.quiz;
+  if(z.i>=z.qs.length){if(z.score>(P.best||0)){P.best=z.score;save()}return `<section class="head"><div class="eyebrow">Entrenar</div><h2>${z.score} de ${z.qs.length}</h2><p class="lede">${z.score>=8?'Muy bien: los counters y conceptos ya están.':'Repetí cuando puedas: la velocidad de respuesta viene de hacerlo seguido.'} Tu mejor resultado es ${P.best||0}.</p></section><div class="row"><button class="btn acc" data-act="quiz-new">Otra ronda</button></div>`}
+  const q=z.qs[z.i];
+  return `<section class="head"><div class="eyebrow">Entrenar · Pregunta ${z.i+1} de ${z.qs.length} · Mejor: ${P.best||0}</div><div class="track" style="max-width:720px"><i style="width:${z.i/z.qs.length*100}%"></i></div></section><div class="quiz stack"><div class="qtext">${q.q}</div><div class="opts">${q.opts.map(o=>`<button class="opt ${z.ans?(o===q.a?'right':(o===z.ans?'wrong':'')):''}" data-act="ans" data-v="${esc(o)}"${z.ans?' disabled':''}>${o}</button>`).join('')}</div>${z.ans?`<p class="ex">${q.x}</p><div><button class="btn" data-act="quiz-next">Seguir</button></div>`:''}</div>`}
+
+/* ---------- Ayuda ---------- */
+function vAyuda(){return `<section class="head"><div class="eyebrow">Ayuda</div><h2>Por qué perdí y qué hago</h2></section>
+  <div class="bgrid"><div class="acc">${PROBLEMS.map(([t,l])=>`<details><summary>${t}</summary><ul>${l.map(x=>`<li>${x}</li>`).join('')}</ul></details>`).join('')}</div>
+  <div class="panel chat" id="coach"><div><h3>Preguntale al coach</h3><p class="count" id="coachnote">Contale con qué civ jugás y qué te pasó.</p></div><div class="chips" id="coachex"></div><div class="chatlog" id="chatlog" aria-live="polite"></div><form class="chatform" id="chatform"><input class="input" id="chatq" autocomplete="off" placeholder="Ej: juego Francos, ¿qué hago contra Britanos?" aria-label="Tu pregunta"><button class="btn" id="chatsend">Enviar</button></form></div></div>
+  <section class="stack"><h3>Glosario</h3><dl class="gloss">${GLOSS.map(([a,b])=>`<div><dt>${a}</dt><dd>${b}</dd></div>`).join('')}</dl></section>
+  <section class="src"><h3>Fuentes</h3><p>Última revisión: noviembre de 2026, con The Viking Sagas incluida. Bonos, únicas y tecnologías salen de guías de la comunidad y páginas oficiales; las valoraciones, planes y consejos son una recomendación propia para quien aprende. El árbol tecnológico del juego es la referencia final.</p><ul>${SOURCES.map(([t,u])=>`<li><a href="${u}" target="_blank" rel="noopener">${t}</a></li>`).join('')}</ul></section>`}
+
+/* ---------- Coach ---------- */
+const EX=['Juego Francos en Arabia. ¿Cómo abro y qué hago después?','¿Qué civ me conviene si me gustan los arqueros?','Siempre pierdo contra rush de exploradores. ¿Qué hago?'];
+const RULES=()=>`Sos un coach de Age of Empires II: Definitive Edition. Respondés en español rioplatense (vos), en texto plano sin markdown ni listas con asteriscos, en un máximo de 150 palabras. El alumno sabe jugar pero no conoce táctica, aperturas ni civilizaciones. Da pasos concretos con tiempos y población cuando corresponda. El balance cambia con los parches: si no estás seguro de un valor, decilo y sugerí confirmarlo en el árbol tecnológico. Usá solo estos datos sobre civilizaciones y no inventes unidades:\n\nCIVS:\n${CIVS.map(c=>`${c.es} (${c.en}): ${c.s.map(k=>SPEC[k]).join('/')}, ${c.st}. Únicas: ${c.uu.map(u=>u[0]).join(', ')}. Tecnologías: ${c.ut.map(u=>u[0]+' ('+u[1]+')').join(', ')}. Bonos: ${c.b.join(' ')} Plan: ${c.win} Contra ella: ${c.vs}`).join('\n')}\n\nAPERTURAS EN LA APP: ${BUILDS.map(b=>b.name+' ('+b.tag+')').join('; ')}.\n\nCOUNTERS: ${U.map(u=>u.n+' pierde contra '+u.loses.map(i=>ub[i].n).join(', ')).join('; ')}.\n\nEmpieza la conversación:`;
+function chatPaint(){const l=$('#chatlog');if(!l)return;l.innerHTML=ST.chat.map(m=>`<div class="msg ${m.role==='user'?'me':'ai'}">${esc(m.content)}</div>`).join('');l.scrollTop=l.scrollHeight}
+async function initCoach(){
+  chatPaint();
+  const ex=$('#coachex');if(ex)ex.innerHTML=EX.map(t=>`<button class="chip" data-act="coach-ex" data-t="${esc(t)}">${t}</button>`).join('');
+  if(!sampleChecked){sampleChecked=true;if(window.claude&&window.claude.use){try{sampleFn=await claude.use('sample')}catch(e){sampleFn=null}}}
+  const n=$('#coachnote'),f=$('#chatform'),b=$('#coachex');
+  if(!sampleFn&&n&&f){n.textContent='El coach necesita Claude y no está disponible en esta vista. El resto de la página funciona igual.';f.hidden=true;if(b)b.hidden=true;ST.pendingAsk=null;return}
+  if(ST.pendingAsk){const q=ST.pendingAsk;ST.pendingAsk=null;ask(q);$('#coach').scrollIntoView({block:'start'})}
+}
+async function ask(text){
+  if(!sampleFn||ST.busy||!text.trim())return;
+  ST.busy=true;ST.chat.push({role:'user',content:text.trim()});
+  const reply={role:'assistant',content:'Pensando...'};ST.chat.push(reply);chatPaint();
+  const send=$('#chatsend');if(send)send.textContent='Detener';
+  ST.ctl=new AbortController();
+  const hist=ST.chat.slice(0,-1).slice(-8);
+  try{
+    const r=await sampleFn([{role:'user',content:RULES()},...hist],{cache:false,signal:ST.ctl.signal,onText:({text})=>{reply.content=text;chatPaint()}});
+    if(r.truncated)reply.content+='\n\n(La respuesta se cortó. Pedí algo más puntual.)';
+  }catch(e){
+    if(e&&e.code==='cancelled'){reply.content=(e.text||'Detenido.')}
+    else if(e&&['not_granted','sampling_disabled','not_declared','capability_disabled','capability_removed'].includes(e.code)){reply.content='El coach no tiene permiso para usar Claude en esta vista.';sampleFn=null;const f=$('#chatform');if(f)f.hidden=true}
+    else if(e&&e.code==='rate_limited'){reply.content='Demasiadas preguntas seguidas. Probá de nuevo en un rato.'}
+    else if(e&&e.code==='refused'){reply.content='No pude responder a eso. Probá con otra pregunta del juego.'}
+    else{reply.content=(e&&e.text?e.text+'\n\n':'')+'Se cortó la conexión. Volvé a preguntar.'}
+  }
+  ST.busy=false;ST.ctl=null;const s2=$('#chatsend');if(s2)s2.textContent='Enviar';chatPaint();
+}
+
+/* ---------- Eventos ---------- */
+document.addEventListener('click',e=>{
+  const linkB=e.target.closest('a[data-build]');if(linkB){ST.build=linkB.dataset.build;ST.step=0}
+  const tr=e.target.closest('tr[data-href]');if(tr&&!e.target.closest('a')){location.hash=tr.dataset.href.slice(1);return}
+  const t=e.target.closest('[data-act]');if(!t)return;const a=t.dataset.act;
+  if(a==='toggle-lesson'){const i=t.dataset.i;P.done[i]=!P.done[i];if(!P.done[i])delete P.done[i];save();render()}
+  else if(a==='build'){ST.build=t.dataset.id;ST.step=0;ST.clock.on=false;ST.clock.t=0;render()}
+  else if(a==='openbuild'){ST.build=t.dataset.id;ST.step=0;ST.clock.on=false;ST.clock.t=0;location.hash='aperturas'}
+  else if(a==='step'){ST.clock.follow=false;setStep(+t.dataset.i)}
+  else if(a==='prev'){ST.clock.follow=false;setStep(ST.step-1)}
+  else if(a==='next'){ST.clock.follow=false;setStep(ST.step+1)}
+  else if(a==='clock'){const c=ST.clock;c.on=!c.on;c.last=Date.now();c.follow=true;if(c.on)wake();paintStep()}
+  else if(a==='clock-reset'){ST.clock.on=false;ST.clock.t=0;ST.step=0;paintStep()}
+  else if(a==='ftime'){const b=curBuild(),v=$('#ftime').value;$('#fout').textContent=tierText(b,v);if(parseT(v)!=null){P.feudal[b.id]=v;save()}}
+  else if(a==='lvl'){ST.lvl=+t.dataset.v;$$('[data-act="lvl"]').forEach(x=>x.setAttribute('aria-pressed',+x.dataset.v===ST.lvl));paintCivGrid()}
+  else if(a==='view'){ST.view=t.dataset.v;try{localStorage.setItem(KEY+'-view',ST.view)}catch(err){}$$('[data-act="view"]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===ST.view));paintCivGrid()}
+  else if(a==='sortcol'){const v=+t.dataset.v;ST.sort=ST.sort===v?0:v;const s=$('#civsort');if(s)s.value=ST.sort;paintCivGrid()}
+  else if(a==='spec'){const k=t.dataset.k;ST.filt.has(k)?ST.filt.delete(k):ST.filt.add(k);t.setAttribute('aria-pressed',ST.filt.has(k));paintCivGrid()}
+  else if(a==='main'){P.main=P.main===ST.civ?null:ST.civ;save();const y=scrollY;render();scrollTo(0,y)}
+  else if(a==='ask-civ'){const c=civById[ST.civ];ST.pendingAsk=`Juego ${c.es}. Dame un plan concreto para una partida en Arabia: apertura, qué hacer en Feudal y Castillos, y cómo enfrentar a las civs que me cuestan.`;location.hash='ayuda'}
+  else if(a==='toc'){const el=$('#sec-'+t.dataset.id);if(el)el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'start'})}
+  else if(a==='enemy'){const id=t.dataset.id;ST.enemy.has(id)?ST.enemy.delete(id):ST.enemy.add(id);t.setAttribute('aria-pressed',ST.enemy.has(id));paintResp()}
+  else if(a==='mapciv'){const f=t.dataset.f;ST.filt.clear();ST.lvl=0;ST.q='';ST.sort=0;if(f==='lvl1')ST.lvl=1;else ST.filt.add(f);location.hash='civs'}
+  else if(a==='ans'){const z=ST.quiz;if(z.ans)return;z.ans=t.dataset.v;if(z.ans===z.qs[z.i].a)z.score++;render()}
+  else if(a==='quiz-next'){ST.quiz.i++;ST.quiz.ans=null;render()}
+  else if(a==='quiz-new'){newQuiz();render()}
+  else if(a==='coach-ex'){ask(t.dataset.t)}
+});
+document.addEventListener('change',e=>{
+  if(e.target.id==='speed'){ST.clock.speed=+e.target.value}
+  else if(e.target.id==='civsort'){ST.sort=+e.target.value;paintCivGrid()}
+  else if(e.target.id==='cmp'){ST.cmp=e.target.value;paintRate()}
+});
+document.addEventListener('input',e=>{if(e.target.id==='civq'){ST.q=e.target.value;paintCivGrid()}});
+document.addEventListener('submit',e=>{if(e.target.id==='chatform'){e.preventDefault();if(ST.busy){if(ST.ctl)ST.ctl.abort();return}const q=$('#chatq');const v=q.value;q.value='';ask(v)}});
+document.addEventListener('keydown',e=>{
+  if(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||e.altKey||e.ctrlKey||e.metaKey)return;
+  if(ST.route==='aperturas'){if(e.key==='ArrowRight'){ST.clock.follow=false;setStep(ST.step+1)}if(e.key==='ArrowLeft'){ST.clock.follow=false;setStep(ST.step-1)}}
+  else if(ST.route==='civ'&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){const i=CIVS.indexOf(civById[ST.civ]);const n=CIVS[(i+(e.key==='ArrowRight'?1:-1)+CIVS.length)%CIVS.length];location.hash='civ-'+n.id}
+});
+addEventListener('hashchange',route);
+let wakeLock=null;async function wake(){try{if(navigator.wakeLock&&!wakeLock){wakeLock=await navigator.wakeLock.request('screen');wakeLock.addEventListener('release',()=>{wakeLock=null})}}catch(e){}}
+
+/* ---------- Relojes ---------- */
+const reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
+setInterval(()=>{
+  const fill=$('#qfill');
+  if(fill){
+    const gt=reduced?480:((Date.now()-heroStart)/1000*1.7)%(197*25);
+    const pop=3+Math.floor(gt/25),frac=(gt%25)/25;
+    fill.style.width=(reduced?0:frac*100)+'%';$('#qpop').textContent=pop+' aldeanos';$('#qclock').textContent='reloj '+fmtT(gt);
+  }
+  const c=ST.clock;
+  if(c.on){
+    const now=Date.now();c.t+=(now-c.last)/1000*c.speed;c.last=now;
+    if(ST.route==='aperturas'){
+      const b=curBuild();
+      if(c.follow){let idx=0;b.steps.forEach((s,i)=>{if(s.t<=c.t)idx=i});if(idx!==ST.step)setStep(idx)}
+      const n=$('#clock');if(n)n.textContent=fmtT(c.t);
+      const nx=b.steps[ST.step+1],nel=$('#next');
+      if(nel&&nx&&c.follow)nel.textContent=`En ${fmtT(Math.max(0,nx.t-c.t))}: ${nx.do}`;
+    }
+  }
+},200);
+
+route();
+bootStore();
+</script>
