@@ -107,6 +107,13 @@ button{cursor:pointer}
 .lv{font-size:12px;font-weight:750;padding:3px 9px;border-radius:999px;white-space:nowrap;border:1px solid currentColor}
 .lv1{color:var(--good)} .lv2{color:var(--warn)} .lv3{color:var(--bad)}
 
+/* Íconos de unidades */
+.ui{width:48px;height:48px;border-radius:7px;flex:none;display:block;background:var(--sunken);box-shadow:0 0 0 1px var(--rule)}
+.ui.s{width:26px;height:26px;border-radius:5px}
+.ui.m{width:36px;height:36px;border-radius:6px}
+.ui.l{width:64px;height:64px;border-radius:9px}
+.uirow{display:flex;gap:6px;flex-wrap:wrap}
+.chip .ui.s{width:22px;height:22px;margin-left:-6px;border-radius:50%}
 /* Escudo */
 .sh{width:34px;height:40px;flex:none;display:block}
 .sh text{font-family:var(--display);font-weight:850;font-stretch:110%;fill:#fff;paint-order:stroke;stroke:rgba(0,0,0,.35);stroke-width:2px}
@@ -237,6 +244,8 @@ button{cursor:pointer}
 .callout b{font-family:var(--display);font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-stretch:118%;color:var(--acc)}
 .ucards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
 .ucard{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.ucard.withimg{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;align-items:start}
+.ucard.withimg .ui{grid-row:span 4}
 .ucard .eyebrow{font-size:11px}
 .ucard b{font-family:var(--display);font-size:18px;font-weight:800;font-stretch:106%}
 .ucard small{color:var(--muted);font-size:13px}
@@ -296,11 +305,13 @@ td.mono,th.mono{text-align:right}
 .tri{display:block;width:100%;max-width:520px;height:auto;margin-inline:auto}
 .tri text{font-family:var(--display);fill:var(--ink)}
 .resp{display:grid;gap:4px}
-.rrow{display:grid;grid-template-columns:32px minmax(0,1fr);gap:10px;align-items:start;padding:10px 0;border-bottom:1px solid var(--rule)}
+.rrow{display:grid;grid-template-columns:32px auto minmax(0,1fr);gap:10px;align-items:start;padding:10px 0;border-bottom:1px solid var(--rule)}
 .rrow:last-child{border-bottom:0}
 .rank{font-family:var(--mono);font-size:15px;font-weight:600;width:28px;height:28px;display:grid;place-items:center;border-radius:50%;background:var(--acc-hi);color:var(--on-acc)}
 .utable td{white-space:normal;vertical-align:top}
 .utable td:first-child{font-weight:700;white-space:nowrap}
+.utable td:first-child span{display:inline-flex;align-items:center;gap:10px}
+.qimg{display:flex;align-items:center;gap:14px}
 
 /* Mapas */
 .maps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
@@ -381,6 +392,11 @@ td.mono,th.mono{text-align:right}
 
 /* ---------- Civilizaciones ---------- */
 /*@CIVDATA@*/
+
+/* ---------- Íconos de unidades (Age of Empires II © Microsoft, vía aoe2techtree.net) ---------- */
+/*@ICONS@*/
+const uimg=(name,cls='',alt='')=>{const src=ICONS[name]||ICONS[{Longboat:'Longship'}[name]];return src?`<img class="ui${cls?' '+cls:''}" src="${src}" alt="${esc(alt)}" width="48" height="48" loading="lazy">`:''};
+const gimg=(id,cls='')=>uimg('@'+id,cls);
 
 const NAV=[['ruta','Inicio'],['civs','Civilizaciones'],['aperturas','Aperturas'],['counters','Counters'],['mapas','Mapas'],['quiz','Entrenar'],['ayuda','Ayuda y coach']];
 const SPEC={cav:'Caballería',arch:'Arqueros',inf:'Infantería',naval:'Naval',monk:'Monjes',gun:'Pólvora',siege:'Asedio',def:'Defensa',camel:'Camellos',eleph:'Elefantes',ca:'Arq. a caballo',cont:'Contraunidades'};
@@ -473,7 +489,7 @@ function cardHtml(c){
   return `<a class="ccard" href="#civ-${c.id}"><div class="cc-top">${shield(c)}<div><b>${c.es}</b><small>${c.en} · ${c.st}</small></div>${lvTag(c.l)}</div>
   <p class="cc-sum">${c.sum}</p>
   <div class="cc-stats" aria-label="${STATS.map((s,i)=>s+' '+c.rv[i]+' de 5').join(', ')}">${STATS_SHORT.map((s,i)=>`<div class="ms"><span>${s}</span>${pips(c.rv[i])}</div>`).join('')}</div>
-  <div class="cc-tags">${c.s.map(specTag).join('')}</div></a>`;
+  <div class="cc-tags"><span class="uirow" title="${esc(c.uu.map(u=>u[1]).join(', '))}">${c.uu.map(u=>uimg(u[0],'s')).join('')}</span>${c.s.map(specTag).join('')}</div></a>`;
 }
 function vCivs(){
   return `<section class="head"><div class="eyebrow">${CIVS.length} civilizaciones</div><h2>Elegí tu civilización</h2><p class="lede">Cada ficha tiene un resumen arriba y debajo todo el detalle: bonos, únicas, plan por edad, aperturas, mapas, rivales y consejos. El escudo muestra la especialidad principal a la izquierda.</p></section>
@@ -497,7 +513,7 @@ function paintCivGrid(){
   if(!list.length){g.className='';g.innerHTML='<div class="panel">Ninguna civilización coincide. Probá con menos filtros o otra búsqueda.</div>';return}
   if(ST.view==='table'){
     g.className='scroll panel';g.style.padding='4px 8px';
-    g.innerHTML=`<table class="ctable"><thead><tr><th>Civilización</th><th>Especialidad</th><th>Dificultad</th>${STATS.map((s,i)=>`<th><button data-act="sortcol" data-v="${i+1}" aria-pressed="${ST.sort===i+1}">${s}</button></th>`).join('')}</tr></thead><tbody>${list.map(c=>`<tr data-href="#civ-${c.id}"><td><a href="#civ-${c.id}">${shield(c)}${c.es}</a></td><td>${c.s.map(k=>SPEC[k]).join(' · ')}</td><td>${lvTag(c.l)}</td>${c.rv.map(n=>`<td><span class="cell-bar"><b>${n}</b><i style="width:${n*9}px"></i></span></td>`).join('')}</tr>`).join('')}</tbody></table>`;
+    g.innerHTML=`<table class="ctable"><thead><tr><th>Civilización</th><th>Especialidad</th><th>Únicas</th><th>Dificultad</th>${STATS.map((s,i)=>`<th><button data-act="sortcol" data-v="${i+1}" aria-pressed="${ST.sort===i+1}">${s}</button></th>`).join('')}</tr></thead><tbody>${list.map(c=>`<tr data-href="#civ-${c.id}"><td><a href="#civ-${c.id}">${shield(c)}${c.es}</a></td><td>${c.s.map(k=>SPEC[k]).join(' · ')}</td><td><span class="uirow" style="flex-wrap:nowrap">${c.uu.map(u=>uimg(u[0],'s')).join('')}</span></td><td>${lvTag(c.l)}</td>${c.rv.map(n=>`<td><span class="cell-bar"><b>${n}</b><i style="width:${n*9}px"></i></span></td>`).join('')}</tr>`).join('')}</tbody></table>`;
   }else{g.className='cgrid';g.style.padding='';g.innerHTML=list.map(cardHtml).join('')}
 }
 
@@ -519,14 +535,14 @@ function vCiv(){
   <aside class="panel rate" aria-label="Valoración"><div class="eyebrow">Valoración orientativa</div><div id="rate"></div>
     <label class="field"><span class="count">Comparar con</span><select class="select" id="cmp" style="flex:1 1 140px;min-width:0"><option value="">Ninguna</option>${CIVS.filter(x=>x.id!==c.id).map(x=>`<option value="${x.id}"${ST.cmp===x.id?' selected':''}>${x.es}</option>`).join('')}</select></label>
     <p class="fine">1 a 5, pensado para quien aprende. Facilidad alta significa que perdona más errores.</p></aside></section>
-  <section class="facts"><div class="fact"><div class="eyebrow">Unidades únicas</div><b>${uuNames}</b><p>${c.uu[0][2]}</p></div><div class="fact"><div class="eyebrow">Tecnología de Castillos</div><b>${c.ut[0][0]}</b><p>${c.ut[0][2]}</p></div><div class="fact"><div class="eyebrow">Tecnología Imperial</div><b>${c.ut[1][0]}</b><p>${c.ut[1][2]}</p></div><div class="fact"><div class="eyebrow">Bono de equipo</div><b>${c.t}</b><p>Lo reciben vos y tus aliados en partidas por equipos.</p></div></section>
+  <section class="facts"><div class="fact"><div class="eyebrow">Unidades únicas</div><div class="uirow">${c.uu.map(u=>uimg(u[0],'m',u[1])).join('')}</div><b>${uuNames}</b><p>${c.uu[0][2]}</p></div><div class="fact"><div class="eyebrow">Tecnología de Castillos</div><b>${c.ut[0][0]}</b><p>${c.ut[0][2]}</p></div><div class="fact"><div class="eyebrow">Tecnología Imperial</div><b>${c.ut[1][0]}</b><p>${c.ut[1][2]}</p></div><div class="fact"><div class="eyebrow">Bono de equipo</div><b>${c.t}</b><p>Lo reciben vos y tus aliados en partidas por equipos.</p></div></section>
   <nav class="toc" id="toc" aria-label="Secciones de la ficha">${SECS.map(([id,l])=>`<button data-act="toc" data-id="${id}">${l}</button>`).join('')}</nav>
   <section class="sec" id="sec-resumen"><header><h2>Resumen</h2><p>Lo que hace bien y dónde sufre.</p></header><div class="two">
     <div class="panel pc pro"><h3>Fortalezas</h3><ul class="list plus">${c.pro.map(x=>`<li>${x}</li>`).join('')}</ul></div>
     <div class="panel pc con"><h3>Debilidades</h3><ul class="list minus">${c.con.map(x=>`<li>${x}</li>`).join('')}</ul></div></div></section>
   <section class="sec" id="sec-bonos"><header><h2>Bonos</h2><p>Todo lo que la civ tiene distinto al resto.</p></header><div class="stack"><div class="panel"><ul class="list">${c.b.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="callout"><b>Bono de equipo</b><span>${c.t}</span></div></div></section>
   <section class="sec" id="sec-unicas"><header><h2>Únicas</h2><p>Unidades y tecnologías que solo tiene esta civ.</p></header><div class="stack">
-    <div class="ucards">${c.uu.map(u=>`<div class="ucard"><div class="eyebrow">Unidad única</div><b>${u[1]}</b><small>${u[0]}</small><p>${u[2]}</p></div>`).join('')}</div>
+    <div class="ucards">${c.uu.map(u=>{const im=uimg(u[0],'l',u[1]);return `<div class="ucard${im?' withimg':''}">${im}<div class="eyebrow">Unidad única</div><b>${u[1]}</b><small>${u[0]}</small><p>${u[2]}</p></div>`}).join('')}</div>
     <div class="ucards">${c.ut.map(u=>`<div class="ucard"><span class="age${u[1]==='Imperial'?' imp':''}">${u[1]}</span><b>${u[0]}</b><p>${u[2]}</p></div>`).join('')}</div></div></section>
   <section class="sec" id="sec-ejercito"><header><h2>Ejército</h2><p>Con qué peleás y qué hacés cuando se acaba el oro.</p></header><div class="two">
     <div class="panel"><div class="eyebrow">Composición principal</div><p style="margin-top:8px">${c.army}</p></div>
@@ -588,17 +604,17 @@ function setStep(i){const b=curBuild();ST.step=Math.max(0,Math.min(b.steps.lengt
 /* ---------- Counters ---------- */
 function vCounters(){
   return `<section class="head"><div class="eyebrow">Counters</div><h2>Mirá qué hace el rival y respondé</h2><p class="lede">Elegí lo que ves en su ejército. La respuesta suma qué conviene contra todo el grupo.</p></section>
-  <div class="bgrid"><div class="panel stack"><div class="eyebrow">El rival tiene</div><div class="chips" role="group" aria-label="Unidades rivales">${U.map(u=>`<button class="chip" data-act="enemy" data-id="${u.id}" aria-pressed="${ST.enemy.has(u.id)}">${u.n}</button>`).join('')}</div><div class="eyebrow">Tu mejor respuesta</div><div class="resp" id="resp"></div></div>
+  <div class="bgrid"><div class="panel stack"><div class="eyebrow">El rival tiene</div><div class="chips" role="group" aria-label="Unidades rivales">${U.map(u=>`<button class="chip" data-act="enemy" data-id="${u.id}" aria-pressed="${ST.enemy.has(u.id)}">${gimg(u.id,'s')}${u.n}</button>`).join('')}</div><div class="eyebrow">Tu mejor respuesta</div><div class="resp" id="resp"></div></div>
   <div class="panel"><svg class="tri" viewBox="0 0 520 380" role="img" aria-label="Triángulo de counters: caballería gana a arqueros, arqueros ganan a infantería y lanceros ganan a caballería.">
   <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--acc-hi)"/></marker></defs>
   <g fill="none" stroke="var(--acc-hi)" stroke-width="3.5"><path d="M232 66L116 270" marker-end="url(#ah)"/><path d="M176 304H340" marker-end="url(#ah)"/><path d="M404 270L288 66" marker-end="url(#ah)"/></g>
   <g font-size="27" font-weight="800" text-anchor="middle"><text x="260" y="44">Caballería</text><text x="100" y="314">Arqueros</text><text x="420" y="314">Lanceros</text></g>
   <g font-size="20" text-anchor="middle"><text x="118" y="165" style="fill:var(--muted)">gana a</text><text x="258" y="292" style="fill:var(--muted)">ganan a</text><text x="402" y="165" style="fill:var(--muted)">ganan a</text>
   <text x="100" y="352" style="fill:var(--muted)">y los hostigadores</text><text x="420" y="352" style="fill:var(--muted)">y los camellos</text></g></svg></div></div>
-  <section class="stack"><h3>Referencia completa</h3><div class="scroll panel" style="padding:4px 8px"><table class="utable"><thead><tr><th>Unidad</th><th>Edad</th><th>Costo</th><th>Le gana a</th><th>Pierde contra</th></tr></thead><tbody>${U.map(u=>`<tr><td>${u.n}</td><td>${u.age}</td><td>${u.cost}</td><td>${[...u.beats.map(i=>ub[i].n),u.vs].filter(Boolean).join(', ')||'Edificios'}</td><td>${u.loses.map(i=>ub[i].n).join(', ')}</td></tr>`).join('')}</tbody></table></div><p class="fine">Las civilizaciones cambian estas relaciones: revisá en la ficha de cada civ qué hace bien y en el juego si tiene la mejora completa de cada línea.</p></section>`;
+  <section class="stack"><h3>Referencia completa</h3><div class="scroll panel" style="padding:4px 8px"><table class="utable"><thead><tr><th>Unidad</th><th>Edad</th><th>Costo</th><th>Le gana a</th><th>Pierde contra</th></tr></thead><tbody>${U.map(u=>`<tr><td><span>${gimg(u.id,'s')}${u.n}</span></td><td>${u.age}</td><td>${u.cost}</td><td>${[...u.beats.map(i=>ub[i].n),u.vs].filter(Boolean).join(', ')||'Edificios'}</td><td>${u.loses.map(i=>ub[i].n).join(', ')}</td></tr>`).join('')}</tbody></table></div><p class="fine">Las civilizaciones cambian estas relaciones: revisá en la ficha de cada civ qué hace bien y en el juego si tiene la mejora completa de cada línea.</p></section>`;
 }
 function respond(){const s={};[...ST.enemy].forEach(id=>{const e=ub[id];e.loses.forEach((c,i)=>{s[c]=s[c]||{p:0,vs:[]};s[c].p+=3-i>0?3-i:1;s[c].vs.push(e.n)})});[...ST.enemy].forEach(id=>{const e=ub[id];(e.beats||[]).forEach(c=>{if(s[c])s[c].p-=2})});return Object.entries(s).sort((a,b)=>b[1].p-a[1].p).slice(0,3)}
-function paintResp(){const r=$('#resp');if(!r)return;if(!ST.enemy.size){r.innerHTML='<p class="count">Elegí al menos una unidad rival.</p>';return}r.innerHTML=respond().map(([id,v],i)=>{const u=ub[id];return `<div class="rrow"><span class="rank">${i+1}</span><div><b>${u.n}</b> <span class="count">${u.en} · ${u.age} · ${u.cost}</span><div>Sirve contra: ${v.vs.join(', ')}.</div><div class="count">${u.why}</div></div></div>`}).join('')}
+function paintResp(){const r=$('#resp');if(!r)return;if(!ST.enemy.size){r.innerHTML='<p class="count">Elegí al menos una unidad rival.</p>';return}r.innerHTML=respond().map(([id,v],i)=>{const u=ub[id];return `<div class="rrow"><span class="rank">${i+1}</span>${gimg(u.id)}<div><b>${u.n}</b> <span class="count">${u.en} · ${u.age} · ${u.cost}</span><div>Sirve contra: ${v.vs.join(', ')}.</div><div class="count">${u.why}</div></div></div>`}).join('')}
 
 /* ---------- Mapas ---------- */
 function vMapas(){return `<section class="head"><div class="eyebrow">Mapas</div><h2>El mapa decide la apertura</h2><p class="lede">El pool ranked rota: revisalo en el juego. Estos tipos cubren casi todo lo que vas a encontrar.</p></section>
@@ -607,16 +623,16 @@ function vMapas(){return `<section class="head"><div class="eyebrow">Mapas</div>
 /* ---------- Entrenar ---------- */
 function newQuiz(){
   const qs=[];const shuffle=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
-  shuffle(U.filter(u=>u.loses.length)).slice(0,4).forEach(u=>{const a=ub[u.loses[0]].n;const pool=U.filter(x=>x.id!==u.loses[0]&&!u.loses.includes(x.id)).map(x=>x.n);qs.push({q:`El rival masea ${u.n}. ¿Cuál es tu mejor respuesta?`,a,o:shuffle(pool).slice(0,3),x:u.why})});
+  shuffle(U.filter(u=>u.loses.length)).slice(0,4).forEach(u=>{const a=ub[u.loses[0]].n;const pool=U.filter(x=>x.id!==u.loses[0]&&!u.loses.includes(x.id)).map(x=>x.n);qs.push({q:`El rival masea ${u.n}. ¿Cuál es tu mejor respuesta?`,img:gimg(u.id,'l'),a,o:shuffle(pool).slice(0,3),x:u.why})});
   shuffle(CIVS).slice(0,2).forEach(c=>{const a=SPEC[c.s[0]];const pool=Object.keys(SPEC).filter(k=>!c.s.includes(k)).map(k=>SPEC[k]);qs.push({q:`¿En qué se especializan los ${c.es}?`,a,o:shuffle(pool).slice(0,3),x:`${c.es}: ${c.win}`})});
-  shuffle(CIVS).slice(0,2).forEach(c=>{const u=c.uu[0];const pool=CIVS.filter(x=>x.id!==c.id&&!x.uu.some(y=>y[0]===u[0])).map(x=>x.es);qs.push({q:`¿De qué civilización es la unidad única ${u[0]} (${u[1]})?`,a:c.es,o:shuffle(pool).slice(0,3),x:u[2]})});
+  shuffle(CIVS).slice(0,2).forEach(c=>{const u=c.uu[0];const pool=CIVS.filter(x=>x.id!==c.id&&!x.uu.some(y=>y[0]===u[0])).map(x=>x.es);qs.push({q:`¿De qué civilización es la unidad única ${u[0]} (${u[1]})?`,img:uimg(u[0],'l'),a:c.es,o:shuffle(pool).slice(0,3),x:u[2]})});
   shuffle(QBANK).slice(0,2).forEach(q=>qs.push(q));
   ST.quiz={qs:shuffle(qs).map(q=>({...q,opts:shuffle([q.a,...q.o])})),i:0,score:0,ans:null};
 }
 function vQuiz(){if(!ST.quiz)newQuiz();const z=ST.quiz;
   if(z.i>=z.qs.length){if(z.score>(P.best||0)){P.best=z.score;save()}return `<section class="head"><div class="eyebrow">Entrenar</div><h2>${z.score} de ${z.qs.length}</h2><p class="lede">${z.score>=8?'Muy bien: los counters y conceptos ya están.':'Repetí cuando puedas: la velocidad de respuesta viene de hacerlo seguido.'} Tu mejor resultado es ${P.best||0}.</p></section><div class="row"><button class="btn acc" data-act="quiz-new">Otra ronda</button></div>`}
   const q=z.qs[z.i];
-  return `<section class="head"><div class="eyebrow">Entrenar · Pregunta ${z.i+1} de ${z.qs.length} · Mejor: ${P.best||0}</div><div class="track" style="max-width:720px"><i style="width:${z.i/z.qs.length*100}%"></i></div></section><div class="quiz stack"><div class="qtext">${q.q}</div><div class="opts">${q.opts.map(o=>`<button class="opt ${z.ans?(o===q.a?'right':(o===z.ans?'wrong':'')):''}" data-act="ans" data-v="${esc(o)}"${z.ans?' disabled':''}>${o}</button>`).join('')}</div>${z.ans?`<p class="ex">${q.x}</p><div><button class="btn" data-act="quiz-next">Seguir</button></div>`:''}</div>`}
+  return `<section class="head"><div class="eyebrow">Entrenar · Pregunta ${z.i+1} de ${z.qs.length} · Mejor: ${P.best||0}</div><div class="track" style="max-width:720px"><i style="width:${z.i/z.qs.length*100}%"></i></div></section><div class="quiz stack"><div class="qimg">${q.img||''}<div class="qtext">${q.q}</div></div><div class="opts">${q.opts.map(o=>`<button class="opt ${z.ans?(o===q.a?'right':(o===z.ans?'wrong':'')):''}" data-act="ans" data-v="${esc(o)}"${z.ans?' disabled':''}>${o}</button>`).join('')}</div>${z.ans?`<p class="ex">${q.x}</p><div><button class="btn" data-act="quiz-next">Seguir</button></div>`:''}</div>`}
 
 /* ---------- Ayuda ---------- */
 function vAyuda(){return `<section class="head"><div class="eyebrow">Ayuda</div><h2>Por qué perdí y qué hago</h2></section>
