@@ -125,7 +125,7 @@ const U=[
 {id:'mangonel',n:'Mangana',en:'Mangonel',age:'Castillos',cost:'Madera y oro',beats:['archer','spear','skirm'],loses:['knight','scout','eagle','bombard'],why:'Daño en área contra masas. Puede dañar a tus propias tropas.'},
 {id:'ram',n:'Ariete',en:'Ram',age:'Castillos',cost:'Madera y oro',beats:[],vs:'Edificios',loses:['maa','spear','knight'],why:'Casi inmune a flechas. Las unidades melee lo destruyen.'},
 {id:'treb',n:'Trabuquete',en:'Trebuchet',age:'Imperial',cost:'Madera y oro',beats:[],vs:'Castillos y edificios a distancia',loses:['knight','scout','bombard'],why:'Tira desde lejos. Mandá caballería a buscarlo.'},
-{id:'eleph',n:'Elefante de guerra',en:'Battle Elephant',age:'Castillos',cost:'Comida y oro',beats:['maa','scout'],vs:'Edificios',loses:['spear','camel','monk'],why:'Mucha vida y lento. Picas y monjes lo frenan.'},
+{id:'eleph',n:'Elefante de batalla',en:'Battle Elephant',age:'Castillos',cost:'Comida y oro',beats:['maa','scout'],vs:'Edificios',loses:['spear','camel','monk'],why:'Mucha vida y lento. Picas y monjes lo frenan.'},
 {id:'eagle',n:'Guerrero Águila',en:'Eagle Warrior',age:'Castillos',cost:'Comida y oro',beats:['monk','mangonel','archer','ram'],loses:['maa','knight','scout'],why:'Rápido y resistente a flechas. La línea de milicia le gana.'},
 {id:'hc',n:'Cañón de mano',en:'Hand Cannoneer',age:'Imperial',cost:'Comida y oro',beats:['maa','spear','eagle'],loses:['knight','scout','bombard'],why:'Destroza infantería. Lento para recargar.'},
 {id:'bombard',n:'Cañón de bombardeo',en:'Bombard Cannon',age:'Imperial',cost:'Madera y oro',beats:['mangonel','treb','ram'],vs:'Edificios',loses:['knight','scout'],why:'Largo alcance contra asedio y edificios.'}
