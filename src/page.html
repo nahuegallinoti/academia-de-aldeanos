@@ -1,4 +1,7 @@
 <title>Academia de Aldeanos</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 38'%3E%3Cpath d='M2 2h28v16c0 9-7 15-14 18C9 33 2 27 2 18z' fill='%23E8B03C' stroke='%230E1624' stroke-width='1.5'/%3E%3Cpath d='M10 12h12M16 8v20M11 22l5 5 5-5' stroke='%230E1624' stroke-width='2.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="@TOUCHICON@">
+<meta name="theme-color" content="#0E1624">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -113,6 +116,19 @@ button{cursor:pointer}
 .ui.m{width:36px;height:36px;border-radius:6px}
 .ui.l{width:64px;height:64px;border-radius:9px}
 .uirow{display:flex;gap:6px;flex-wrap:wrap}
+.ui[data-k]{cursor:zoom-in}
+a .ui[data-k],button .ui[data-k]{cursor:inherit}
+.ui[data-k]:hover{box-shadow:0 0 0 2px var(--acc-hi)}
+a .ui[data-k]:hover,button .ui[data-k]:hover{box-shadow:0 0 0 1px var(--rule)}
+.zoom{border:1px solid var(--rule);border-radius:14px;background:var(--surface);color:var(--ink);padding:22px;width:min(380px,calc(100vw - 32px));box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.zoom::backdrop{background:rgba(6,10,17,.72)}
+.zoom figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+.zoom img{width:240px;height:240px;max-width:100%;image-rendering:pixelated;border-radius:14px;background:var(--sunken);box-shadow:0 0 0 1px var(--rule)}
+.zoom figcaption{display:grid;gap:4px}
+.zoom figcaption b{font-family:var(--display);font-size:24px;font-weight:800;font-stretch:108%}
+.zoom figcaption small{color:var(--muted);font-size:13.5px}
+.zoom figcaption p{font-size:15px;color:var(--ink);margin-top:4px}
+.zoom .btn{margin:16px auto 0;display:flex}
 .chip .ui.s{width:22px;height:22px;margin-left:-6px;border-radius:50%}
 /* Escudo */
 .sh{width:34px;height:40px;flex:none;display:block}
@@ -186,8 +202,11 @@ button{cursor:pointer}
 .cell-bar{display:inline-flex;align-items:center;gap:7px}
 .cell-bar i{display:inline-block;height:6px;border-radius:3px;background:var(--acc-hi)}
 .cell-bar b{font-family:var(--mono);font-weight:600;font-size:13px;width:10px;text-align:right}
-.ctable th button{border:0;background:none;padding:0;font-weight:700;color:var(--muted);font-size:12.5px;letter-spacing:.04em}
-.ctable th button[aria-pressed="true"]{color:var(--acc)}
+.sortb{border:0;background:none;padding:0;font:inherit;font-weight:700;color:var(--muted);letter-spacing:inherit;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.sortb:hover{color:var(--ink)}
+.sortb span{font-size:10px;opacity:.45}
+th[aria-sort="ascending"] .sortb,th[aria-sort="descending"] .sortb{color:var(--acc)}
+th[aria-sort="ascending"] .sortb span,th[aria-sort="descending"] .sortb span{opacity:1}
 
 /* Civilizaciones: ficha */
 .crumbs{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
@@ -385,6 +404,7 @@ td.mono,th.mono{text-align:right}
   </div>
 </header>
 <main class="main"><div class="wrap" id="view"></div></main>
+<dialog class="zoom" id="zoom" aria-label="Unidad ampliada"><figure><img id="zoomimg" src="data:," alt=""><figcaption><b id="zoomt"></b><small id="zooms"></small><p id="zoomd"></p></figcaption></figure><button class="btn ghost" data-act="zoom-close">Cerrar</button></dialog>
 
 <script>
 /* ---------- Datos base ---------- */
@@ -395,7 +415,7 @@ td.mono,th.mono{text-align:right}
 
 /* ---------- Íconos de unidades (Age of Empires II © Microsoft, vía aoe2techtree.net) ---------- */
 /*@ICONS@*/
-const uimg=(name,cls='',alt='')=>{const src=ICONS[name]||ICONS[{Longboat:'Longship'}[name]];return src?`<img class="ui${cls?' '+cls:''}" src="${src}" alt="${esc(alt)}" width="48" height="48" loading="lazy">`:''};
+const uimg=(name,cls='',alt='')=>{const src=ICONS[name]||ICONS[{Longboat:'Longship'}[name]];return src?`<img class="ui${cls?' '+cls:''}" src="${src}" alt="${esc(alt)}" data-k="${esc(name)}" width="48" height="48" loading="lazy">`:''};
 const gimg=(id,cls='')=>uimg('@'+id,cls);
 
 const NAV=[['ruta','Inicio'],['civs','Civilizaciones'],['aperturas','Aperturas'],['counters','Counters'],['mapas','Mapas'],['quiz','Entrenar'],['ayuda','Ayuda y coach']];
@@ -407,6 +427,14 @@ const AGES=[['Edad Oscura','0:00 a ~10:00'],['Feudal','~10:00 a ~20:00'],['Casti
 const CIVS=CIVDATA.map(c=>({...c,rv:c.r.split('').map(Number)})).sort((a,b)=>a.es.localeCompare(b.es,'es'));
 const civById=Object.fromEntries(CIVS.map(c=>[c.id,c]));
 const civByEs=Object.fromEntries(CIVS.map(c=>[c.es,c]));
+const UUINFO={};CIVS.forEach(c=>c.uu.forEach(u=>{const o=UUINFO[u[0]];if(o)o.civs.push(c.es);else UUINFO[u[0]]={es:u[1],en:u[0],d:u[2],civs:[c.es]}}));
+function zoomOpen(k){
+  const dlg=$('#zoom');if(!dlg)return;let t,s,d;
+  if(k.startsWith('@')){const u=ub[k.slice(1)];t=u.n;s=`${u.en} · ${u.age} · ${u.cost}`;d=u.why}
+  else{const u=UUINFO[k]||{es:k,en:k,d:'',civs:[]};t=u.es;s=`${u.en} · Unidad única de ${u.civs.join(', ')}`;d=u.d}
+  const src=ICONS[k]||ICONS[{Longboat:'Longship'}[k]];$('#zoomimg').src=src;$('#zoomimg').alt=t;$('#zoomt').textContent=t;$('#zooms').textContent=s;$('#zoomd').textContent=d;
+  if(dlg.showModal){if(!dlg.open)dlg.showModal()}else dlg.setAttribute('open','');
+}
 const buildById=Object.fromEntries(BUILDS.map(b=>[b.id,b]));
 
 /* ---------- Estado y guardado ---------- */
@@ -435,7 +463,7 @@ async function bootStore(){
   }catch(e){setSave('local')}
 }
 
-const ST={route:'ruta',build:'archers',step:0,clock:{on:false,t:0,last:0,speed:1.7,follow:false},civ:'franks',cmp:'',filt:new Set(),lvl:0,q:'',sort:0,view:'cards',enemy:new Set(['knight','archer']),quiz:null,chat:[],busy:false,ctl:null,pendingAsk:null};
+const ST={route:'ruta',build:'archers',step:0,clock:{on:false,t:0,last:0,speed:1.7,follow:false},civ:'franks',cmp:'',filt:new Set(),lvl:0,q:'',sort:'name',dir:1,us:'n',ud:1,view:'cards',enemy:new Set(['knight','archer']),quiz:null,chat:[],busy:false,ctl:null,pendingAsk:null};
 try{const v=localStorage.getItem(KEY+'-view');if(v==='table'||v==='cards')ST.view=v}catch(e){}
 let sampleFn=null,sampleChecked=false;
 const heroStart=Date.now();
@@ -447,6 +475,7 @@ function shield(c,cls='sh'){
 }
 const specTag=k=>`<span class="tag"><i class="dot" style="background:var(--t-${k})"></i>${SPEC[k]}</span>`;
 const lvTag=l=>`<span class="lv lv${l}">${LVL[l]}</span>`;
+const sortTh=(label,key,cur,dir,act)=>{const on=String(cur)===String(key);return `<th aria-sort="${on?(dir>0?'ascending':'descending'):'none'}"><button class="sortb" data-act="${act}" data-v="${key}" title="Ordenar por ${esc(label.toLowerCase())}">${label}<span aria-hidden="true">${on?(dir>0?'▲':'▼'):'↕'}</span></button></th>`};
 const pips=n=>`<div class="pips" aria-hidden="true">${[1,2,3,4,5].map(i=>`<i${i<=n?' class="on"':''}></i>`).join('')}</div>`;
 const civLink=(c,extra='')=>`<a class="tag" href="#civ-${c.id}"${extra}><i class="dot" style="background:var(--t-${c.s[0]})"></i>${c.es}</a>`;
 function navRender(){const cur=ST.route==='civ'?'civs':ST.route;$('#nav').innerHTML=NAV.map(([id,l])=>`<a href="#${id}"${cur===id?' aria-current="page"':''}>${l}</a>`).join('')}
@@ -494,7 +523,7 @@ function cardHtml(c){
 function vCivs(){
   return `<section class="head"><div class="eyebrow">${CIVS.length} civilizaciones</div><h2>Elegí tu civilización</h2><p class="lede">Cada ficha tiene un resumen arriba y debajo todo el detalle: bonos, únicas, plan por edad, aperturas, mapas, rivales y consejos. El escudo muestra la especialidad principal a la izquierda.</p></section>
   <div class="stack"><div class="ctl"><input class="input search" id="civq" type="search" placeholder="Buscar por nombre, unidad única o estilo" value="${esc(ST.q)}" aria-label="Buscar civilización">
-  <label class="field"><span class="count">Ordenar</span><select class="select" id="civsort" aria-label="Ordenar civilizaciones"><option value="0">Nombre</option>${STATS.map((s,i)=>`<option value="${i+1}"${ST.sort===i+1?' selected':''}>${s}</option>`).join('')}</select></label>
+  <label class="field"><span class="count">Ordenar</span><select class="select" id="civsort" aria-label="Ordenar civilizaciones"><option value="name"${ST.sort==='name'?' selected':''}>Nombre</option><option value="lvl"${ST.sort==='lvl'?' selected':''}>Dificultad</option>${STATS.map((s,i)=>`<option value="${i+1}"${ST.sort===i+1?' selected':''}>${s}</option>`).join('')}</select></label>
   <div class="seg" role="group" aria-label="Vista"><button data-act="view" data-v="cards" aria-pressed="${ST.view==='cards'}">Fichas</button><button data-act="view" data-v="table" aria-pressed="${ST.view==='table'}">Tabla</button></div></div>
   <div class="row"><div class="seg" role="group" aria-label="Dificultad">${[[0,'Todas'],[1,'Para empezar'],[2,'Intermedia'],[3,'Técnica']].map(([v,l])=>`<button data-act="lvl" data-v="${v}" aria-pressed="${ST.lvl===v}">${l}</button>`).join('')}</div></div>
   <div class="chips" role="group" aria-label="Filtrar por especialidad">${Object.entries(SPEC).map(([k,v])=>`<button class="chip" data-act="spec" data-k="${k}" aria-pressed="${ST.filt.has(k)}"><i class="dot" style="background:var(--t-${k})"></i>${v}</button>`).join('')}</div></div>
@@ -504,16 +533,19 @@ function vCivs(){
 function civList(){
   const q=ST.q.trim().toLowerCase();
   const list=CIVS.filter(c=>(!ST.lvl||c.l===ST.lvl)&&(!ST.filt.size||[...ST.filt].some(f=>c.s.includes(f)))&&(!q||[c.es,c.en,c.st,c.uu.map(u=>u[0]+' '+u[1]).join(' ')].join(' ').toLowerCase().includes(q)));
-  if(ST.sort)list.sort((a,b)=>b.rv[ST.sort-1]-a.rv[ST.sort-1]||a.es.localeCompare(b.es,'es'));
+  const by={name:c=>c.es,spec:c=>SPEC[c.s[0]],uu:c=>c.uu.length,lvl:c=>c.l},k=ST.sort;
+  const val=c=>typeof k==='number'?c.rv[k-1]:(by[k]||by.name)(c);
+  list.sort((a,b)=>{const va=val(a),vb=val(b);const r=typeof va==='string'?va.localeCompare(vb,'es'):va-vb;return r*ST.dir||a.es.localeCompare(b.es,'es')});
   return list;
 }
 function paintCivGrid(){
   const list=civList(),g=$('#cgrid');
-  $('#civcount').textContent=`${list.length} de ${CIVS.length}`+(ST.sort?` · ordenadas por ${STATS[ST.sort-1].toLowerCase()}`:'');
+  const sl={name:'nombre',spec:'especialidad',uu:'cantidad de únicas',lvl:'dificultad'}[ST.sort]||STATS[ST.sort-1].toLowerCase();
+  $('#civcount').textContent=`${list.length} de ${CIVS.length} · ordenadas por ${sl} (${ST.dir>0?'ascendente':'descendente'})`;
   if(!list.length){g.className='';g.innerHTML='<div class="panel">Ninguna civilización coincide. Probá con menos filtros o otra búsqueda.</div>';return}
   if(ST.view==='table'){
     g.className='scroll panel';g.style.padding='4px 8px';
-    g.innerHTML=`<table class="ctable"><thead><tr><th>Civilización</th><th>Especialidad</th><th>Únicas</th><th>Dificultad</th>${STATS.map((s,i)=>`<th><button data-act="sortcol" data-v="${i+1}" aria-pressed="${ST.sort===i+1}">${s}</button></th>`).join('')}</tr></thead><tbody>${list.map(c=>`<tr data-href="#civ-${c.id}"><td><a href="#civ-${c.id}">${shield(c)}${c.es}</a></td><td>${c.s.map(k=>SPEC[k]).join(' · ')}</td><td><span class="uirow" style="flex-wrap:nowrap">${c.uu.map(u=>uimg(u[0],'s')).join('')}</span></td><td>${lvTag(c.l)}</td>${c.rv.map(n=>`<td><span class="cell-bar"><b>${n}</b><i style="width:${n*9}px"></i></span></td>`).join('')}</tr>`).join('')}</tbody></table>`;
+    g.innerHTML=`<table class="ctable"><thead><tr>${sortTh('Civilización','name',ST.sort,ST.dir,'sortcol')}${sortTh('Especialidad','spec',ST.sort,ST.dir,'sortcol')}${sortTh('Únicas','uu',ST.sort,ST.dir,'sortcol')}${sortTh('Dificultad','lvl',ST.sort,ST.dir,'sortcol')}${STATS.map((s,i)=>sortTh(s,i+1,ST.sort,ST.dir,'sortcol')).join('')}</tr></thead><tbody>${list.map(c=>`<tr data-href="#civ-${c.id}"><td><a href="#civ-${c.id}">${shield(c)}${c.es}</a></td><td>${c.s.map(k=>SPEC[k]).join(' · ')}</td><td><span class="uirow" style="flex-wrap:nowrap">${c.uu.map(u=>uimg(u[0],'s')).join('')}</span></td><td>${lvTag(c.l)}</td>${c.rv.map(n=>`<td><span class="cell-bar"><b>${n}</b><i style="width:${n*9}px"></i></span></td>`).join('')}</tr>`).join('')}</tbody></table>`;
   }else{g.className='cgrid';g.style.padding='';g.innerHTML=list.map(cardHtml).join('')}
 }
 
@@ -611,7 +643,16 @@ function vCounters(){
   <g font-size="27" font-weight="800" text-anchor="middle"><text x="260" y="44">Caballería</text><text x="100" y="314">Arqueros</text><text x="420" y="314">Lanceros</text></g>
   <g font-size="20" text-anchor="middle"><text x="118" y="165" style="fill:var(--muted)">gana a</text><text x="258" y="292" style="fill:var(--muted)">ganan a</text><text x="402" y="165" style="fill:var(--muted)">ganan a</text>
   <text x="100" y="352" style="fill:var(--muted)">y los hostigadores</text><text x="420" y="352" style="fill:var(--muted)">y los camellos</text></g></svg></div></div>
-  <section class="stack"><h3>Referencia completa</h3><div class="scroll panel" style="padding:4px 8px"><table class="utable"><thead><tr><th>Unidad</th><th>Edad</th><th>Costo</th><th>Le gana a</th><th>Pierde contra</th></tr></thead><tbody>${U.map(u=>`<tr><td><span>${gimg(u.id,'s')}${u.n}</span></td><td>${u.age}</td><td>${u.cost}</td><td>${[...u.beats.map(i=>ub[i].n),u.vs].filter(Boolean).join(', ')||'Edificios'}</td><td>${u.loses.map(i=>ub[i].n).join(', ')}</td></tr>`).join('')}</tbody></table></div><p class="fine">Las civilizaciones cambian estas relaciones: revisá en la ficha de cada civ qué hace bien y en el juego si tiene la mejora completa de cada línea.</p></section>`;
+  <section class="stack"><h3>Referencia completa</h3><div class="scroll panel" style="padding:4px 8px"><table class="utable" id="utable">${utableHtml()}</table></div><p class="fine">Las civilizaciones cambian estas relaciones: revisá en la ficha de cada civ qué hace bien y en el juego si tiene la mejora completa de cada línea.</p></section>`;
+}
+const AGE_ORDER={'Feudal':1,'Castillos':2,'Imperial':3};
+const beatsText=u=>[...u.beats.map(i=>ub[i].n),u.vs].filter(Boolean).join(', ')||'Edificios';
+function utableHtml(){
+  const by={n:u=>u.n,age:u=>AGE_ORDER[u.age]||9,cost:u=>u.cost,beats:u=>u.beats.length+(u.vs?1:0),loses:u=>u.loses.length};
+  const f=by[ST.us]||by.n;
+  const rows=[...U].sort((a,b)=>{const va=f(a),vb=f(b);const r=typeof va==='string'?va.localeCompare(vb,'es'):va-vb;return r*ST.ud||a.n.localeCompare(b.n,'es')});
+  const h=(l,k)=>sortTh(l,k,ST.us,ST.ud,'usort');
+  return `<thead><tr>${h('Unidad','n')}${h('Edad','age')}${h('Costo','cost')}${h('Le gana a','beats')}${h('Pierde contra','loses')}</tr></thead><tbody>${rows.map(u=>`<tr><td><span>${gimg(u.id,'s')}${u.n}</span></td><td>${u.age}</td><td>${u.cost}</td><td>${beatsText(u)}</td><td>${u.loses.map(i=>ub[i].n).join(', ')}</td></tr>`).join('')}</tbody>`;
 }
 function respond(){const s={};[...ST.enemy].forEach(id=>{const e=ub[id];e.loses.forEach((c,i)=>{s[c]=s[c]||{p:0,vs:[]};s[c].p+=3-i>0?3-i:1;s[c].vs.push(e.n)})});[...ST.enemy].forEach(id=>{const e=ub[id];(e.beats||[]).forEach(c=>{if(s[c])s[c].p-=2})});return Object.entries(s).sort((a,b)=>b[1].p-a[1].p).slice(0,3)}
 function paintResp(){const r=$('#resp');if(!r)return;if(!ST.enemy.size){r.innerHTML='<p class="count">Elegí al menos una unidad rival.</p>';return}r.innerHTML=respond().map(([id,v],i)=>{const u=ub[id];return `<div class="rrow"><span class="rank">${i+1}</span>${gimg(u.id)}<div><b>${u.n}</b> <span class="count">${u.en} · ${u.age} · ${u.cost}</span><div>Sirve contra: ${v.vs.join(', ')}.</div><div class="count">${u.why}</div></div></div>`}).join('')}
@@ -676,6 +717,8 @@ async function ask(text){
 /* ---------- Eventos ---------- */
 document.addEventListener('click',e=>{
   const linkB=e.target.closest('a[data-build]');if(linkB){ST.build=linkB.dataset.build;ST.step=0}
+  const zi=e.target.closest('img.ui[data-k]');if(zi&&!zi.closest('a,button')){e.preventDefault();zoomOpen(zi.dataset.k);return}
+  const dlg=e.target.closest('#zoom');if(dlg&&e.target===dlg){dlg.close();return}
   const tr=e.target.closest('tr[data-href]');if(tr&&!e.target.closest('a')){location.hash=tr.dataset.href.slice(1);return}
   const t=e.target.closest('[data-act]');if(!t)return;const a=t.dataset.act;
   if(a==='toggle-lesson'){const i=t.dataset.i;P.done[i]=!P.done[i];if(!P.done[i])delete P.done[i];save();render()}
@@ -689,21 +732,23 @@ document.addEventListener('click',e=>{
   else if(a==='ftime'){const b=curBuild(),v=$('#ftime').value;$('#fout').textContent=tierText(b,v);if(parseT(v)!=null){P.feudal[b.id]=v;save()}}
   else if(a==='lvl'){ST.lvl=+t.dataset.v;$$('[data-act="lvl"]').forEach(x=>x.setAttribute('aria-pressed',+x.dataset.v===ST.lvl));paintCivGrid()}
   else if(a==='view'){ST.view=t.dataset.v;try{localStorage.setItem(KEY+'-view',ST.view)}catch(err){}$$('[data-act="view"]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===ST.view));paintCivGrid()}
-  else if(a==='sortcol'){const v=+t.dataset.v;ST.sort=ST.sort===v?0:v;const s=$('#civsort');if(s)s.value=ST.sort;paintCivGrid()}
+  else if(a==='sortcol'){const raw=t.dataset.v,v=/^\d$/.test(raw)?+raw:raw;if(ST.sort===v)ST.dir*=-1;else{ST.sort=v;ST.dir=typeof v==='number'?-1:1}const s=$('#civsort');if(s)s.value=String(ST.sort);paintCivGrid()}
+  else if(a==='usort'){const v=t.dataset.v;if(ST.us===v)ST.ud*=-1;else{ST.us=v;ST.ud=(v==='beats'?-1:1)}$('#utable').innerHTML=utableHtml()}
   else if(a==='spec'){const k=t.dataset.k;ST.filt.has(k)?ST.filt.delete(k):ST.filt.add(k);t.setAttribute('aria-pressed',ST.filt.has(k));paintCivGrid()}
   else if(a==='main'){P.main=P.main===ST.civ?null:ST.civ;save();const y=scrollY;render();scrollTo(0,y)}
   else if(a==='ask-civ'){const c=civById[ST.civ];ST.pendingAsk=`Juego ${c.es}. Dame un plan concreto para una partida en Arabia: apertura, qué hacer en Feudal y Castillos, y cómo enfrentar a las civs que me cuestan.`;location.hash='ayuda'}
   else if(a==='toc'){const el=$('#sec-'+t.dataset.id);if(el)el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'start'})}
   else if(a==='enemy'){const id=t.dataset.id;ST.enemy.has(id)?ST.enemy.delete(id):ST.enemy.add(id);t.setAttribute('aria-pressed',ST.enemy.has(id));paintResp()}
-  else if(a==='mapciv'){const f=t.dataset.f;ST.filt.clear();ST.lvl=0;ST.q='';ST.sort=0;if(f==='lvl1')ST.lvl=1;else ST.filt.add(f);location.hash='civs'}
+  else if(a==='mapciv'){const f=t.dataset.f;ST.filt.clear();ST.lvl=0;ST.q='';ST.sort='name';ST.dir=1;if(f==='lvl1')ST.lvl=1;else ST.filt.add(f);location.hash='civs'}
   else if(a==='ans'){const z=ST.quiz;if(z.ans)return;z.ans=t.dataset.v;if(z.ans===z.qs[z.i].a)z.score++;render()}
   else if(a==='quiz-next'){ST.quiz.i++;ST.quiz.ans=null;render()}
   else if(a==='quiz-new'){newQuiz();render()}
   else if(a==='coach-ex'){ask(t.dataset.t)}
+  else if(a==='zoom-close'){const d=$('#zoom');if(d.close)d.close();else d.removeAttribute('open')}
 });
 document.addEventListener('change',e=>{
   if(e.target.id==='speed'){ST.clock.speed=+e.target.value}
-  else if(e.target.id==='civsort'){ST.sort=+e.target.value;paintCivGrid()}
+  else if(e.target.id==='civsort'){const v=e.target.value;ST.sort=/^\d$/.test(v)?+v:v;ST.dir=typeof ST.sort==='number'?-1:1;paintCivGrid()}
   else if(e.target.id==='cmp'){ST.cmp=e.target.value;paintRate()}
 });
 document.addEventListener('input',e=>{if(e.target.id==='civq'){ST.q=e.target.value;paintCivGrid()}});
