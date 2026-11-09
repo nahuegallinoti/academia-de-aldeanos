@@ -6,7 +6,8 @@ const glyph=(name)=>{
 };
 let toastTimer;
 let pendingSearchTarget=null;
-function toast(message){const el=$('#toast');el.textContent=message;el.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.hidden=true,3500)}
+/* Un diálogo modal se dibuja por encima de todo: si hay una ficha abierta, el aviso se muestra dentro de ella. */
+function toast(message){const el=$('#toast'),dlg=$('#zoom'),host=dlg&&dlg.open?dlg:document.body;if(el.parentElement!==host)host.appendChild(el);el.textContent=message;el.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.hidden=true,3500)}
 function setTheme(theme){
   if(theme==='system')delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=theme;
   const dark=theme==='dark'||(theme==='system'&&matchMedia('(prefers-color-scheme:dark)').matches);
