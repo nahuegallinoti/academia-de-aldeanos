@@ -5,13 +5,11 @@
 .navbtn:hover,.navg.cur .navbtn,.navg.open .navbtn{color:var(--on-bar)}
 .navg.open .navbtn span{transform:rotate(180deg)}
 .navg.cur .navbtn::after{content:"";position:absolute;left:10px;right:10px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--acc-hi)}
-/* El panel nace debajo de la flecha: su esquina queda junto a ella y una pestañita la señala */
-.nav .navpanel{display:grid;visibility:hidden;opacity:0;transform:translateY(-6px);transition:opacity .14s,transform .14s,visibility 0s .14s;position:absolute;top:calc(100% + 10px);left:calc(100% - 44px);width:300px;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:12px;box-shadow:0 18px 44px rgba(0,0,0,.32);padding:8px;z-index:40;gap:2px}
+/* El borde del panel se alinea con el inicio del texto del menú. */
+.nav .navpanel{display:grid;visibility:hidden;opacity:0;transform:translateY(-6px);transition:opacity .14s,transform .14s,visibility 0s .14s;position:absolute;top:calc(100% + 10px);left:10px;width:300px;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:12px;box-shadow:0 18px 44px rgba(0,0,0,.32);padding:8px;z-index:40;gap:2px}
 .nav .navpanel::before{content:"";position:absolute;left:0;right:0;top:-14px;height:14px}
-.navg::before{content:"";position:absolute;right:11px;top:calc(100% + 4px);width:12px;height:12px;background:var(--surface);border-left:1px solid var(--rule);border-top:1px solid var(--rule);transform:rotate(45deg);z-index:41;visibility:hidden;opacity:0;transition:opacity .14s,visibility 0s .14s}
-.navg.open .navpanel,.navg.open::before{visibility:visible;opacity:1;transform:none;transition:opacity .14s,transform .14s}
-.navg.open::before{transform:rotate(45deg)}
-@media (hover:hover) and (min-width:821px){.navg:hover .navpanel,.navg:hover::before{visibility:visible;opacity:1;transition:opacity .14s,transform .14s}.navg:hover .navpanel{transform:none}.navg:hover .navbtn{color:var(--on-bar)}.navg:hover .navbtn span{transform:rotate(180deg)}}
+.navg.open .navpanel{visibility:visible;opacity:1;transform:none;transition:opacity .14s,transform .14s}
+@media (hover:hover) and (min-width:821px){.navg:hover .navpanel{visibility:visible;opacity:1;transition:opacity .14s,transform .14s;transform:none}.navg:hover .navbtn{color:var(--on-bar)}.navg:hover .navbtn span{transform:rotate(180deg)}}
 .nav .navpanel a{display:grid;gap:2px;padding:9px 12px;border-radius:8px;text-decoration:none;color:var(--ink);font-size:14px;white-space:normal}
 .nav .navpanel a::after{display:none}
 .nav .navpanel a:hover{background:var(--hover)}
@@ -31,10 +29,10 @@
   .top .nav .navbtn{padding:10px 4px 4px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;pointer-events:none;color:var(--on-bar-muted)}
   .top .nav .navbtn span,.top .nav .navg.cur .navbtn::after{display:none}
   .top .nav .navpanel{display:grid;visibility:visible;opacity:1;transition:none;position:static;transform:none;width:auto;background:none;border:0;box-shadow:none;padding:0;grid-template-columns:1fr 1fr;gap:5px;min-width:0}
-  .top .nav .navpanel::before,.top .nav .navg::before{display:none}
+  .top .nav .navpanel::before{display:none}
   .top .nav .navpanel a{color:var(--on-bar);background:var(--bar-2);padding:10px 12px}
   .top .nav .navpanel a[aria-current="page"]{color:var(--acc-hi);background:var(--bar-2)}
   .top .nav .navpanel small{display:none}
   .subnav{margin-bottom:14px}
 }
-@media (prefers-reduced-motion:reduce){.navbtn span,.nav .navpanel,.navg::before{transition:none}}
+@media (prefers-reduced-motion:reduce){.navbtn span,.nav .navpanel{transition:none}}

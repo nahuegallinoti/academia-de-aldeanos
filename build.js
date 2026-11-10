@@ -11,9 +11,13 @@ CIVDATA.forEach(c=>{need.forEach(k=>{if(c[k]==null)bad.push(c.id+' falta '+k)});
 if(bad.length){console.error(bad.join('\n'));process.exit(1)}
 console.log('civs',CIVDATA.length);
 if(process.argv[2]==='check')process.exit(0);
+const english=JSON.parse(src('i18n-en.json'));
+const placeholders=s=>(s.match(/\{\d+\}/g)||[]).sort().join(',');
+Object.entries(english).forEach(([key,value])=>{if(typeof value!=='string'||placeholders(key)!==placeholders(value))throw new Error('Invalid English translation: '+key)});
+['Inicio','Civilizaciones','Unidades','Edificios','Aperturas','Mapas','Aprender','Entrenar','Guía y ayuda'].forEach(key=>{if(!english[key])throw new Error('Missing English label: '+key)});
 const icons=JSON.parse(src('icons.json'));
 const iconJs='const ICONS='+JSON.stringify(Object.fromEntries(Object.entries(icons).map(([k,p])=>[k,'data:image/png;base64,'+fs.readFileSync(path.join(__dirname,'src','icons',p+'.png')).toString('base64')])))+';';
-const page=src('page.html').replace('/*@BASE@*/',()=>src('data-base.js').trim()).replace('/*@CIVDATA@*/',()=>civJs).replace('/*@ICONS@*/',()=>iconJs).replace('/*@UNITMETA@*/',()=>src('units-meta.json').trim()).replace('/*@BLDCSS@*/',()=>src('buildings.css')).replace('/*@NAVCSS@*/',()=>src('nav.css')).replace('/*@SHEETCSS@*/',()=>src('sheets.css')).replace('/*@SHEETS@*/',()=>require('./tools/build-sheets.js')(__dirname)).replace('/*@BUILDINGS@*/',()=>require('./tools/build-buildings.js')(__dirname)).replace('/*@UXCSS@*/',()=>src('experience.css')).replace('/*@UXJS@*/',()=>src('experience.js')).replace('@TOUCHICON@',()=>'data:image/png;base64,'+fs.readFileSync(path.join(__dirname,'src','apple-touch-icon.png')).toString('base64'));
+const page=src('page.html').replace('/*@I18N@*/',()=>src('i18n.js').replace('/*@ENGLISH@*/',()=>src('i18n-en.json').trim())).replace('/*@BASE@*/',()=>src('data-base.js').trim()).replace('/*@CIVDATA@*/',()=>civJs).replace('/*@ICONS@*/',()=>iconJs).replace('/*@UNITMETA@*/',()=>src('units-meta.json').trim()).replace('/*@BLDCSS@*/',()=>src('buildings.css')).replace('/*@NAVCSS@*/',()=>src('nav.css')).replace('/*@SHEETCSS@*/',()=>src('sheets.css')).replace('/*@SHEETS@*/',()=>require('./tools/build-sheets.js')(__dirname)).replace('/*@BUILDINGS@*/',()=>require('./tools/build-buildings.js')(__dirname)).replace('/*@UXCSS@*/',()=>src('experience.css')).replace('/*@UXJS@*/',()=>src('experience.js')).replace('@TOUCHICON@',()=>'data:image/png;base64,'+fs.readFileSync(path.join(__dirname,'src','apple-touch-icon.png')).toString('base64'));
 // Valida el JavaScript ensamblado antes de modificar los archivos de salida.
 new (require('vm').Script)(page.match(/<script>([\s\S]*)<\/script>/)[1]);
 fs.writeFileSync(path.join(__dirname,'academia-de-aldeanos.html'),page);

@@ -67,7 +67,7 @@ function vEdificios(){
   <div id="blist" class="stack"></div>
   <p class="fine">Costos, vida, tiempos y qué produce cada edificio salen de los árboles tecnológicos de aoe2techtree.net, con los nombres oficiales del juego en español latino. Algunas civs tienen descuentos o no tienen todos los edificios.</p>`;
 }
-function bMatches(b,q){if(!q)return true;const hay=[b.n,b.game,b.en,b.r,...b.units.map(u=>u.es+' '+u.en),...b.techs.map(t=>t.es+' '+t.en)].join(' ').toLowerCase();return hay.includes(q)}
+function bMatches(b,q){if(!q)return true;const hay=[b.n,b.game,b.en,b.r,...b.units.map(u=>u.es+' '+u.en),...b.techs.map(t=>t.es+' '+t.en)].join(' ');return searchText(hay).includes(fold(q))}
 function paintBld(){
   const box=$('#blist');if(!box)return;const q=(ST.bq||'').trim().toLowerCase();
   const list=BLD_LIST.filter(b=>(!ST.bcat||b.cat===ST.bcat)&&bMatches(b,q));

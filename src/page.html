@@ -198,7 +198,8 @@ a .ui[data-k]:hover,button .ui[data-k]:hover{box-shadow:0 0 0 1px var(--rule)}
 .mine .sh{width:52px;height:62px}
 
 .progress{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.track{flex:1 1 180px;height:8px;background:var(--sunken);min-width:0;border-radius:4px;overflow:hidden}
+.track{height:8px;background:var(--sunken);min-width:0;border-radius:4px;overflow:hidden}
+.progress>.track{flex:1 1 180px}
 .track i{display:block;height:100%;background:var(--acc-hi)}
 .lessons{border:1px solid var(--rule);border-radius:var(--r);background:var(--surface);overflow:hidden}
 .lesson+.lesson{border-top:1px solid var(--rule)}
@@ -442,7 +443,7 @@ td.mono,th.mono{text-align:right}
   <div class="topin">
     <a class="brand" href="#ruta" aria-label="Academia de Aldeanos, inicio"><svg viewBox="0 0 32 38" aria-hidden="true"><path d="M2 2h28v16c0 9-7 15-14 18C9 33 2 27 2 18z" fill="var(--acc-hi)"/><path d="M10 12h12M16 8v20M11 22l5 5 5-5" stroke="var(--bar)" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg><b>Academia de Aldeanos<small>AoE II · Definitive Edition</small></b></a>
     <nav class="nav" id="nav" aria-label="Secciones"></nav>
-    <div class="tools"><button class="tool search-open" data-act="search-open" aria-label="Buscar en toda la academia" title="Buscar (Ctrl+K)"><span aria-hidden="true">⌕</span><span class="search-label">Buscar <kbd>Ctrl K</kbd></span></button><button class="tool" id="themebtn" data-act="theme" aria-label="Cambiar tema" title="Cambiar tema">◐</button><button class="tool menubtn" data-act="menu" aria-expanded="false" aria-controls="nav" aria-label="Abrir menú">☰</button></div>
+    <div class="tools"><label class="language-control" data-no-translate><span class="sr-only">Idioma / Language</span><select id="language" aria-label="Idioma / Language"><option value="es" lang="es">ES</option><option value="en" lang="en">EN</option></select></label><button class="tool search-open" data-act="search-open" aria-label="Buscar en toda la academia" title="Buscar (Ctrl+K)"><span aria-hidden="true">⌕</span><span class="search-label">Buscar <kbd>Ctrl K</kbd></span></button><button class="tool" id="themebtn" data-act="theme" aria-label="Cambiar tema" title="Cambiar tema">◐</button><button class="tool menubtn" data-act="menu" aria-expanded="false" aria-controls="nav" aria-label="Abrir menú">☰</button></div>
   </div>
 </header>
 <main class="main"><nav class="subnav" id="subnav" aria-label="Secciones del grupo" hidden></nav><div class="wrap" id="view" tabindex="-1"></div></main>
@@ -453,6 +454,7 @@ td.mono,th.mono{text-align:right}
 <dialog class="finder" id="finder" aria-labelledby="finder-title"><div class="finder-head"><h2 id="finder-title">¿Qué estás buscando?</h2><button class="icon-close" data-act="search-close" aria-label="Cerrar búsqueda">✕</button></div><label class="sr-only" for="globalq">Buscar civilización, unidad, apertura o concepto</label><input class="input" id="globalq" type="search" placeholder="Civilización, unidad, apertura, concepto…" autocomplete="off" aria-controls="searchresults"><div class="finder-meta" id="searchmeta" role="status"></div><div class="searchresults" id="searchresults"></div><div class="finder-foot"><span>↑ ↓ para recorrer · Enter para abrir</span><kbd>Esc para cerrar</kbd></div></dialog>
 
 <script>
+/*@I18N@*/
 /* ---------- Datos base ---------- */
 /*@BASE@*/
 
@@ -473,7 +475,7 @@ const STATS=['Economía','Temprano','Castillos','Imperial','Agua','Facilidad'];
 const STATS_SHORT=['Eco','Temprano','Castillos','Imperial','Agua','Facilidad'];
 const LVL={1:'Para empezar',2:'Intermedia',3:'Técnica'};
 const AGES=[['Edad Oscura','0:00 a ~10:00'],['Feudal','~10:00 a ~20:00'],['Castillos','~17:00 a ~30:00'],['Imperial','desde ~28:00']];
-const CIVS=CIVDATA.map(c=>({...c,rv:c.r.split('').map(Number)})).sort((a,b)=>a.es.localeCompare(b.es,'es'));
+const CIVS=CIVDATA.map(c=>({...c,rv:c.r.split('').map(Number)})).sort((a,b)=>displayCompare(a.es,b.es));
 const civById=Object.fromEntries(CIVS.map(c=>[c.id,c]));
 const civByEs=Object.fromEntries(CIVS.map(c=>[c.es,c]));
 const UUINFO={};CIVS.forEach(c=>c.uu.forEach(u=>{const o=UUINFO[u[0]];if(o)o.civs.push(c.es);else UUINFO[u[0]]={es:u[1],en:u[0],d:u[2],civs:[c.es]}}));
@@ -638,10 +640,10 @@ function vCivs(){
 }
 function civList(){
   const q=fold(ST.q.trim());
-  const list=CIVS.filter(c=>(!ST.lvl||c.l===ST.lvl)&&(!ST.filt.size||[...ST.filt].some(f=>c.s.includes(f)))&&(!q||fold([c.es,c.en,c.st,c.s.map(k=>SPEC[k]).join(' '),c.uu.map(u=>u[0]+' '+u[1]).join(' ')].join(' ')).includes(q)));
+  const list=CIVS.filter(c=>(!ST.lvl||c.l===ST.lvl)&&(!ST.filt.size||[...ST.filt].some(f=>c.s.includes(f)))&&(!q||searchText([c.es,c.en,c.st,c.s.map(k=>SPEC[k]).join(' '),c.uu.map(u=>u[0]+' '+u[1]).join(' ')].join(' ')).includes(q)));
   const by={name:c=>c.es,spec:c=>SPEC[c.s[0]],uu:c=>c.uu.length,lvl:c=>c.l},k=ST.sort;
   const val=c=>typeof k==='number'?c.rv[k-1]:(by[k]||by.name)(c);
-  list.sort((a,b)=>{const va=val(a),vb=val(b);const r=typeof va==='string'?va.localeCompare(vb,'es'):va-vb;return r*ST.dir||a.es.localeCompare(b.es,'es')});
+  list.sort((a,b)=>{const va=val(a),vb=val(b);const r=typeof va==='string'?displayCompare(va,vb):va-vb;return r*ST.dir||displayCompare(a.es,b.es)});
   return list;
 }
 function paintCivGrid(){
@@ -781,8 +783,8 @@ function unitsList(){
   const q=fold(ST.uq.trim());
   const by={n:x=>x.n,cls:x=>x.cls,at:x=>x.at,age:x=>x.ageN,civ:x=>x.gen?'':x.civ,cost:x=>x.cost,beats:x=>x.gen?x.u.beats.length+(x.u.vs?1:0):-1,loses:x=>x.gen?x.u.loses.length:-1};
   const f=by[ST.us]||by.n;
-  return ALLU.filter(x=>(ST.ukind==='all'||(ST.ukind==='gen')===x.gen)&&(!ST.ugrp||x.grp===ST.ugrp)&&(!ST.uat||x.at.split(' o ').includes(ST.uat))&&(!ST.uage||x.age===ST.uage)&&(!ST.uciv||x.civ.split(', ').includes(ST.uciv))&&(!q||fold(x.n+' '+x.en+' '+x.civ+' '+x.cls+' '+x.at).includes(q)))
-    .sort((a,b)=>{const va=f(a),vb=f(b);const r=typeof va==='string'?va.localeCompare(vb,'es'):va-vb;return r*ST.ud||a.n.localeCompare(b.n,'es')});
+  return ALLU.filter(x=>(ST.ukind==='all'||(ST.ukind==='gen')===x.gen)&&(!ST.ugrp||x.grp===ST.ugrp)&&(!ST.uat||x.at.split(' o ').includes(ST.uat))&&(!ST.uage||x.age===ST.uage)&&(!ST.uciv||x.civ.split(', ').includes(ST.uciv))&&(!q||searchText(x.n+' '+x.en+' '+x.civ+' '+x.cls+' '+x.at).includes(q)))
+    .sort((a,b)=>{const va=f(a),vb=f(b);const r=typeof va==='string'?displayCompare(va,vb):va-vb;return r*ST.ud||displayCompare(a.n,b.n)});
 }
 function paintUnits(){
   const box=$('#ulist');if(!box)return;const list=unitsList();
@@ -937,4 +939,5 @@ setInterval(()=>{
 /*@UXJS@*/
 route();
 bootStore();
+initLanguage();
 </script>

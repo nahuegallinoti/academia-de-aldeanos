@@ -7,3 +7,5 @@ tests/screenshots/
 __pycache__/
 # Claude Code local
 .claude/settings.local.json
+# Intermediate translation extraction; regenerate from the built page.
+/tools/i18n-strings.json

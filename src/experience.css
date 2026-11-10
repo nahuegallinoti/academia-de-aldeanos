@@ -155,6 +155,10 @@ dialog::backdrop{background:#060a11aa;backdrop-filter:blur(4px)}
 .guide-result ol{padding-left:20px;margin:0;display:grid;gap:12px;font-size:15px}
 .guide-result h3{font-size:22px}
 .guide-result .callout{font-size:14px}
+.quiz-progress{display:flex;align-items:center;gap:12px;padding-bottom:16px;border-bottom:1px solid var(--rule);margin-bottom:4px}
+.quiz-progress .count{font-size:13px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.quiz-progress .track{flex:0 1 120px;height:4px;background:var(--rule)}
+.quiz-progress .tag{margin-left:auto;white-space:nowrap}
 .quiz .qtext{font-size:26px;letter-spacing:-.025em}
 .quiz .opt{min-height:56px;display:flex;align-items:center;gap:12px;font-size:15px}
 .opt-key{border:1px solid var(--rule);border-radius:5px;min-width:25px;height:25px;display:grid;place-items:center;font:11px var(--mono);opacity:.7}
@@ -210,4 +214,8 @@ dialog::backdrop{background:#060a11aa;backdrop-filter:blur(4px)}
  .brand b{font-size:11px;max-width:146px}.tools .tool{width:33px;min-width:33px;height:34px}.topin{gap:8px}.brand{gap:7px}
  .guide-form{grid-template-columns:minmax(0,1fr)}.guide-form label:first-child,.guide-form .btn{grid-column:auto}.us-head{gap:14px}.us-head b{font-size:24px}.us-facts{grid-template-columns:1fr 1fr}.finder-foot>span{max-width:150px}.rrow{grid-template-columns:24px 36px minmax(0,1fr);gap:8px}.rrow .ui{width:36px;height:36px}
 }
+.language-control{display:flex;align-items:center;flex-shrink:0}
+.language-control select{font-family:inherit;font-size:12px;font-weight:600;color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:7px;min-height:36px;padding:4px;cursor:pointer;max-width:59px}
+.language-control select:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+@media(max-width:560px){.topin{gap:5px}.tools{gap:3px}.brand b{max-width:110px}.language-control select{min-height:34px;max-width:48px;font-size:11px}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}.task-card:hover{transform:none}}
