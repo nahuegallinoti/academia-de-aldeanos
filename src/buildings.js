@@ -79,44 +79,35 @@ function paintBld(){
   box.innerHTML=BCAT.filter(([k])=>!ST.bcat||ST.bcat===k).map(([k,l])=>{const items=list.filter(b=>b.cat===k);if(!items.length)return '';
     return `<section class="stack" style="gap:10px"><h3>${l}</h3><div class="bgrid2">${items.map(b=>`<button class="bcard" data-bld="${b.id}">${bIcon(b.pic,'',b.n)}<span><b>${b.n}</b><small>${AGE_BLD[b.age]||''}${b.game&&b.game.toLowerCase()!==b.n.toLowerCase()?` · En el juego: ${b.game}`:''}</small><span class="costs">${costHtml(b.cost)}</span><small class="what">${b.units.filter(u=>u.all).length?`Produce ${b.units.filter(u=>u.all).length} unidades`:''}${b.units.filter(u=>u.all).length&&b.techs.filter(t=>t.all).length?' · ':''}${b.techs.filter(t=>t.all).length?`Investiga ${b.techs.filter(t=>t.all).length} tecnologías`:''}${b.civs.length?`Solo ${b.civs.length} civs`:''}</small></span></button>`).join('')}</div></section>`}).join('');
 }
-function unitChip(u){
+function unitTile(u,bid){
   const k=ICONS[u.en]?u.en:(GEN_EN[u.en]||null);
-  const src=k?(ICONS[k]||''):(BICON['u'+u.pic]||'');
-  const img=src?`<img class="ui m" src="${src}" alt="" width="36" height="36" loading="lazy">`:'';
-  return `<button class="uchip" ${k?`data-act="unit" data-k="${esc(k)}"`:`data-bunit="${u.pic}" data-name="${esc(u.es)}" data-en="${esc(u.en)}"`}>${img}<span><b>${u.es}</b><small>${u.en}${u.age?` · ${AGE_BLD[u.age]}`:''}</small></span></button>`;
+  const src=k?(ICONS[k]||''):sIcon(u.en);
+  const attrs=k?`data-act="unit" data-k="${esc(k)}"`:`data-unit-en="${esc(u.en)}" data-from="${bid}"`;
+  return `<button class="ptile" ${attrs}>${src?`<img src="${src}" alt="" width="48" height="48" loading="lazy">`:'<span class="tc-ph"></span>'}<b>${u.es}</b>${ageDots(u.age)}</button>`;
 }
 function bOpen(id){
-  const b=BLD_BY_ID[id],dlg=$('#zoom');if(!b||!dlg)return;ST.bLast=id;
-  const cb=$('#zoom [data-act="copy-unit"],#zoom [data-act="copy-bld"]');if(cb){cb.dataset.act='copy-bld';cb.textContent='Copiar enlace'}
-  const fact=(l,v)=>v?`<div><span>${l}</span><b>${v}</b></div>`:'';
+  const b=BLD_BY_ID[id],dlg=$('#zoom');if(!b||!dlg)return;ST.bLast=id;ST.unit=null;
   const gu=b.units.filter(u=>u.all),ou=b.units.filter(u=>!u.all);
   const gt=b.techs.filter(t=>t.all),ot=b.techs.filter(t=>!t.all);
-  const byAge=ts=>[1,2,3,4].map(a=>{const l=ts.filter(t=>t.age===a);return l.length?`<div><b>${AGE_BLD[a]}</b><span>${l.map(t=>`${t.es} <span class="muted">(${t.en})</span>`).join(', ')}</span></div>`:''}).join('');
-  let extra='';
-  if(b.id===82)extra=`<p class="fine">Además, cada civ entrena acá su unidad única e investiga sus dos tecnologías únicas. Miralas en la ficha de tu civ.</p>`;
-  $('#zoombody').innerHTML=`<div class="us-head"><img src="${BICON['b'+b.pic]||''}" alt="${esc(b.n)}"><div><b>${b.n}</b><small>En el juego: ${b.game} · ${b.en}</small><p style="margin-top:8px">${b.r}</p></div></div>
-  <div class="us-facts">${fact('Disponible desde',AGE_BLD[b.age])}${fact('Costo',costHtml(b.cost))}${fact('Vida',b.hp)}${fact('Construcción',b.time?b.time+' s':'')}${fact('Guarnición',b.garrison||'')}</div>
-  <div class="callout" style="margin-top:14px"><b>Consejo</b><span>${b.t}</span></div>
-  ${b.civs.length?`<div class="us-sec"><h3>Lo tienen</h3><div class="chiplist">${civLinks(b.civs)}</div></div>`:''}
-  ${gu.length?`<div class="us-sec"><h3>Qué produce</h3><div class="uchips">${gu.map(unitChip).join('')}</div></div>`:''}
-  ${ou.length?`<details class="us-sec"><summary><b>Unidades de algunas civs (${ou.length})</b></summary><div class="uchips">${ou.map(unitChip).join('')}</div></details>`:''}
-  ${gt.length?`<div class="us-sec"><h3>Qué investiga</h3><div class="us-tech">${byAge(gt)}</div></div>`:''}
-  ${ot.length?`<details class="us-sec"><summary><b>Tecnologías de algunas civs (${ot.length})</b></summary><div class="us-tech">${byAge(ot)}</div></details>`:''}
-  ${extra}`;
-  if(dlg.showModal){if(!dlg.open)dlg.showModal()}else dlg.setAttribute('open','');
-  dlg.scrollTop=0;
+  const techsByAge=ts=>[1,2,3,4].map(a=>{const l=ts.filter(t=>t.age===a);return l.length?`<div class="tg"><div class="tg-head">${ageDots(a)}<b>${AGE_BLD[a]}</b></div><div class="tg-grid">${l.map(t=>techCard(t.en)).join('')}</div></div>`:''}).join('');
+  const bars=[['Vida',b.hp,5000,b.hp],['Construcción',b.time,200,b.time?b.time+' s':''],['Guarnición',b.garrison,20,b.garrison||'']].filter(x=>x[1]);
+  sheetOpen(heroHtml({img:BICON['b'+b.pic],color:'def',kicker:'Edificio · '+(BCAT.find(c=>c[0]===b.cat)||['',''])[1],title:b.n,sub:`En el juego: ${b.game} · ${b.en}`,
+    tags:tag('Desde',AGE_BLD[b.age],ageDots(b.age))+`<span class="sh-tag"><span><small>Costo</small><span class="costs">${costChips(b.cost)}</span></span></span>`})
+  +`<p class="sh-lede">${b.r}</p>
+  ${bars.length?`<section class="sh-block"><div class="sh-stats">${bars.map(([l,v,max,txt])=>`<div class="st"><span>${l}</span><div class="bar" aria-hidden="true"><i style="width:${Math.min(100,v/max*100)}%"></i></div><b>${txt}</b></div>`).join('')}</div></section>`:''}
+  <div class="callout sh-tip"><b>Consejo</b><span>${b.t}</span></div>
+  ${b.civs.length?`<section class="sh-block"><h3>Lo tienen</h3><div class="chiplist">${civLinks(b.civs)}</div></section>`:''}
+  ${gu.length?`<section class="sh-block"><h3>Qué produce</h3><div class="ptiles">${gu.map(u=>unitTile(u,b.id)).join('')}</div></section>`:''}
+  ${ou.length?`<details class="sh-block sh-more"><summary>Unidades de algunas civs <span>${ou.length}</span></summary><div class="ptiles">${ou.map(u=>unitTile(u,b.id)).join('')}</div></details>`:''}
+  ${b.id===82?`<p class="fine">Además, cada civ entrena acá su unidad única e investiga sus dos tecnologías únicas. Miralas en la ficha de tu civ.</p>`:''}
+  ${gt.length?`<section class="sh-block"><h3>Qué investiga</h3><div class="tgroups">${techsByAge(gt)}</div></section>`:''}
+  ${ot.length?`<details class="sh-block sh-more"><summary>Tecnologías de algunas civs <span>${ot.length}</span></summary><div class="tgroups">${techsByAge(ot)}</div></details>`:''}`);
   if(ST.route==='edificios'){try{history.replaceState(null,'','#edificio-'+b.slug)}catch(e){}}
-}
-function bUnitOpen(pic,name,en){
-  const b=BLD_BY_ID[ST.bLast];
-  $('#zoombody').innerHTML=`<div class="us-head"><img src="${BICON['u'+pic]||''}" alt="${esc(name)}"><div><b>${name}</b><small>${en}${b?` · Se hace en: ${b.n}`:''}</small></div></div>${b?`<p style="margin-top:14px"><button class="btn ghost" data-bld="${b.id}">← Volver a ${b.n}</button></p>`:''}`;
-  $('#zoom').scrollTop=0;
 }
 /* La ficha de unidad y la de edificio comparten el diálogo: el botón de copiar enlace sigue a la ficha abierta. */
 {const zo=zoomOpen;zoomOpen=function(k){const cb=$('#zoom [data-act="copy-bld"]');if(cb)cb.dataset.act='copy-unit';return zo(k)}}
 document.addEventListener('click',e=>{
   const cpy=e.target.closest('[data-act="copy-bld"]');if(cpy){const b=BLD_BY_ID[ST.bLast];if(b){const url=new URL(location.href);url.hash='edificio-'+b.slug;if(navigator.clipboard)navigator.clipboard.writeText(url.href).then(()=>toast('Enlace del edificio copiado')).catch(()=>toast('No se pudo copiar el enlace'));else toast('Tu navegador no permite copiar el enlace')}return}
-  const bu=e.target.closest('[data-bunit]');if(bu){bUnitOpen(bu.dataset.bunit,bu.dataset.name,bu.dataset.en);return}
   const bl=e.target.closest('[data-bld]');if(bl){e.preventDefault();bOpen(+bl.dataset.bld);return}
   const t=e.target.closest('[data-bact]');if(!t)return;
   if(t.dataset.bact==='bcat'){ST.bcat=t.dataset.v;$$('[data-bact="bcat"]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===ST.bcat));paintBld()}

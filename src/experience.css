@@ -118,7 +118,7 @@ kbd{font:11px var(--mono);border:1px solid var(--rule);padding:2px 5px;border-ra
 h1[tabindex="-1"]:focus,h2[tabindex="-1"]:focus{outline:none}
 .toc{top:70px}
 .sec{scroll-margin-top:142px}
-.dialog-tools{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:12px}
+.dialog-tools{display:flex;justify-content:flex-end;align-items:center;margin-bottom:20px;gap:12px}
 .icon-close{width:36px;height:36px;flex:none;display:grid;place-items:center;border:1px solid var(--rule);background:var(--surface);border-radius:8px;font-size:16px}
 .icon-close:hover{background:var(--hover)}
 dialog{box-shadow:0 24px 90px #0005}

@@ -433,6 +433,7 @@ td.mono,th.mono{text-align:right}
 @media (prefers-reduced-motion:reduce){.alloc span,.ccard{transition:none}.ccard:hover{transform:none}}
 /*@BLDCSS@*/
 /*@NAVCSS@*/
+/*@SHEETCSS@*/
 /*@UXCSS@*/
 </style>
 
@@ -448,7 +449,7 @@ td.mono,th.mono{text-align:right}
 <footer class="footer"><div class="footer-in"><a class="footer-brand" href="#ruta">Academia de Aldeanos <span>Aprendé. Practicá. Volvé a jugar.</span></a><div class="footer-links"><a href="#aprender">Aprender a jugar</a><a href="#ayuda">Ayuda y fuentes</a></div><p>Guía de la comunidad · Age of Empires II © Microsoft. Las estrategias y valoraciones son orientativas.</p></div></footer>
 <nav class="mobile-nav" aria-label="Accesos rápidos"></nav>
 <div class="toast" id="toast" role="status" hidden></div>
-<dialog class="zoom" id="zoom" aria-label="Ficha de unidad"><div class="dialog-tools"><button class="btn ghost" data-act="copy-unit">Copiar enlace</button><button class="icon-close" data-act="zoom-close" aria-label="Cerrar ficha">✕</button></div><div id="zoombody"></div><button class="btn ghost" data-act="zoom-close">Cerrar ficha</button></dialog>
+<dialog class="zoom" id="zoom" aria-label="Ficha de unidad"><div class="dialog-tools"><button class="icon-close" data-act="zoom-close" aria-label="Cerrar ficha">✕</button></div><div id="zoombody"></div><button class="btn ghost" data-act="zoom-close">Cerrar ficha</button></dialog>
 <dialog class="finder" id="finder" aria-labelledby="finder-title"><div class="finder-head"><h2 id="finder-title">¿Qué estás buscando?</h2><button class="icon-close" data-act="search-close" aria-label="Cerrar búsqueda">✕</button></div><label class="sr-only" for="globalq">Buscar civilización, unidad, apertura o concepto</label><input class="input" id="globalq" type="search" placeholder="Civilización, unidad, apertura, concepto…" autocomplete="off" aria-controls="searchresults"><div class="finder-meta" id="searchmeta" role="status"></div><div class="searchresults" id="searchresults"></div><div class="finder-foot"><span>↑ ↓ para recorrer · Enter para abrir</span><kbd>Esc para cerrar</kbd></div></dialog>
 
 <script>
@@ -476,35 +477,6 @@ const CIVS=CIVDATA.map(c=>({...c,rv:c.r.split('').map(Number)})).sort((a,b)=>a.e
 const civById=Object.fromEntries(CIVS.map(c=>[c.id,c]));
 const civByEs=Object.fromEntries(CIVS.map(c=>[c.es,c]));
 const UUINFO={};CIVS.forEach(c=>c.uu.forEach(u=>{const o=UUINFO[u[0]];if(o)o.civs.push(c.es);else UUINFO[u[0]]={es:u[1],en:u[0],d:u[2],civs:[c.es]}}));
-function zoomOpen(k){
-  const dlg=$('#zoom');if(!dlg)return;
-  ST.unit=k;
-  const src=ICONS[k]||ICONS[{Longboat:'Longship'}[k]]||'';
-  const fact=(l,v)=>v?`<div><span>${l}</span><b>${v}</b></div>`:'';
-  const techRows=cls=>(TECHS[cls]||[]).map(([b,t])=>`<div><b>${b}</b><span>${t}</span></div>`).join('');
-  let h;
-  if(k.startsWith('@')){
-    const id=k.slice(1),u=ub[id];
-    h=`<div class="us-head"><img src="${src}" alt="${esc(u.n)}"><div><b>${u.n}</b><small>${u.en} · Unidad genérica</small><p style="margin-top:8px">${u.why}</p></div></div>
-    <div class="us-facts">${fact('Tipo',u.cls)}${fact('Se hace en',u.at)}${fact('Edad',u.age)}${fact('Costo',u.cost)}</div>
-    <div class="us-sec"><h3>Mejoras de línea</h3><p>${LINE[id]||'Sin mejoras de línea.'}</p></div>
-    <div class="us-sec"><h3>Tecnologías que la mejoran</h3><div class="us-tech">${techRows(GCLS[id])}</div></div>
-    <div class="us-sec us-two"><div><h3>Le gana a</h3><p>${beatsText(u)}</p></div><div><h3>Pierde contra</h3><p>${u.loses.map(i=>ub[i].n).join(', ')}</p></div></div>`;
-  }else{
-    const u=UUINFO[k]||{es:k,en:k,d:'',civs:[]},m=UUMETA[k]||{},cls=UCLS[k];
-    const owners=u.civs.map(n=>civByEs[n]).filter(Boolean);
-    const low=x=>x.toLowerCase();
-    const uts=owners.flatMap(c=>c.ut.filter(t=>low(t[2]).includes(low(k))||low(t[2]).includes(low(u.es))).map(t=>[c,t]));
-    h=`<div class="us-head"><img src="${src}" alt="${esc(u.es)}"><div><b>${u.es}</b><small>${u.en} · Unidad única de ${owners.map(c=>`<a href="#civ-${c.id}" data-act="zoom-close">${c.es}</a>`).join(', ')}</small><p style="margin-top:8px">${u.d}</p></div></div>
-    <div class="us-facts">${fact('Tipo',CLSNAME[cls])}${fact('Se hace en',m.at)}${fact('Disponible desde',AGE_NAME[m.age])}${fact('Versión de élite',m.elite?'Sí, en Imperial':'No')}</div>
-    ${uts.length?`<div class="us-sec"><h3>Tecnologías únicas que la afectan</h3><div class="us-tech">${uts.map(([c,t])=>`<div><b>${t[0]}</b><span>${t[1]} · ${t[2]}</span></div>`).join('')}</div></div>`:''}
-    <div class="us-sec"><h3>Tecnologías generales que la mejoran</h3><div class="us-tech">${techRows(cls)}</div><p class="fine">Son las mejoras de su tipo de unidad. Algunas civs no tienen todas: confirmalo en el árbol tecnológico del juego.</p></div>`;
-  }
-  $('#zoombody').innerHTML=h;
-  if(dlg.showModal){if(!dlg.open)dlg.showModal()}else dlg.setAttribute('open','');
-  const x=UNIT_BY_K[k];if(x&&ST.route==='unidades'){try{history.replaceState(null,'','#unidad-'+x.slug)}catch(e){}}
-  dlg.scrollTop=0;
-}
 const buildById=Object.fromEntries(BUILDS.map(b=>[b.id,b]));
 
 /* ---------- Estado y guardado ---------- */
@@ -887,6 +859,7 @@ async function ask(text){
 }
 
 /*@BUILDINGS@*/
+/*@SHEETS@*/
 
 /* ---------- Eventos ---------- */
 document.addEventListener('click',e=>{
