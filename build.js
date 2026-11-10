@@ -12,12 +12,18 @@ if(bad.length){console.error(bad.join('\n'));process.exit(1)}
 console.log('civs',CIVDATA.length);
 if(process.argv[2]==='check')process.exit(0);
 const english=JSON.parse(src('i18n-en.json'));
+const access=JSON.parse(src('availability.json'));
+if(access.civs.length!==CIVDATA.length||CIVDATA.some(c=>!access.civs.includes(c.id)))throw new Error('Availability must cover every civilization');
+for(const kind of ['units','techs','buildings'])for(const [name,owners] of Object.entries(access[kind]))if(!owners.length||new Set(owners).size!==owners.length||owners.some(id=>!ids.has(id)))throw new Error('Invalid availability: '+kind+' '+name);
+const sheets=JSON.parse(src('sheets-data.json'));
+for(const kind of ['units','techs'])for(const name of Object.keys(sheets[kind]))if(!access[kind][name])throw new Error('Missing availability: '+name);
+for(const id of Object.keys(JSON.parse(src('buildings.json'))))if(!access.buildings[id])throw new Error('Missing building availability: '+id);
 const placeholders=s=>(s.match(/\{\d+\}/g)||[]).sort().join(',');
 Object.entries(english).forEach(([key,value])=>{if(typeof value!=='string'||placeholders(key)!==placeholders(value))throw new Error('Invalid English translation: '+key)});
 ['Inicio','Civilizaciones','Unidades','Edificios','Aperturas','Mapas','Aprender','Entrenar','Guía y ayuda'].forEach(key=>{if(!english[key])throw new Error('Missing English label: '+key)});
 const icons=JSON.parse(src('icons.json'));
 const iconJs='const ICONS='+JSON.stringify(Object.fromEntries(Object.entries(icons).map(([k,p])=>[k,'data:image/png;base64,'+fs.readFileSync(path.join(__dirname,'src','icons',p+'.png')).toString('base64')])))+';';
-const page=src('page.html').replace('/*@I18N@*/',()=>src('i18n.js').replace('/*@ENGLISH@*/',()=>src('i18n-en.json').trim())).replace('/*@BASE@*/',()=>src('data-base.js').trim()).replace('/*@CIVDATA@*/',()=>civJs).replace('/*@ICONS@*/',()=>iconJs).replace('/*@UNITMETA@*/',()=>src('units-meta.json').trim()).replace('/*@BLDCSS@*/',()=>src('buildings.css')).replace('/*@NAVCSS@*/',()=>src('nav.css')).replace('/*@SHEETCSS@*/',()=>src('sheets.css')).replace('/*@SHEETS@*/',()=>require('./tools/build-sheets.js')(__dirname)).replace('/*@BUILDINGS@*/',()=>require('./tools/build-buildings.js')(__dirname)).replace('/*@UXCSS@*/',()=>src('experience.css')).replace('/*@UXJS@*/',()=>src('experience.js')).replace('@TOUCHICON@',()=>'data:image/png;base64,'+fs.readFileSync(path.join(__dirname,'src','apple-touch-icon.png')).toString('base64'));
+const page=src('page.html').replace('/*@I18N@*/',()=>src('i18n.js').replace('/*@ENGLISH@*/',()=>src('i18n-en.json').trim())).replace('/*@AVAILABILITY@*/',()=>src('availability.js').replace('/*@AVAILDATA@*/',()=>src('availability.json').trim())).replace('/*@BASE@*/',()=>src('data-base.js').trim()).replace('/*@CIVDATA@*/',()=>civJs).replace('/*@ICONS@*/',()=>iconJs).replace('/*@UNITMETA@*/',()=>src('units-meta.json').trim()).replace('/*@BLDCSS@*/',()=>src('buildings.css')).replace('/*@NAVCSS@*/',()=>src('nav.css')).replace('/*@SHEETCSS@*/',()=>src('sheets.css')).replace('/*@SHEETS@*/',()=>require('./tools/build-sheets.js')(__dirname)).replace('/*@BUILDINGS@*/',()=>require('./tools/build-buildings.js')(__dirname)).replace('/*@UXCSS@*/',()=>src('experience.css')).replace('/*@UXJS@*/',()=>src('experience.js')).replace('@TOUCHICON@',()=>'data:image/png;base64,'+fs.readFileSync(path.join(__dirname,'src','apple-touch-icon.png')).toString('base64'));
 // Valida el JavaScript ensamblado antes de modificar los archivos de salida.
 new (require('vm').Script)(page.match(/<script>([\s\S]*)<\/script>/)[1]);
 fs.writeFileSync(path.join(__dirname,'academia-de-aldeanos.html'),page);

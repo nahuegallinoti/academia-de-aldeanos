@@ -63,49 +63,50 @@ function vEdificios(){
   return `<section class="head"><div class="eyebrow">${BLD_LIST.length} edificios</div><h2>Edificios</h2><p class="lede">Qué hace cada edificio, cuánto cuesta, desde qué edad está y qué produce o investiga. Tocá uno para ver su ficha completa; desde ahí podés abrir cada unidad.</p></section>
   <div class="stack"><div class="ctl" style="grid-template-columns:minmax(0,1fr) auto"><input class="input search" id="bq" type="search" placeholder="Buscar edificio, unidad o tecnología" value="${esc(ST.bq||'')}" aria-label="Buscar edificio">
   <div class="seg" role="group" aria-label="Vista">${[['cards','Tarjetas'],['table','Tabla']].map(([v,l])=>`<button data-bact="bview" data-v="${v}" aria-pressed="${(ST.bview||'cards')===v}">${l}</button>`).join('')}</div></div>
-  <div class="chips" role="group" aria-label="Categoría"><button class="chip" data-bact="bcat" data-v="" aria-pressed="${!ST.bcat}">Todos</button>${BCAT.map(([k,l])=>`<button class="chip" data-bact="bcat" data-v="${k}" aria-pressed="${ST.bcat===k}">${l}</button>`).join('')}</div></div>
+  <label class="building-civ-filter" for="bciv">Civilización<select class="select" id="bciv"><option value="">Todas</option>${CIVS.map(c=>`<option value="${c.id}"${ST.bciv===c.id?' selected':''}>${c.es}</option>`).join('')}</select></label><div class="chips" role="group" aria-label="Categoría"><button class="chip" data-bact="bcat" data-v="" aria-pressed="${!ST.bcat}">Todos</button>${BCAT.map(([k,l])=>`<button class="chip" data-bact="bcat" data-v="${k}" aria-pressed="${ST.bcat===k}">${l}</button>`).join('')}</div></div>
   <div id="blist" class="stack"></div>
   <p class="fine">Costos, vida, tiempos y qué produce cada edificio salen de los árboles tecnológicos de aoe2techtree.net, con los nombres oficiales del juego en español latino. Algunas civs tienen descuentos o no tienen todos los edificios.</p>`;
 }
 function bMatches(b,q){if(!q)return true;const hay=[b.n,b.game,b.en,b.r,...b.units.map(u=>u.es+' '+u.en),...b.techs.map(t=>t.es+' '+t.en)].join(' ');return searchText(hay).includes(fold(q))}
 function paintBld(){
   const box=$('#blist');if(!box)return;const q=(ST.bq||'').trim().toLowerCase();
-  const list=BLD_LIST.filter(b=>(!ST.bcat||b.cat===ST.bcat)&&bMatches(b,q));
+  const list=BLD_LIST.filter(b=>(!ST.bcat||b.cat===ST.bcat)&&(!ST.bciv||accessIds('buildings',b.id)?.includes(ST.bciv))&&bMatches(b,q));
   if(!list.length){box.innerHTML='<div class="panel">Ningún edificio coincide. Probá con otra búsqueda.</div>';return}
   if((ST.bview||'cards')==='table'){
-    box.innerHTML=`<div class="scroll panel" style="padding:4px 8px"><table class="utable rtable" id="btable"><thead><tr><th>Edificio</th><th>Edad</th><th>Costo</th><th>Vida</th><th>Construcción</th><th>Produce</th><th>Investiga</th></tr></thead><tbody>${list.map(b=>`<tr><td><span>${bIcon(b.pic,'s',b.n)}<button class="linkbtn" data-bld="${b.id}">${b.n}</button></span></td><td>${AGE_BLD[b.age]||''}</td><td><span class="costs">${costHtml(b.cost)}</span></td><td class="mono">${b.hp||'—'}</td><td class="mono">${b.time?b.time+' s':'—'}</td><td>${b.units.filter(u=>u.all).length||'—'}</td><td>${b.techs.filter(t=>t.all).length||'—'}</td></tr>`).join('')}</tbody></table></div>`;
+    box.innerHTML=`<div class="scroll panel" style="padding:4px 8px"><table class="utable rtable" id="btable"><thead><tr><th>Edificio</th><th>Edad</th><th>Costo</th><th>Vida</th><th>Construcción</th><th>Civilizaciones</th><th>Produce</th><th>Investiga</th></tr></thead><tbody>${list.map(b=>`<tr><td><span>${bIcon(b.pic,'s',b.n)}<button class="linkbtn" data-bld="${b.id}">${b.n}</button></span></td><td>${AGE_BLD[b.age]||''}</td><td><span class="costs">${costHtml(b.cost)}</span></td><td class="mono">${b.hp||'—'}</td><td class="mono">${b.time?b.time+' s':'—'}</td><td>${accessSummary('buildings',b.id)}</td><td>${b.units.length||'—'}</td><td>${b.techs.length||'—'}</td></tr>`).join('')}</tbody></table></div>`;
     if(typeof rz==='function')rz($('#btable'));return;
   }
   box.innerHTML=BCAT.filter(([k])=>!ST.bcat||ST.bcat===k).map(([k,l])=>{const items=list.filter(b=>b.cat===k);if(!items.length)return '';
-    return `<section class="stack" style="gap:10px"><h3>${l}</h3><div class="bgrid2">${items.map(b=>`<button class="bcard" data-bld="${b.id}">${bIcon(b.pic,'',b.n)}<span><b>${b.n}</b><small>${AGE_BLD[b.age]||''}${b.game&&b.game.toLowerCase()!==b.n.toLowerCase()?` · En el juego: ${b.game}`:''}</small><span class="costs">${costHtml(b.cost)}</span><small class="what">${b.units.filter(u=>u.all).length?`Produce ${b.units.filter(u=>u.all).length} unidades`:''}${b.units.filter(u=>u.all).length&&b.techs.filter(t=>t.all).length?' · ':''}${b.techs.filter(t=>t.all).length?`Investiga ${b.techs.filter(t=>t.all).length} tecnologías`:''}${b.civs.length?`Solo ${b.civs.length} civs`:''}</small></span></button>`).join('')}</div></section>`}).join('');
+    return `<section class="stack" style="gap:10px"><h3>${l}</h3><div class="bgrid2">${items.map(b=>`<button class="bcard" data-bld="${b.id}">${bIcon(b.pic,'',b.n)}<span><b>${b.n}</b><small>${AGE_BLD[b.age]||''}${b.game&&b.game.toLowerCase()!==b.n.toLowerCase()?` · En el juego: ${b.game}`:''}</small><span class="costs">${costHtml(b.cost)}</span><small class="what">${b.units.length?`Produce ${b.units.length} unidades`:''}${b.units.length&&b.techs.length?' · ':''}${b.techs.length?`Investiga ${b.techs.length} tecnologías`:''}</small><small class="building-access">${accessSummary('buildings',b.id)}</small></span></button>`).join('')}</div></section>`}).join('');
 }
 function unitTile(u,bid){
   const k=ICONS[u.en]?u.en:(GEN_EN[u.en]||null);
   const src=k?(ICONS[k]||''):sIcon(u.en);
-  const attrs=k?`data-act="unit" data-k="${esc(k)}"`:`data-unit-en="${esc(u.en)}" data-from="${bid}"`;
-  return `<button class="ptile" ${attrs}>${src?`<img src="${src}" alt="" width="48" height="48" loading="lazy">`:'<span class="tc-ph"></span>'}<b>${u.es}</b>${ageDots(u.age)}</button>`;
+  const attrs=GEN_EN[u.en]?`data-unit-line="${GEN_EN[u.en]}" data-unit-version="${esc(u.en)}"`:k?`data-act="unit" data-k="${esc(k)}"`:`data-unit-en="${esc(u.en)}" data-from="${bid}"`;
+  return `<button class="ptile" ${attrs}>${src?`<img src="${src}" alt="" width="48" height="48" loading="lazy">`:'<span class="tc-ph"></span>'}<b>${u.es}</b>${ageDots(u.age)}<small class="unit-access">${accessSummary('units',u.en)}</small></button>`;
 }
 function bOpen(id){
   const b=BLD_BY_ID[id],dlg=$('#zoom');if(!b||!dlg)return;ST.bLast=id;ST.unit=null;
-  const gu=b.units.filter(u=>u.all),ou=b.units.filter(u=>!u.all);
-  const gt=b.techs.filter(t=>t.all),ot=b.techs.filter(t=>!t.all);
-  const techsByAge=ts=>[1,2,3,4].map(a=>{const l=ts.filter(t=>t.age===a);return l.length?`<div class="tg"><button class="tg-head link" data-age="${a}">${ageDots(a)}<b>${AGE_BLD[a]}</b><i class="go" aria-hidden="true">›</i></button><div class="tg-grid">${l.map(t=>techCard(t.en)).join('')}</div></div>`:''}).join('');
+  const common=(kind,name)=>(accessIds(kind,name)?.length||0)>=CIVS.length*.6;
+  const gu=b.units.filter(u=>common('units',u.en)),ou=b.units.filter(u=>!common('units',u.en));
+  const gt=b.techs.filter(t=>common('techs',t.en)),ot=b.techs.filter(t=>!common('techs',t.en));
+  const techsByAge=ts=>[1,2,3,4].map(a=>{const l=ts.filter(t=>t.age===a);return l.length?`<div class="tg"><button class="tg-head link" data-age="${a}">${ageDots(a)}<b>${AGE_BLD[a]}</b><i class="go" aria-hidden="true">›</i></button><div class="tg-grid">${l.map(t=>techCard(t.en,accessIds('buildings',b.id))).join('')}</div></div>`:''}).join('');
   const bars=[['Vida',b.hp,5000,b.hp],['Construcción',b.time,200,b.time?b.time+' s':''],['Guarnición',b.garrison,20,b.garrison||'']].filter(x=>x[1]);
   sheetOpen(heroHtml({img:BICON['b'+b.pic],color:'def',kicker:'Edificio · '+(BCAT.find(c=>c[0]===b.cat)||['',''])[1],title:b.n,sub:`En el juego: ${b.game} · ${b.en}`,
     tags:tag('Desde',AGE_BLD[b.age],ageDots(b.age),`data-age="${b.age}"`)+`<span class="sh-tag"><span><small>Costo</small><span class="costs">${costChips(b.cost)}</span></span></span>`})
-  +`<p class="sh-lede">${b.r}</p>
+  +`<p class="sh-lede">${b.r}</p>${availabilityHtml('buildings',b.id,{label:b.n})}
   ${bars.length?`<section class="sh-block"><div class="sh-stats">${bars.map(([l,v,max,txt])=>`<div class="st"><span>${l}</span><div class="bar" aria-hidden="true"><i style="width:${Math.min(100,v/max*100)}%"></i></div><b>${txt}</b></div>`).join('')}</div></section>`:''}
   <div class="callout sh-tip"><b>Consejo</b><span>${b.t}</span></div>
-  ${b.civs.length?`<section class="sh-block"><h3>Lo tienen</h3><div class="chiplist">${civLinks(b.civs)}</div></section>`:''}
+
   ${gu.length?`<section class="sh-block"><h3>Qué produce</h3><div class="ptiles">${gu.map(u=>unitTile(u,b.id)).join('')}</div></section>`:''}
   ${ou.length?`<details class="sh-block sh-more"><summary>Unidades de algunas civs <span>${ou.length}</span></summary><div class="ptiles">${ou.map(u=>unitTile(u,b.id)).join('')}</div></details>`:''}
   ${b.id===82?`<p class="fine">Además, cada civ entrena acá su unidad única e investiga sus dos tecnologías únicas. Miralas en la ficha de tu civ.</p>`:''}
-  ${gt.length?`<section class="sh-block"><h3>Qué investiga</h3><div class="tgroups">${techsByAge(gt)}</div></section>`:''}
+  ${gt.length?`<section class="sh-block"><h3>Qué investiga</h3><p class="availability-hint">Se muestran las civilizaciones que tienen este edificio y cada tecnología.</p><div class="tgroups">${techsByAge(gt)}</div></section>`:''}
   ${ot.length?`<details class="sh-block sh-more"><summary>Tecnologías de algunas civs <span>${ot.length}</span></summary><div class="tgroups">${techsByAge(ot)}</div></details>`:''}`,{label:b.n,fn:()=>bOpen(id)});
   if(ST.route==='edificios'){try{history.replaceState(null,'','#edificio-'+b.slug)}catch(e){}}
 }
 /* La ficha de unidad y la de edificio comparten el diálogo: el botón de copiar enlace sigue a la ficha abierta. */
-{const zo=zoomOpen;zoomOpen=function(k){const cb=$('#zoom [data-act="copy-bld"]');if(cb)cb.dataset.act='copy-unit';return zo(k)}}
+{const zo=zoomOpen;zoomOpen=function(k,version){const cb=$('#zoom [data-act="copy-bld"]');if(cb)cb.dataset.act='copy-unit';return zo(k,version)}}
 document.addEventListener('click',e=>{
   const cpy=e.target.closest('[data-act="copy-bld"]');if(cpy){const b=BLD_BY_ID[ST.bLast];if(b){const url=new URL(location.href);url.hash='edificio-'+b.slug;if(navigator.clipboard)navigator.clipboard.writeText(url.href).then(()=>toast('Enlace del edificio copiado')).catch(()=>toast('No se pudo copiar el enlace'));else toast('Tu navegador no permite copiar el enlace')}return}
   const bl=e.target.closest('[data-bld]');if(bl){e.preventDefault();bOpen(+bl.dataset.bld);return}
@@ -115,3 +116,5 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('input',e=>{if(e.target.id==='bq'){ST.bq=e.target.value;paintBld()}});
 {const d=document.getElementById('zoom');if(d)d.addEventListener('close',()=>{if((location.hash||'').startsWith('#edificio-')){try{history.replaceState(null,'','#edificios')}catch(e){}}})}
+
+document.addEventListener('change',e=>{if(e.target.id==='bciv'){ST.bciv=e.target.value;paintBld()}});

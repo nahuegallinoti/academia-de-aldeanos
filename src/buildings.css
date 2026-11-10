@@ -17,6 +17,9 @@
 .uchip b{display:block;font-size:14px;line-height:1.2}
 .uchip small{display:block;color:var(--muted);font-size:12px}
 .muted{color:var(--muted)}
+.building-civ-filter{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.building-civ-filter .select{min-width:0;max-width:100%}
+.bcard .building-access{color:var(--acc);font-size:12px;font-weight:650;margin-top:7px}
 details.us-sec summary{cursor:pointer;padding:4px 0}
 details.us-sec[open] summary{margin-bottom:8px}
 @media (prefers-reduced-motion:reduce){.bcard{transition:none}.bcard:hover{transform:none}}

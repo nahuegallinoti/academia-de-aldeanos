@@ -185,6 +185,7 @@ dialog::backdrop{background:#060a11aa;backdrop-filter:blur(4px)}
 .counter-constraints{padding-top:14px;border-top:1px solid var(--rule);display:flex;align-items:center;flex-wrap:wrap;gap:12px;font-size:13px}
 .counter-constraints label{display:flex;gap:7px;align-items:center}.counter-constraints input{width:17px;height:17px;accent-color:var(--acc)}
 .counter-constraints .select{font-size:13px;min-height:36px;padding:6px 9px}
+.counter-constraints label{min-width:0;max-width:100%;flex-wrap:wrap}.counter-constraints .select{max-width:100%}
 .map h3{font-stretch:100%;letter-spacing:-.03em}
 .map-index{font:11px var(--mono);color:var(--acc);padding-bottom:8px;border-bottom:1px solid var(--rule)}
 .map .chiplist .tag{min-height:30px;text-decoration:none}

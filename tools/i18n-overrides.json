@@ -178,5 +178,15 @@
   "Armá tu plan": "Build your plan",
   "Armar mi plan": "Build my plan",
   "Sin oro": "No gold",
-  "Generación de oro": "Gold generation"
+  "Generación de oro": "Gold generation",
+  "Todas las civilizaciones": "All civilizations",
+  "Disponibilidad no documentada": "Availability not documented",
+  "No disponible para esta unidad": "Not available for this unit",
+  "No disponible en": "Not available to",
+  "Ver las {0} civilizaciones": "View all {0} civilizations",
+  "Buscar civilización en esta lista": "Search civilizations in this list",
+  "Se indica qué civilizaciones de la versión seleccionada tienen cada tecnología.": "Each technology shows which civilizations using the selected unit version have access to it.",
+  "Las {0} unidades compartidas por distintas civilizaciones y las {1} unidades únicas. Filtrá por tu civilización y abrí una ficha para ver sus versiones y mejoras disponibles.": "Browse {0} shared units and {1} unique units. Filter by your civilization and open a unit to check its available versions and upgrades.",
+  "No hay una respuesta directa con estos filtros. Probá otra edad o quitá “sin oro”; mientras tanto, protegé tu economía y evitá enfrentamientos desfavorables.": "There is no direct counter with these filters. Try another age or remove “no gold”; meanwhile, protect your economy and avoid unfavorable fights.",
+  "Se muestran las civilizaciones que tienen este edificio y cada tecnología.": "Shows civilizations with access to both this building and each technology."
 }

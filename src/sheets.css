@@ -21,6 +21,28 @@
 .sh-block{margin-top:20px;display:grid;gap:10px}
 .sh-block h3{font-family:var(--display);font-size:12.5px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-stretch:116%;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .sh-sel{font-family:var(--body);text-transform:none;letter-spacing:0;font-weight:700;font-size:13px;color:var(--acc);background:var(--acc-soft);border-radius:999px;padding:2px 10px}
+/* Availability stays compact until the reader opens the full list. */
+.availability-main{margin-top:16px;padding:13px 15px;border:1px solid var(--rule);border-radius:12px;background:var(--sunken);display:grid;gap:9px}
+.availability-heading{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.availability-heading h3{font:700 11px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+.availability-version{font-size:12px;color:var(--muted)}
+.availability-total{font-size:14px;font-weight:700;margin:0}
+.availability-list{display:flex;flex-wrap:wrap;gap:6px}
+.availability-list .tag{max-width:100%;white-space:normal;text-decoration:none;font-size:12px}
+.availability-list .tag:hover{border-color:var(--acc);color:var(--acc)}
+.availability-details{min-width:0}
+.availability-details>summary{cursor:pointer;font-size:12px;color:var(--acc);font-weight:650;padding:3px 0;overflow-wrap:anywhere}
+.availability-expanded:not(:empty){display:grid;gap:9px;margin-top:8px}
+.availability-expanded>.availability-list{max-height:230px;overflow-y:auto;padding:2px}
+.availability-search{width:100%;min-width:0;font-size:12px}
+.availability-exceptions{display:grid;gap:6px}
+.availability-exceptions>span{font-size:12px;color:var(--muted)}
+.availability-compact{margin-top:7px;padding-top:5px;border-top:1px solid var(--rule);min-width:0}
+.availability-compact .availability-expanded>.availability-list{max-height:180px}
+.availability-none{font-size:11px;color:var(--muted)}
+.tc>.availability{grid-column:1/-1}
+.availability-hint{margin:8px 0 0;color:var(--muted);font-size:12px}
+.unit-access{font-size:10.5px;color:var(--muted);line-height:1.35}
 /* Línea de mejoras */
 .sh-line{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 .ln-node{display:grid;justify-items:center;gap:4px;min-width:108px;padding:10px 12px;border:1px solid var(--rule);border-radius:12px;background:var(--surface);color:var(--ink);text-align:center}

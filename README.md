@@ -9,6 +9,7 @@ Guía de Age of Empires II: Definitive Edition en español e inglés: fichas de 
 - `src/page.html`: estructura, estilos y lógica de la página.
 - `src/experience.css` y `src/experience.js`: navegación adaptable, búsqueda global, temas, planificador y mejoras de las secciones.
 - `src/i18n.js` y `src/i18n-en.json`: selector de idioma y traducciones locales de la interfaz y de todo el contenido, sin conexiones a servicios de traducción durante el uso.
+- `src/availability.json` y `src/availability.js`: acceso exacto por civilización a unidades, versiones, edificios y tecnologías; listas compactas y desplegables con búsqueda.
 - `src/data-base.js`: lecciones, aperturas, unidades para counters, mapas, glosario y preguntas.
 - `src/civs-*.js`: una ficha por civilización (bonos, únicas, plan por edad, aperturas, mapas, rivales, consejos).
 - `build.js`: valida las fichas y la sintaxis del JavaScript ensamblado, y arma la página.
@@ -18,6 +19,8 @@ La ruta de aprendizaje tiene su sección **Aprender**. El inicio concentra acces
 La búsqueda global se abre con **Ctrl/Cmd+K** o **/**. Las aperturas tienen enlaces propios (`#apertura-scouts`), y las fichas de unidades se pueden compartir (`#unidad-knight`). El tema claro, oscuro o automático se conserva en este navegador.
 
 El selector **ES / EN** recuerda el idioma en este navegador. Los enlaces con `?lang=en` o `?lang=es` abren un idioma concreto. Cambiarlo conserva el progreso, los filtros, las fichas abiertas y el reloj. Las búsquedas aceptan ambos idiomas y los enlaces de las fichas conservan sus identificadores.
+
+Las fichas muestran todas las civilizaciones cuando son ocho o menos. Para listas largas muestran un recuento y un desplegable; las listas de más de doce permiten buscar por nombre en español o inglés. Si solo faltan hasta seis civilizaciones, se destacan las excepciones. «Todas las civilizaciones» se reserva para disponibilidad universal. Al cambiar de versión de una unidad se actualizan las civilizaciones y el acceso a sus tecnologías. Unidades, edificios y counters se pueden filtrar por civilización.
 
 ## Armar
 
@@ -42,11 +45,14 @@ Con el servidor activo, desde otra terminal:
 ```bash
 python tests/smoke.py
 python tests/i18n.py
+python tests/availability.py
 ```
 
 Comprueba navegación, búsquedas con y sin acentos, filtros, fichas, reloj, guía, quiz, guardado local y desbordamientos en 1440, 820, 390 y 320 px. Las capturas quedan en `tests/screenshots/` (ignorado por Git). `TEST_URL` y `TEST_SCREENSHOTS` permiten cambiar la web y la carpeta de capturas.
 
 La prueba de idiomas recorre las 56 civilizaciones, las 103 unidades, todos los edificios, edades y pasos de aperturas en inglés. También comprueba el cambio de idioma con filtros y reloj activos y la conservación del progreso.
+
+La prueba de disponibilidad comprueba unidades restringidas, diferencias entre versiones, tecnologías según los propietarios de la unidad, excepciones, búsqueda y navegación de listas, filtros y tamaños móviles. Los datos proceden de una revisión concreta de [aoe2techtree](https://github.com/SiegeEngineers/aoe2techtree), identificada en `src/availability.json`. `node tools/gen-availability.js <carpeta>` los regenera desde `trees/`, `data.json` y `source.json` de esa revisión. Excluye nodos `NotAvailable` y comprueba cada acceso contra los identificadores habilitados de `data.json`; no confunde la presencia de una opción tachada en el árbol con disponibilidad. El armado exige cobertura de todas las unidades, edificios, tecnologías y civilizaciones de la app.
 
 Para ampliar las traducciones, editá `src/i18n-en.json`. Las entradas dinámicas usan marcadores como `{0}` y `{1}`; el armado valida que se conserven. `tools/i18n-glossary.json` contiene los nombres del juego y `tools/i18n-overrides.json` conserva revisiones de redacción. El extractor de desarrollo `node tools/extract-i18n.js <ruta-a-acorn>` requiere Acorn y genera `tools/i18n-strings.json` (ignorado). `python tools/translate-i18n.py` permite completar el catálogo durante el desarrollo usando Google Translate y aplica las revisiones; su salida debe revisarse antes de publicar. Estas herramientas no son necesarias para armar ni usar la app.
 

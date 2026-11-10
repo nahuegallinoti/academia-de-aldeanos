@@ -478,6 +478,7 @@ const AGES=[['Edad Oscura','0:00 a ~10:00'],['Feudal','~10:00 a ~20:00'],['Casti
 const CIVS=CIVDATA.map(c=>({...c,rv:c.r.split('').map(Number)})).sort((a,b)=>displayCompare(a.es,b.es));
 const civById=Object.fromEntries(CIVS.map(c=>[c.id,c]));
 const civByEs=Object.fromEntries(CIVS.map(c=>[c.es,c]));
+/*@AVAILABILITY@*/
 const UUINFO={};CIVS.forEach(c=>c.uu.forEach(u=>{const o=UUINFO[u[0]];if(o)o.civs.push(c.es);else UUINFO[u[0]]={es:u[1],en:u[0],d:u[2],civs:[c.es]}}));
 const buildById=Object.fromEntries(BUILDS.map(b=>[b.id,b]));
 
@@ -760,28 +761,28 @@ const beatsText=u=>[...u.beats.map(i=>ub[i].n),u.vs].filter(Boolean).join(', ')|
 const slugU=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 const GRP_G={scout:'Caballería',knight:'Caballería',camel:'Caballería',eleph:'Elefante',archer:'Arquero a pie',skirm:'Arquero a pie',ca:'Arquero a caballo',spear:'Infantería',maa:'Infantería',eagle:'Infantería',monk:'Monje',mangonel:'Asedio',ram:'Asedio',treb:'Asedio',bombard:'Asedio',hc:'Pólvora'};
 const ALLU=[
-  ...U.map(u=>({k:'@'+u.id,slug:u.id,n:u.n,en:u.en,grp:GRP_G[u.id],cls:u.cls,at:u.at,age:u.age,ageN:AGE_ORDER[u.age]||9,civ:'Genérica',gen:true,cost:u.cost,u})),
-  ...Object.entries(UUINFO).filter(([k])=>UUMETA[k]).map(([k,v])=>{const m=UUMETA[k]||{};const age=AGE_NAME[m.age]||'';return {k,slug:slugU(k),n:v.es,en:v.en,grp:CLSNAME[UCLS[k]]||'',cls:CLSNAME[UCLS[k]]||'',at:m.at||'',age,ageN:AGE_ORDER[age]||9,civ:v.civs.join(', '),gen:false,cost:'—'}})
+  ...U.map(u=>({k:'@'+u.id,slug:u.id,n:u.n,en:u.en,grp:GRP_G[u.id],cls:u.cls,at:u.at,age:u.age,ageN:AGE_ORDER[u.age]||9,civ:civOwners('units',u.en).map(c=>c.es).join(', '),gen:true,cost:u.cost,u})),
+  ...Object.entries(UUINFO).filter(([k])=>UUMETA[k]).map(([k,v])=>{const m=UUMETA[k]||{};const age=AGE_NAME[m.age]||'';return {k,slug:slugU(k),n:v.es,en:v.en,grp:CLSNAME[UCLS[k]]||'',cls:CLSNAME[UCLS[k]]||'',at:m.at||'',age,ageN:AGE_ORDER[age]||9,civ:civOwners('units',k).map(c=>c.es).join(', '),gen:false,cost:'—'}})
 ];
 const UNIT_BY_SLUG=Object.fromEntries(ALLU.map(x=>[x.slug,x]));
 const UNIT_BY_K=Object.fromEntries(ALLU.map(x=>[x.k,x]));
 const uniq=a=>[...new Set(a)].filter(Boolean).sort((x,y)=>x.localeCompare(y,'es'));
 const U_GRPS=uniq(ALLU.map(x=>x.grp));
 const U_ATS=uniq(ALLU.flatMap(x=>x.at.split(' o ')));
-const U_CIVS=uniq(ALLU.filter(x=>!x.gen).flatMap(x=>x.civ.split(', ')));
+const U_CIVS=uniq(CIVS.map(c=>c.es));
 function vUnidades(){
   const sel=(id,label,opts,cur,all)=>`<label for="${id}">${label}<select class="select" id="${id}"><option value="">${all}</option>${opts.map(o=>`<option${o===cur?' selected':''}>${o}</option>`).join('')}</select></label>`;
-  return `<section class="head"><div class="eyebrow">${ALLU.length} unidades</div><h2>Unidades</h2><p class="lede">Las ${U.length} unidades genéricas que comparten casi todas las civs y las ${ALLU.length-U.length} unidades únicas. Tocá una para ver su ficha: dónde se hace, desde qué edad, sus mejoras de línea y qué tecnologías la afectan.</p></section>
+  return `<section class="head"><div class="eyebrow">${ALLU.length} unidades</div><h2>Unidades</h2><p class="lede">Las ${U.length} unidades compartidas por distintas civilizaciones y las ${ALLU.length-U.length} unidades únicas. Filtrá por tu civilización y abrí una ficha para ver sus versiones y mejoras disponibles.</p></section>
   <div class="stack"><div class="ctl"><input class="input search" id="uq" type="search" placeholder="Buscar por nombre en español o inglés" value="${esc(ST.uq)}" aria-label="Buscar unidad">
   <div class="seg" role="group" aria-label="Qué unidades">${[['all','Todas'],['gen','Genéricas'],['uu','Únicas']].map(([v,l])=>`<button data-act="ukind" data-v="${v}" aria-pressed="${ST.ukind===v}">${l}</button>`).join('')}</div>
   <div class="seg" role="group" aria-label="Vista">${[['cards','Tarjetas'],['table','Tabla']].map(([v,l])=>`<button data-act="uview" data-v="${v}" aria-pressed="${ST.uview===v}">${l}</button>`).join('')}</div></div>
-  <div class="ufilters">${sel('ugrp','Tipo',U_GRPS,ST.ugrp,'Todos')}${sel('uat','Se hace en',U_ATS,ST.uat,'Cualquier edificio')}${sel('uage','Edad',['Feudal','Castillos','Imperial'],ST.uage,'Cualquier edad')}${sel('uciv','Civilización (únicas)',U_CIVS,ST.uciv,'Todas')}</div></div>
+  <div class="ufilters">${sel('ugrp','Tipo',U_GRPS,ST.ugrp,'Todos')}${sel('uat','Se hace en',U_ATS,ST.uat,'Cualquier edificio')}${sel('uage','Edad',['Feudal','Castillos','Imperial'],ST.uage,'Cualquier edad')}${sel('uciv','Civilización',U_CIVS,ST.uciv,'Todas')}</div></div>
   <div class="stack"><div class="row" style="justify-content:space-between"><span class="count" id="ucount"></span><button class="btn ghost" data-act="ureset">Limpiar filtros</button></div><div id="ulist"></div></div>
   <p class="fine">Dónde se entrena cada unidad única sale de los árboles tecnológicos de aoe2techtree.net. Las tecnologías de cada ficha son las generales de su tipo: algunas civs no tienen todas.</p>`;
 }
 function unitsList(){
   const q=fold(ST.uq.trim());
-  const by={n:x=>x.n,cls:x=>x.cls,at:x=>x.at,age:x=>x.ageN,civ:x=>x.gen?'':x.civ,cost:x=>x.cost,beats:x=>x.gen?x.u.beats.length+(x.u.vs?1:0):-1,loses:x=>x.gen?x.u.loses.length:-1};
+  const by={n:x=>x.n,cls:x=>x.cls,at:x=>x.at,age:x=>x.ageN,civ:x=>x.civ,cost:x=>x.cost,beats:x=>x.gen?x.u.beats.length+(x.u.vs?1:0):-1,loses:x=>x.gen?x.u.loses.length:-1};
   const f=by[ST.us]||by.n;
   return ALLU.filter(x=>(ST.ukind==='all'||(ST.ukind==='gen')===x.gen)&&(!ST.ugrp||x.grp===ST.ugrp)&&(!ST.uat||x.at.split(' o ').includes(ST.uat))&&(!ST.uage||x.age===ST.uage)&&(!ST.uciv||x.civ.split(', ').includes(ST.uciv))&&(!q||searchText(x.n+' '+x.en+' '+x.civ+' '+x.cls+' '+x.at).includes(q)))
     .sort((a,b)=>{const va=f(a),vb=f(b);const r=typeof va==='string'?displayCompare(va,vb):va-vb;return r*ST.ud||displayCompare(a.n,b.n)});
@@ -793,15 +794,15 @@ function paintUnits(){
   if(ST.uview==='table'){
     const gen=ST.ukind==='gen',h=(l,k)=>sortTh(l,k,ST.us,ST.ud,'usort');
     box.className='scroll panel';box.style.padding='4px 8px';
-    box.innerHTML=`<table class="utable rtable" id="${gen?'utable-gen':'utable'}"><thead><tr>${h('Unidad','n')}${h('Tipo','cls')}${h('Se hace en','at')}${h('Edad','age')}${gen?h('Costo','cost')+h('Le gana a','beats')+h('Pierde contra','loses'):h('Civilización','civ')}</tr></thead><tbody>${list.map(x=>`<tr><td><span>${uimg(x.k,'s',x.n)}<button class="linkbtn" data-act="unit" data-k="${esc(x.k)}">${x.n}</button></span></td><td>${x.cls}</td><td>${x.at}</td><td>${x.age}</td>${gen?`<td>${x.cost}</td><td>${beatsText(x.u)}</td><td>${x.u.loses.map(i=>ub[i].n).join(', ')}</td>`:`<td>${x.gen?'<span class="tag">Genérica</span>':x.civ}</td>`}</tr>`).join('')}</tbody></table>`;
+    box.innerHTML=`<table class="utable rtable" id="${gen?'utable-gen':'utable'}"><thead><tr>${h('Unidad','n')}${h('Tipo','cls')}${h('Se hace en','at')}${h('Edad','age')}${h('Civilizaciones','civ')}${gen?h('Costo','cost')+h('Le gana a','beats')+h('Pierde contra','loses'):''}</tr></thead><tbody>${list.map(x=>`<tr><td><span>${uimg(x.k,'s',x.n)}<button class="linkbtn" data-act="unit" data-k="${esc(x.k)}">${x.n}</button></span></td><td>${x.cls}</td><td>${x.at}</td><td>${x.age}</td><td>${x.gen?accessSummary('units',x.en):x.civ}</td>${gen?`<td>${x.cost}</td><td>${beatsText(x.u)}</td><td>${x.u.loses.map(i=>ub[i].n).join(', ')}</td>`:''}</tr>`).join('')}</tbody></table>`;
     rz(box.querySelector('table'));
   }else{
     box.className='ugrid';box.style.padding='';
-    box.innerHTML=list.map(x=>`<button class="unitcard" data-act="unit" data-k="${esc(x.k)}">${uimg(x.k,'',x.n)}<span><b>${x.n}</b><small>${x.en}</small><small>${[x.cls,x.at,x.age].filter(Boolean).join(' · ')}</small><span class="tag${x.gen?' gen':''}">${x.gen?'Genérica':x.civ}</span></span></button>`).join('');
+    box.innerHTML=list.map(x=>`<button class="unitcard" data-act="unit" data-k="${esc(x.k)}">${uimg(x.k,'',x.n)}<span><b>${x.n}</b><small>${x.en}</small><small>${[x.cls,x.at,x.age].filter(Boolean).join(' · ')}</small><span class="tag${x.gen?' gen':''}">${x.gen?accessSummary('units',x.en):x.civ}</span></span></button>`).join('');
   }
 }
 function respond(){const s={};[...ST.enemy].forEach(id=>{const e=ub[id];e.loses.forEach((c,i)=>{s[c]=s[c]||{p:0,vs:[]};s[c].p+=3-i>0?3-i:1;s[c].vs.push(e.n)})});[...ST.enemy].forEach(id=>{const e=ub[id];(e.beats||[]).forEach(c=>{if(s[c])s[c].p-=2})});return Object.entries(s).sort((a,b)=>b[1].p-a[1].p).slice(0,3)}
-function paintResp(){const r=$('#resp');if(!r)return;if(!ST.enemy.size){r.innerHTML='<p class="count">Elegí al menos una unidad rival.</p>';return}r.innerHTML=respond().map(([id,v],i)=>{const u=ub[id];return `<div class="rrow"><span class="rank">${i+1}</span>${gimg(u.id)}<div><b>${u.n}</b> <span class="count">${u.en} · ${u.cls} · ${u.at} · ${u.age} · ${u.cost}</span><div>Sirve contra: ${v.vs.join(', ')}.</div><div class="count">${u.why}</div></div></div>`}).join('')}
+function paintResp(){const r=$('#resp');if(!r)return;if(!ST.enemy.size){r.innerHTML='<p class="count">Elegí al menos una unidad rival.</p>';return}r.innerHTML=respond().map(([id,v],i)=>{const u=ub[id];return `<div class="rrow"><span class="rank">${i+1}</span>${gimg(u.id)}<div><b>${u.n}</b> <span class="count">${u.en} · ${u.cls} · ${u.at} · ${u.age} · ${u.cost}</span><div class="count">${accessSummary('units',u.en)}</div><div>Sirve contra: ${v.vs.join(', ')}.</div><div class="count">${u.why}</div></div></div>`}).join('')}
 
 /* ---------- Mapas ---------- */
 function vMapas(){return `<section class="head"><div class="eyebrow">Mapas</div><h2>El mapa decide la apertura</h2><p class="lede">El pool ranked rota: revisalo en el juego. Estos tipos cubren casi todo lo que vas a encontrar.</p></section>
