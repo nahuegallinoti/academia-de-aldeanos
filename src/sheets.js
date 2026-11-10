@@ -61,20 +61,50 @@ function lineHtml(nodes,sel){
 function techGroupsHtml(groups){
   if(!groups||!groups.length)return '';
   return `<div class="tgroups">${groups.map(([bid,list])=>{const b=BLD_BY_ID[bid];const items=list.filter(t=>SD.techs[t]);if(!items.length)return '';
-    return `<div class="tg"><div class="tg-head">${bldIcon(bid)?`<img src="${bldIcon(bid)}" alt="" width="28" height="28">`:''}<b>${b?b.n:''}</b></div><div class="tg-grid">${items.map(techCard).join('')}</div></div>`}).join('')}</div>`;
+    return `<div class="tg"><button class="tg-head link" data-bld="${bid}">${bldIcon(bid)?`<img src="${bldIcon(bid)}" alt="" width="28" height="28">`:''}<b>${b?b.n:''}</b><i class="go" aria-hidden="true">›</i></button><div class="tg-grid">${items.map(techCard).join('')}</div></div>`}).join('')}</div>`;
 }
-function techCard(en){const t=SD.techs[en]||{es:en};return `<div class="tc">${tIcon(en)?`<img src="${tIcon(en)}" alt="" width="40" height="40">`:'<span class="tc-ph"></span>'}<div><b>${t.es}</b>${TFX[en]?`<small>${TFX[en]}</small>`:''}<span class="tc-age">${AGE_BLD[t.age]||''}</span></div></div>`}
+function techCard(en){const t=SD.techs[en]||{es:en};return `<div class="tc">${tIcon(en)?`<img src="${tIcon(en)}" alt="" width="40" height="40">`:'<span class="tc-ph"></span>'}<div><b>${t.es}</b>${TFX[en]?`<small>${TFX[en]}</small>`:''}${t.age?`<button class="tc-age link" data-age="${t.age}">${AGE_BLD[t.age]}</button>`:''}</div></div>`}
 function vsTiles(ids,cls){return ids.map(i=>{const u=ub[i];if(!u)return '';return `<button class="vs-tile ${cls}" data-act="unit" data-k="@${i}">${ICONS['@'+i]?`<img src="${ICONS['@'+i]}" alt="" width="40" height="40">`:''}<span>${u.n}</span></button>`}).join('')}
 let SHEET={nodes:[],sel:0};
-function sheetOpen(html){
-  const dlg=$('#zoom');$('#zoombody').innerHTML=html;
+/* Historial dentro del diálogo: cada ficha que se abre desde otra se apila y se puede volver */
+let SHIST=[],SBACK=false;
+function sheetOpen(html,entry){
+  const dlg=$('#zoom');
+  if(!dlg.open)SHIST=[];
+  if(SBACK)SBACK=false;else if(entry)SHIST.push(entry);
+  const prev=SHIST.length>1?SHIST[SHIST.length-2]:null;
+  $('#zoombody').innerHTML=(prev?`<button class="sh-backnav" data-sh-back>← Volver a ${prev.label}</button>`:'')+html;
   if(dlg.showModal){if(!dlg.open)dlg.showModal()}else dlg.setAttribute('open','');
   dlg.scrollTop=0;
 }
-function heroHtml({img,color,kicker,title,sub,tags}){
-  return `<div class="sh-hero" style="--tc:var(--t-${color||'def'})"><div class="sh-portrait">${img?`<img src="${img}" alt="" width="48" height="48">`:''}</div><div class="sh-title"><div class="sh-kicker">${kicker}</div><h2>${title}</h2>${sub?`<small>${sub}</small>`:''}<div class="sh-tags">${tags}</div></div></div>`;
+/* Edades: costo del avance, requisitos y qué habilita cada una */
+const AGEINFO={
+  1:{n:'Edad Oscura',num:'I',cost:null,time:null,req:'Es la edad con la que empieza la partida.',d:'Juntás comida y madera, explorás el mapa y preparás el avance. Solo hay milicia, exploradores y defensas básicas.'},
+  2:{n:'Edad Feudal',num:'II',cost:{Food:500},time:130,req:'2 edificios de la Edad Oscura, por ejemplo cuartel, molino, campamento maderero o minero.',d:'Llegan los arqueros, los establos y la herrería. Empiezan las peleas de verdad y la transición a granjas.'},
+  3:{n:'Edad de los Castillos',num:'III',cost:{Food:800,Gold:200},time:160,req:'2 edificios de la Edad Feudal, por ejemplo herrería, mercado, campo de arqueros o establo.',d:'Caballeros, monjes, asedio, castillos y unidades únicas. Es el momento de elegir entre boom o presión.'},
+  4:{n:'Edad Imperial',num:'IV',cost:{Food:1000,Gold:800},time:190,req:'2 edificios de la Edad de los Castillos (universidad, monasterio o taller de asedio) o un castillo.',d:'Las mejoras finales de todas las líneas, trabuquetes y pólvora. Las partidas largas se deciden acá.'}
+};
+function ageOpen(a){
+  a=+a;const A=AGEINFO[a];if(!A)return;
+  const blds=BLD_LIST.filter(b=>b.age===a&&!b.civs.length);
+  const seen=new Set(),units=[];
+  BLD_LIST.filter(b=>!b.civs.length).forEach(b=>b.units.filter(u=>u.all&&u.age===a).forEach(u=>{if(!seen.has(u.en)){seen.add(u.en);units.push([u,b.id])}}));
+  const tgroups=BLD_LIST.filter(b=>!b.civs.length).map(b=>[b.id,b.techs.filter(t=>t.all&&t.age===a).map(t=>t.en)]).filter(g=>g[1].length);
+  const nav=`<div class="age-nav">${a>1?`<button class="btn ghost" data-age="${a-1}">← ${AGEINFO[a-1].n}</button>`:'<span></span>'}${a<4?`<button class="btn ghost" data-age="${a+1}">${AGEINFO[a+1].n} →</button>`:''}</div>`;
+  sheetOpen(heroHtml({glyph:A.num,color:'def',kicker:'Edad '+a+' de 4',title:A.n,
+    tags:(A.cost?`<span class="sh-tag"><span><small>Costo del avance</small><span class="costs">${costChips(A.cost)}</span></span></span>`:'')+(A.time?tag('Investigación',A.time+' s'):'')+tag('Se investiga en','Centro Urbano',bldIcon(109)?`<img src="${bldIcon(109)}" alt="" width="28" height="28">`:'','data-bld="109"')})
+  +`<p class="sh-lede">${A.d}</p>
+  <div class="callout sh-tip"><b>Requisito</b><span>${A.req}</span></div>
+  ${blds.length?`<section class="sh-block"><h3>Edificios que se habilitan <span class="sh-count">${blds.length}</span></h3><div class="ptiles">${blds.map(b=>`<button class="ptile" data-bld="${b.id}">${BICON['b'+b.pic]?`<img src="${BICON['b'+b.pic]}" alt="" width="48" height="48">`:''}<b>${b.n}</b></button>`).join('')}</div></section>`:''}
+  ${units.length?`<section class="sh-block"><h3>Unidades que se habilitan <span class="sh-count">${units.length}</span></h3><div class="ptiles">${units.map(([u,bid])=>unitTile(u,bid)).join('')}</div></section>`:''}
+  ${tgroups.length?`<section class="sh-block"><h3>Tecnologías que se habilitan <span class="sh-count">${tgroups.reduce((s,g)=>s+g[1].length,0)}</span></h3>${techGroupsHtml(tgroups)}</section>`:''}
+  ${nav}`,{label:A.n,fn:()=>ageOpen(a)});
 }
-const tag=(label,val,icon)=>val?`<span class="sh-tag">${icon||''}<span><small>${label}</small><b>${val}</b></span></span>`:'';
+
+function heroHtml({img,glyph,color,kicker,title,sub,tags}){
+  return `<div class="sh-hero" style="--tc:var(--t-${color||'def'})"><div class="sh-portrait">${img?`<img src="${img}" alt="" width="48" height="48">`:''}${glyph?`<span class="sh-glyph">${glyph}</span>`:''}</div><div class="sh-title"><div class="sh-kicker">${kicker}</div><h2>${title}</h2>${sub?`<small>${sub}</small>`:''}<div class="sh-tags">${tags}</div></div></div>`;
+}
+const tag=(label,val,icon,attrs)=>{if(!val)return '';const el=attrs?'button':'span';return `<${el} class="sh-tag${attrs?' link':''}" ${attrs||''}>${icon||''}<span><small>${label}</small><b>${val}</b></span>${attrs?'<i class="go" aria-hidden="true">›</i>':''}</${el}>`};
 function zoomOpen(k){
   const dlg=$('#zoom');if(!dlg)return;ST.unit=k;
   let h;
@@ -83,7 +113,7 @@ function zoomOpen(k){
     SHEET={nodes,sel};
     const atId={'Establo':B_EST,'Cuartel':B_CUA,'Campo de arqueros':B_ARQ,'Monasterio':B_MON,'Taller de asedio':49,'Castillo':B_CAS}[u.at];
     h=heroHtml({img:ICONS[k],color:CLS_COLOR[cls],kicker:'Unidad genérica · '+u.cls,title:u.n,sub:u.en,
-      tags:tag('Se hace en',u.at,atId&&bldIcon(atId)?`<img src="${bldIcon(atId)}" alt="" width="28" height="28">`:'')+tag('Desde',u.age,ageDots(AGE_ORDER[u.age]+1))+`<span class="sh-tag"><span><small>Costo</small><span class="costs">${costChips((SD.units[nodes[0][0]]||{}).cost)}</span></span></span>`})
+      tags:tag('Se hace en',u.at,atId&&bldIcon(atId)?`<img src="${bldIcon(atId)}" alt="" width="28" height="28">`:'',atId?`data-bld="${atId}"`:'')+tag('Desde',u.age,ageDots(AGE_ORDER[u.age]+1),`data-age="${AGE_ORDER[u.age]+1}"`)+`<span class="sh-tag"><span><small>Costo</small><span class="costs">${costChips((SD.units[nodes[0][0]]||{}).cost)}</span></span></span>`})
     +`<p class="sh-lede">${u.why}</p>
     <section class="sh-block"><h3>Línea de mejoras</h3>${lineHtml(nodes,sel)}</section>
     <section class="sh-block"><h3>Estadísticas base <span class="sh-sel" id="shsel">${nodes[sel][1]}</span></h3><div id="shstats">${statsHtml(nodes[sel][0])}</div><p class="fine">Valores base, sin mejoras de herrería ni bonos de civilización.</p></section>
@@ -98,14 +128,14 @@ function zoomOpen(k){
     const uts=owners.flatMap(c=>c.ut.filter(t=>low(t[2]).includes(low(k))||low(t[2]).includes(low(u.es))).map(t=>[c,t]));
     const atFirst=(m.at||'').split(' o ')[0];const atId={'Castillo':B_CAS,'Cuartel':B_CUA,'Campo de arqueros':B_ARQ,'Establo':B_EST,'Muelle':B_MUE,'Monasterio':B_MON,'Taller de asedio':49,'Iglesia fortificada':1806,'Krepost':1251,'Donjon':1665}[atFirst];
     h=heroHtml({img:ICONS[k],color:CLS_COLOR[cls],kicker:'Unidad única · '+(CLSNAME[cls]||''),title:u.es,sub:u.en,
-      tags:tag('Se hace en',m.at,atId&&bldIcon(atId)?`<img src="${bldIcon(atId)}" alt="" width="28" height="28">`:'')+tag('Desde',AGE_NAME[m.age],ageDots(m.age))+`<span class="sh-tag"><span><small>${owners.length>1?'Civilizaciones':'Civilización'}</small><span class="sh-civs">${owners.map(c=>`<a href="#civ-${c.id}" data-act="zoom-close">${shield(c)}${c.es}</a>`).join('')}</span></span></span>`})
+      tags:tag('Se hace en',m.at,atId&&bldIcon(atId)?`<img src="${bldIcon(atId)}" alt="" width="28" height="28">`:'',atId?`data-bld="${atId}"`:'')+tag('Desde',AGE_NAME[m.age],ageDots(m.age),m.age?`data-age="${m.age}"`:'')+`<span class="sh-tag"><span><small>${owners.length>1?'Civilizaciones':'Civilización'}</small><span class="sh-civs">${owners.map(c=>`<a href="#civ-${c.id}" data-act="zoom-close">${shield(c)}${c.es}</a>`).join('')}</span></span></span>`})
     +`<p class="sh-lede">${u.d}</p>
     ${nodes.length>1?`<section class="sh-block"><h3>Versiones</h3>${lineHtml(nodes,0)}</section>`:''}
     <section class="sh-block"><h3>Estadísticas base <span class="sh-sel" id="shsel">${nodes[0][1]}</span></h3><div id="shstats">${statsHtml(nodes[0][0])}</div><p class="fine">Valores base, sin mejoras de herrería ni bonos de civilización.</p></section>
     ${uts.length?`<section class="sh-block"><h3>Tecnologías únicas que la afectan</h3><div class="tg-grid">${uts.map(([c,t])=>`<div class="tc ut">${shield(c)}<div><b>${t[0]}</b><small>${t[2]}</small><span class="tc-age">${t[1]}</span></div></div>`).join('')}</div></section>`:''}
     <section class="sh-block"><h3>Tecnologías generales que la mejoran</h3>${techGroupsHtml(TG[cls])}<p class="fine">Son las mejoras de su tipo de unidad. Algunas civs no tienen todas: confirmalo en el árbol tecnológico del juego.</p></section>`;
   }
-  sheetOpen(h);
+  sheetOpen(h,{label:k.startsWith('@')?ub[k.slice(1)].n:(UUINFO[k]||{es:k}).es,fn:()=>zoomOpen(k)});
   const x=UNIT_BY_K[k];if(x&&ST.route==='unidades'){try{history.replaceState(null,'','#unidad-'+x.slug)}catch(e){}}
 }
 /* Ficha de cualquier unidad por su nombre en inglés (unidades que aparecen en los edificios) */
@@ -113,11 +143,13 @@ function unitSheetEn(en,backBld){
   const u=SD.units[en];if(!u)return;
   const b=BLD_BY_ID[backBld];
   SHEET={nodes:[[en,u.es]],sel:0};
-  sheetOpen(heroHtml({img:sIcon(en),color:'def',kicker:'Unidad',title:u.es,sub:en,tags:tag('Se hace en',b?b.n:'',b&&bldIcon(b.id)?`<img src="${bldIcon(b.id)}" alt="" width="28" height="28">`:'')+tag('Desde',AGE_BLD[u.age],ageDots(u.age))})
+  sheetOpen(heroHtml({img:sIcon(en),color:'def',kicker:'Unidad',title:u.es,sub:en,tags:tag('Se hace en',b?b.n:'',b&&bldIcon(b.id)?`<img src="${bldIcon(b.id)}" alt="" width="28" height="28">`:'',b?`data-bld="${b.id}"`:'')+tag('Desde',AGE_BLD[u.age],ageDots(u.age),`data-age="${u.age}"`)})
     +`<section class="sh-block"><h3>Estadísticas base</h3>${statsHtml(en)}<p class="fine">Valores base, sin mejoras de herrería ni bonos de civilización.</p></section>`
-    +(b?`<p class="sh-back"><button class="btn ghost" data-bld="${b.id}">← Volver a ${b.n}</button></p>`:''));
+    ,{label:u.es,fn:()=>unitSheetEn(en,backBld)});
 }
 document.addEventListener('click',e=>{
   const n=e.target.closest('.ln-node');if(n){const i=+n.dataset.ln;SHEET.sel=i;$$('.ln-node').forEach(x=>x.setAttribute('aria-selected',+x.dataset.ln===i));const s=$('#shstats');if(s)s.innerHTML=statsHtml(SHEET.nodes[i][0]);const l=$('#shsel');if(l)l.textContent=SHEET.nodes[i][1];return}
   const ue=e.target.closest('[data-unit-en]');if(ue){unitSheetEn(ue.dataset.unitEn,+ue.dataset.from);return}
+  const ag=e.target.closest('[data-age]');if(ag){e.preventDefault();ageOpen(ag.dataset.age);return}
+  const bk=e.target.closest('[data-sh-back]');if(bk){SHIST.pop();const p=SHIST[SHIST.length-1];if(p){SBACK=true;p.fn()}return}
 });

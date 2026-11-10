@@ -89,10 +89,10 @@ function bOpen(id){
   const b=BLD_BY_ID[id],dlg=$('#zoom');if(!b||!dlg)return;ST.bLast=id;ST.unit=null;
   const gu=b.units.filter(u=>u.all),ou=b.units.filter(u=>!u.all);
   const gt=b.techs.filter(t=>t.all),ot=b.techs.filter(t=>!t.all);
-  const techsByAge=ts=>[1,2,3,4].map(a=>{const l=ts.filter(t=>t.age===a);return l.length?`<div class="tg"><div class="tg-head">${ageDots(a)}<b>${AGE_BLD[a]}</b></div><div class="tg-grid">${l.map(t=>techCard(t.en)).join('')}</div></div>`:''}).join('');
+  const techsByAge=ts=>[1,2,3,4].map(a=>{const l=ts.filter(t=>t.age===a);return l.length?`<div class="tg"><button class="tg-head link" data-age="${a}">${ageDots(a)}<b>${AGE_BLD[a]}</b><i class="go" aria-hidden="true">›</i></button><div class="tg-grid">${l.map(t=>techCard(t.en)).join('')}</div></div>`:''}).join('');
   const bars=[['Vida',b.hp,5000,b.hp],['Construcción',b.time,200,b.time?b.time+' s':''],['Guarnición',b.garrison,20,b.garrison||'']].filter(x=>x[1]);
   sheetOpen(heroHtml({img:BICON['b'+b.pic],color:'def',kicker:'Edificio · '+(BCAT.find(c=>c[0]===b.cat)||['',''])[1],title:b.n,sub:`En el juego: ${b.game} · ${b.en}`,
-    tags:tag('Desde',AGE_BLD[b.age],ageDots(b.age))+`<span class="sh-tag"><span><small>Costo</small><span class="costs">${costChips(b.cost)}</span></span></span>`})
+    tags:tag('Desde',AGE_BLD[b.age],ageDots(b.age),`data-age="${b.age}"`)+`<span class="sh-tag"><span><small>Costo</small><span class="costs">${costChips(b.cost)}</span></span></span>`})
   +`<p class="sh-lede">${b.r}</p>
   ${bars.length?`<section class="sh-block"><div class="sh-stats">${bars.map(([l,v,max,txt])=>`<div class="st"><span>${l}</span><div class="bar" aria-hidden="true"><i style="width:${Math.min(100,v/max*100)}%"></i></div><b>${txt}</b></div>`).join('')}</div></section>`:''}
   <div class="callout sh-tip"><b>Consejo</b><span>${b.t}</span></div>
@@ -101,7 +101,7 @@ function bOpen(id){
   ${ou.length?`<details class="sh-block sh-more"><summary>Unidades de algunas civs <span>${ou.length}</span></summary><div class="ptiles">${ou.map(u=>unitTile(u,b.id)).join('')}</div></details>`:''}
   ${b.id===82?`<p class="fine">Además, cada civ entrena acá su unidad única e investiga sus dos tecnologías únicas. Miralas en la ficha de tu civ.</p>`:''}
   ${gt.length?`<section class="sh-block"><h3>Qué investiga</h3><div class="tgroups">${techsByAge(gt)}</div></section>`:''}
-  ${ot.length?`<details class="sh-block sh-more"><summary>Tecnologías de algunas civs <span>${ot.length}</span></summary><div class="tgroups">${techsByAge(ot)}</div></details>`:''}`);
+  ${ot.length?`<details class="sh-block sh-more"><summary>Tecnologías de algunas civs <span>${ot.length}</span></summary><div class="tgroups">${techsByAge(ot)}</div></details>`:''}`,{label:b.n,fn:()=>bOpen(id)});
   if(ST.route==='edificios'){try{history.replaceState(null,'','#edificio-'+b.slug)}catch(e){}}
 }
 /* La ficha de unidad y la de edificio comparten el diálogo: el botón de copiar enlace sigue a la ficha abierta. */

@@ -81,6 +81,25 @@ details.sh-more summary{cursor:pointer;font-weight:700;font-size:14px;display:fl
 details.sh-more summary span{font-size:12px;color:var(--muted);background:var(--sunken);border-radius:999px;padding:1px 8px}
 .sh-tip{margin-top:16px}
 .sh-back{margin-top:16px}
+
+/* Navegación dentro de las fichas */
+button.sh-tag{font:inherit;color:inherit;text-align:left;cursor:pointer}
+.sh-tag.link:hover{border-color:var(--acc-hi);background:var(--acc-soft)}
+.sh-tag .go,.tg-head .go{font-style:normal;font-size:18px;line-height:1;color:var(--muted);margin-left:2px}
+.sh-tag.link:hover .go,.tg-head.link:hover .go{color:var(--acc)}
+.tg-head.link{width:100%;border:0;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.tg-head.link .go{margin-left:auto}
+.tg-head.link:hover{background:var(--hover)}
+button.tc-age{border:0;background:none;padding:0;font:inherit;font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--acc);cursor:pointer;margin-top:4px;display:inline-block}
+button.tc-age:hover{text-decoration:underline}
+.sh-backnav{border:0;background:none;padding:4px 0;font:inherit;font-weight:700;font-size:14px;color:var(--acc);cursor:pointer;margin:-6px 0 12px}
+.sh-backnav:hover{text-decoration:underline}
+.sh-glyph{font-family:var(--display);font-weight:900;font-size:46px;font-stretch:120%;color:var(--acc-hi);line-height:1}
+.sh-count{font-family:var(--body);text-transform:none;letter-spacing:0;font-size:12px;font-weight:700;color:var(--muted);background:var(--sunken);border-radius:999px;padding:1px 9px}
+.age-nav{display:flex;justify-content:space-between;gap:10px;margin-top:22px;flex-wrap:wrap}
+/* La línea de mejoras va siempre en una fila */
+.sh-line{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px}
+.ln-node{flex:1 1 0;min-width:96px}
 @media (max-width:560px){
   .sh-hero{grid-template-columns:76px minmax(0,1fr);gap:12px;padding:12px}
   .sh-portrait{width:76px;height:76px;border-width:2px}
