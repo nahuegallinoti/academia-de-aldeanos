@@ -470,7 +470,6 @@ details.us-sec[open] summary{margin-bottom:8px}
 .navg.cur .navbtn::after{content:"";position:absolute;left:10px;right:10px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--acc-hi)}
 /* El panel nace debajo de la flecha: su esquina queda junto a ella y una pestañita la señala */
 .nav .navpanel{display:grid;visibility:hidden;opacity:0;transform:translateY(-6px);transition:opacity .14s,transform .14s,visibility 0s .14s;position:absolute;top:calc(100% + 10px);left:calc(100% - 44px);width:300px;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:12px;box-shadow:0 18px 44px rgba(0,0,0,.32);padding:8px;z-index:40;gap:2px}
-.navg:last-child .navpanel{left:auto;right:0}
 .nav .navpanel::before{content:"";position:absolute;left:0;right:0;top:-14px;height:14px}
 .navg::before{content:"";position:absolute;right:11px;top:calc(100% + 4px);width:12px;height:12px;background:var(--surface);border-left:1px solid var(--rule);border-top:1px solid var(--rule);transform:rotate(45deg);z-index:41;visibility:hidden;opacity:0;transition:opacity .14s,visibility 0s .14s}
 .navg.open .navpanel,.navg.open::before{visibility:visible;opacity:1;transform:none;transition:opacity .14s,transform .14s}
